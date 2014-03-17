@@ -71,9 +71,10 @@ margin-top: 60px !important}
 
 
 /* player */
+.main-wrap {padding-left: 220px !important; padding-right: 350px !important}
 .ui-album-cover {display:none !important}
-.main-outher {width: 300px !important}
-.ui-player-lrc {top: 50px !important; width: 300px !important}
+.main-outher {width: 350px !important; padding-right: 5px !important}
+.ui-player-lrc {top: 50px !important; width: 350px !important}
 .ui-player-lrc ul li 
 {-webkit-transition-timing-function: ease !important; 
  -moz-transition-timing-function: ease !important; 
