@@ -27,6 +27,8 @@
 #hot_events_show,
 #artist_fangroup_block
 {display:none  !important;}
+li.do_share a span {display:block !important}
+li.do_share span {display:none}
 
 #main_wrapper {margin-left: 30px !important;}
 #title {padding: 20px 0 10px 30px !important;}
@@ -62,7 +64,6 @@ width: 300px !important;
 margin-right: -320px !important;
 margin-top: 60px !important}
 
-/*li.do_share span {display:none !important} */
 
 #relate_song  
 {position: relative ; top:300px !important}

@@ -15,6 +15,10 @@
       "css":        ["xiaMini.css"]
    },
    {
+      "matches":    ["http://www.xiami.com/fresh*"],
+      "css":        ["xiaMini.css"]
+   },
+   {
       "matches":    ["http://www.xiami.com/album/*"],
       "css":        ["xiaMini-album.css"]
    },
