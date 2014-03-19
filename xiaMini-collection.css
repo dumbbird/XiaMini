@@ -1,0 +1,89 @@
+
+/* main page */
+#slider,
+#recommend, 
+#albums,
+#task,
+#pyramid,
+#friend,
+#scene,
+#sidebutton,
+.athena-main-button,
+.sns,
+.copyright,
+.cooperation
+{display:none  !important;}
+
+#timeline .action .new {border-color:#f60 !important; background-color:#f60 !important;}
+#timeline .action .new:hover{background-color:#f60 !important;}
+/*.primary .account a sup {background-color:#3399FF !important; border-color:white !important;}*/
+
+
+/* album and single page */
+#nav,
+.adm_block.mgt20,
+#song_fans_block,
+#song_tags_block,
+#hot_events_show,
+#artist_fangroup_block
+{display:none  !important;}
+li.do_share a span {display:block !important}
+li.do_share span {display:none}
+
+#main_wrapper {margin-left: 30px !important;}
+#title {padding: 20px 0 10px 30px !important;}
+
+/* album page */
+#album_info {min-height: 250px !important;}
+#album_rank {float: left !important;}
+#album_info table {float:right !important; width: 250px; padding: 5px !important }
+#album_info ul {float:left !important; padding: 10px !important}
+#album_cover p.grade {margin: -45px 0 0 250px !important; z-index:2 !important; position: relative; overflow: auto !important}
+
+td.song_name {width: 300px !important; word-break: break-word !important}
+#lrc {font-size:12.5px !important}
+.lrc_main {line-height:1.6 !important}
+
+/* Single Page Case 1 */
+#song_block .album_relation 
+{float: left !important;
+position: relative;
+width: 100% !important;
+padding-top: 9px !important; 
+}
+
+/* table#albums_info {float: right !important; position: relative !important; margin: -180px 250px 0 5px !important}*/
+/* table#albums_info {font-size:12.5px !important} */
+table#albums_info div {width:600px !important}
+table#albums_info .item {width:70px !important}
+ 
+#song_contents
+{float: right !important;
+position: relative !important;
+width: 300px !important;
+margin-right: -320px !important;
+margin-top: 60px !important}
+
+
+#relate_song  
+{position: relative ; top:300px !important}
+
+/* Single Page Case 2 */
+
+
+/* player */
+.main-wrap {padding-left: 220px !important; padding-right: 350px !important}
+.ui-album-cover {display:none !important}
+.main-outher {width: 350px !important; padding-right: 5px !important}
+.ui-player-lrc {top: 50px !important; width: 350px !important}
+.ui-player-lrc ul li 
+{-webkit-transition-timing-function: ease !important; 
+ -moz-transition-timing-function: ease !important; 
+ -o-transition-timing-function: ease !important; 
+ -ms-transition-timing-function: ease !important; 
+ transition-timing-function:ease !important; 
+ transition-duration: .5s !important; 
+ -moz-transition-duration: .5s !important; 
+ -webkit-transition-duration: .5s !important; 
+ -o-transition-duration: .5s !important}
+

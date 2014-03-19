@@ -2,34 +2,24 @@
   "manifest_version": 2,
   "name": "Xiami Mini",
   "description": "Xiami Mini",
-  "version": "1.0",
+  "version": "1.3",
   "icons": { "16": "xiami.png",
            "48": "xiami.png",
           "128": "xiami.png" },
+  "background":{
+    "scripts": ["background.js"],
+	"persistent": true
+  },  
   "browser_action": {
-    "default_icon": "xiami.png"
+    "default_icon": "xiami.png",
+	 "default_title": "XiaMini",      
+     "default_popup": "popup.html"   
   },
-  "content_scripts": [
-   {
-      "matches":    ["http://www.xiami.com/"],
-      "css":        ["xiaMini.css"]
-   },
-   {
-      "matches":    ["http://www.xiami.com/fresh*"],
-      "css":        ["xiaMini.css"]
-   },
-   {
-      "matches":    ["http://www.xiami.com/album/*"],
-      "css":        ["xiaMini-album.css"]
-   },
-   {
-      "matches":    ["http://www.xiami.com/song/*"],
-      "css":        ["xiaMini.css"]
-   },
-   {
-      "matches":    ["http://www.xiami.com/play*"],
-      "css":        ["xiaMini.css"]
-   }
+  "permissions": [
+	"storage", "tabs", "http://www.xiami.com/*"
+  ],
+  "web_accessible_resources": [
+    "xiaMini.css", "xiaMini-album.css", "xiaMini-collection.css", "xiaMini-guess.css"
   ]
 }
 
