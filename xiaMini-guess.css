@@ -31,7 +31,7 @@ li.do_share a span {display:block !important}
 li.do_share span {display:none}
 
 #main_wrapper {margin-left: 30px !important;}
-#title {padding: 20px 0 10px 30px !important;}
+#wrapper div#title {padding: 20px 0 10px 30px !important;}
 
 /* album page */
 #album_info {min-height: 250px !important;}
@@ -73,8 +73,11 @@ margin-top: 60px !important}
 
 /* player */
 .main-wrap {padding-left: 220px !important; padding-right: 350px !important}
-.ui-album-cover {display:none !important}
+.ui-album-cover {padding-top: 130px !important; margin-left: -950px !important}
+.collect-outer {padding-top:195px !important}
+.collect-list {top: 350px !important}
 .main-outher {width: 350px !important; padding-right: 5px !important}
+.menu-outer {border-bottom: 0px !important}
 .ui-player-lrc {top: 50px !important; width: 350px !important}
 .ui-player-lrc ul li 
 {-webkit-transition-timing-function: ease !important; 
