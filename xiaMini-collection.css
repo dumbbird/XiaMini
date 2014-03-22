@@ -9,6 +9,7 @@
 #scene,
 #sidebutton,
 .athena-main-button,
+.athena-tip,
 .sns,
 .copyright,
 .cooperation
@@ -73,11 +74,13 @@ margin-top: 60px !important}
 
 /* player */
 .main-wrap {padding-left: 220px !important; padding-right: 350px !important}
-.ui-album-cover {padding-top: 130px !important; margin-left: -950px !important}
+.ui-album-cover {position:fixed !important; top: 160px !important; left: -30px !important}
 .collect-outer {padding-top:195px !important}
 .collect-list {top: 350px !important}
 .main-outher {width: 350px !important; padding-right: 5px !important}
 .menu-outer {border-bottom: 0px !important}
+.seiya-chatroom {min-width:930px !important; width:930px !important}
+.seiya-chatroom .col-main {right: 0px !important}
 .ui-player-lrc {top: 50px !important; width: 350px !important}
 .ui-player-lrc ul li 
 {-webkit-transition-timing-function: ease !important; 
