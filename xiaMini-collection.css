@@ -16,7 +16,14 @@
 .athena-tip,
 .sns,
 .copyright,
-.cooperation
+.cooperation,
+#popup_60d_mini,
+#popup_60d_content,
+#popup_60d_mask,
+#J_playerHQ-tip,
+#search_60d,
+#tip_60d,
+#popup_music_taobao
 {display:none  !important;}
 
 #timeline .action .new {border-color:#f60 !important; background-color:#f60 !important;}
@@ -73,27 +80,48 @@ margin-top: 60px !important}
 #relate_song  
 {position: relative ; top:300px !important}
 
-/* Single Page Case 2 */
-
+/* Lyrics Edit Page */
+.set_sec .album_relation {display:none !important;}
 
 /* player */
-.main-wrap {padding-left: 220px !important; padding-right: 350px !important}
-.ui-album-cover {position:fixed !important; top: 160px !important; left: -30px !important}
-.collect-outer {padding-top:195px !important}
-.collect-list {top: 350px !important}
+#J_mainWrap {padding-left: 220px; padding-right: 350px}
+.ui-album-cover {position:fixed; top: 250px; left: -22px}
+.ui-album-sale {position:fixed !important; bottom: 130px !important; left: 10px !important}
+#J_collectScrollView .ks-scrollbar {visibility: hidden} 
 .main-outher {width: 350px !important; padding-right: 5px !important}
 .menu-outer {border-bottom: 0px !important}
-.seiya-chatroom {min-width:930px !important; width:930px !important}
+.seiya-chatroom {min-width:930px !important; right:350px !important}
 .seiya-chatroom .col-main {right: 0px !important}
 .ui-player-lrc {top: 50px !important; width: 350px !important}
-.ui-player-lrc ul li 
-{-webkit-transition-timing-function: ease !important; 
- -moz-transition-timing-function: ease !important; 
- -o-transition-timing-function: ease !important; 
- -ms-transition-timing-function: ease !important; 
- transition-timing-function:ease !important; 
- transition-duration: .5s !important; 
- -moz-transition-duration: .5s !important; 
- -webkit-transition-duration: .5s !important; 
- -o-transition-duration: .5s !important}
+/*
+.ui-lrc-line {
+text-align: center;
+line-height: 22px !important;
+padding: 3px 10px !important;}
 
+.ui-trans-line{
+display:none;
+text-align: center;
+line-height: 0px !important;
+padding: 0px 10px !important;}*/
+
+.ui-trans-current{color:#f60 !important;
+webkit-transition-property: color !important;
+-moz-transition-property: color !important;
+-o-transition-property: color !important;
+-ms-transition-property: color !important;
+transition-property: color !important;
+-webkit-transition-duration: .1s !important;
+-moz-transition-duration: .1s !important;
+-o-transition-duration: .1s !important;
+-ms-transition-duration: .1s !important;
+transition-duration: .1s !important;
+-webkit-transition-timing-function: ease-in !important;
+-moz-transition-timing-function: ease-in !important;
+-o-transition-timing-function: ease-in !important;
+-ms-transition-timing-function: ease-in !important;
+transition-timing-function: ease-in !important;}
+
+
+/* Lyrics Edit Page*/
+#ln_xiamini {top: 20px; right: 20px; position: absolute !important}

@@ -7,11 +7,18 @@
 #pyramid,
 #friend,
 #scene,
+#hot_room,
 #sidebutton,
+.athena-main-panel,
+.athena-playlist-panel,
+.athena-chat-panel,
 .athena-main-button,
+.athena-tip,
 .sns,
 .copyright,
-.cooperation
+.cooperation,
+#tip_60d,
+#search_60d
 {display:none  !important;}
 
 #timeline .action .new {border-color:#f60 !important; background-color:#f60 !important;}
@@ -28,7 +35,7 @@
 {display:none  !important;}
 
 #main_wrapper {margin-left: 30px !important;}
-#title {padding: 20px 0 10px 30px !important;}
+#wrapper div#title {padding: 20px 0 10px 30px !important;}
 
 /* album page */
 #album_info {min-height: 250px !important;}

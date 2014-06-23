@@ -1,36 +1,71 @@
 
 var updateTab = function(tab) {
   if (!/http(.+)xiami\.com/.test(tab.url)) return;
-  // file = localStorage.xmCSS === "true" ? "renderCSS.js" : "removeCSS.js";
-  // chrome.tabs.executeScript(tab.id, {
-    // file : file,
-    // runAt: "document_start"
-  // }, function() {/* chrome.tabs.sendMessage(tab.id, tab.url); */});
 	
-	 if (localStorage.xmCSS != "false") {
-		 if (/album/.test(tab.url))
+  if (localStorage.xmCSS != "false") {
+      if (/album/.test(tab.url))
 			file = "renderCSS-album.js";
-		 else if (localStorage.xmCSS == "collection")
+	  else if (localStorage.xmCSS == "collection")
 			file = "renderCSS-collection.js";
-		 else if (localStorage.xmCSS == "guess")
+	  else if (localStorage.xmCSS == "guess")
 		 	file = "renderCSS-guess.js";
-		 else
+	  else
 			file = "renderCSS.js";
-		chrome.tabs.executeScript(tab.id, {
+	  chrome.tabs.executeScript(tab.id, {
 			file : file,
 			runAt: "document_start"
-		}, function() {});
-	}
-	else 
+	  }, function() {});		
+	} else {
 		chrome.tabs.executeScript(tab.id, {
 			file : "removeCSS.js",
 			runAt: "document_start"
 		}, function() {});
-  };
+	}
+	
+  if (/play?/.test(tab.url)) {
+	//alert ("!!!");
+    if (localStorage.xmCSS != "false") 
+		chrome.tabs.executeScript(tab.id, {
+			file : "Collections.js",
+			runAt: "document_start"
+		}, function() {});
+	else 
+		chrome.tabs.executeScript(tab.id, {
+			file : "Collections-off.js",
+			runAt: "document_start"
+		}, function() {});
+	
+	if (localStorage.trans == "false") 
+		chrome.tabs.executeScript(tab.id, {
+			file : "renderCSS-trans.js",
+			runAt: "document_start"
+		}, function() {});
+	else 
+		chrome.tabs.executeScript(tab.id, {
+			file : "removeCSS-trans.js",
+			runAt: "document_start"
+		}, function() {});
+  }
+  
+  if (/addlyric/.test(tab.url) || /addlrc/.test(tab.url)) {
+	//alert ("lyrics");
+	
+	chrome.tabs.executeScript(tab.id, {
+		file : "renderNotes.js",
+		runAt: "document_start"
+	}, function() {}); 
+  }
+
+};
+
 
 
 if (localStorage.xmCSS != "false") {
   localStorage.xmCSS = "default";
+}
+
+if (localStorage.trans != "false") {
+  localStorage.trans = "true";
 }
 
 chrome.tabs.getAllInWindow(function(tabs) {

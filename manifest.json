@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Xiami Mini",
+  "name": "Xiami Mini (Open Play Special Edition)",
   "description": "Xiami Mini",
-  "version": "1.5",
+  "version": "1.7",
   "icons": { "16": "xiami.png",
            "48": "xiami.png",
           "128": "xiami.png" },
@@ -18,8 +18,14 @@
   "permissions": [
 	"storage", "tabs", "http://www.xiami.com/*"
   ],
+  "content_scripts": [
+   {
+      "matches":    ["http://www.xiami.com/play*"],
+      "js":        ["jquery-2.1.1.min.js", "XiaMi_OpenPlay_Extensions.user.js"]
+   }
+  ],
   "web_accessible_resources": [
-    "xiaMini.css", "xiaMini-album.css", "xiaMini-collection.css", "xiaMini-guess.css"
+    "xiaMini.css", "xiaMini-album.css", "xiaMini-collection.css", "xiaMini-guess.css", "hideTrans.css", "lyricsnotes.html"
   ]
 }
 
