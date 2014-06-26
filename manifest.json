@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Xiami Mini (Open Play Special Edition)",
   "description": "Xiami Mini",
-  "version": "1.7",
+  "version": "1.7.7",
   "icons": { "16": "xiami.png",
            "48": "xiami.png",
           "128": "xiami.png" },
@@ -21,7 +21,11 @@
   "content_scripts": [
    {
       "matches":    ["http://www.xiami.com/play*"],
-      "js":        ["jquery-2.1.1.min.js", "XiaMi_OpenPlay_Extensions.user.js"]
+      "js":        ["jquery-2.1.1.min.js", "XiaMi OpenPlay.user.js"]
+   },
+   {
+      "matches":    ["http://www.xiami.com/*"],
+      "js":        ["jquery-2.1.1.min.js", "XiaMi paging.user.js", "renderGroup.js"]
    }
   ],
   "web_accessible_resources": [

@@ -1,19 +1,22 @@
-// ==UserScript==
-// @name        XiaMi OpenPlay Extensions
+﻿// ==UserScript==
+// @name        XiaMi OpenPlay
+// @author      Ai
 // @namespace   http://www.xiami.com/u/8154435?spm=0.0.0.0.j2pUVV
-// @description This is a beautiful open Extensions for XiaMi.com
+// @description This is a beautiful openplay for XiaMi.com
 // @include     http://www.xiami.com/play?ids=/song/playlist/id*
 // @include     http://www.xiami.com/play
 // @include     http://www.xiami.com/play?uid=*
 // @include     http://www.xiami.com/play?spm=*
-// @require     http://code.jquery.com/jquery-2.1.1.js
-// @version     1
+// @version     1.0.0
 // @grant       none
 // ==/UserScript==
 
+/* 
+本脚本由虾米用户@哀个人制作，仅供娱乐，不可用于商业用途。
+如有意见或建议的请通过"使用说明"里的方式反馈或提出。
+*/
 
-//调用函数把CSS样式添加到<head>段的 <style>元素中
-
+// 调用函数把CSS样式添加到<head>段的 <style>元素中
 function addGlobalStyle(css) {
     var head,
     style;
@@ -28,10 +31,8 @@ function addGlobalStyle(css) {
 }
 
 
-//定义CSS样式
-
-addGlobalStyle('.player-info .track-info .track-controls #J_winopenPlay {' +
-//给弹窗图标设置CSS
+// 定义CSS样式
+addGlobalStyle('.player-info .track-info .track-controls #J_winopenPlay {' + // 弹窗图标CSS
 '  top: 0px; right: -33px; position: absolute; cursor: pointer;' +
 '}' +
 '.icon-winopenPlay {' +
@@ -43,8 +44,7 @@ addGlobalStyle('.player-info .track-info .track-controls #J_winopenPlay {' +
 '.icon-winopenPlay:hover {' +
 '  background-position: -28px -277px;' +
 '}' +
-'.track-play-menu {' +
-//设置DIV+CSS
+'.track-play-menu {' + // 设置DIV+CSS
 '  padding: 10px; border-radius: 4px; left: 300px; width: 140px; height: 60px; bottom: 26px; position: fixed; z-index: 1999; background-color: rgb(51, 51, 51);' +
 '}' +
 '.track-play-menu ul li {' +
@@ -65,22 +65,19 @@ addGlobalStyle('.player-info .track-info .track-controls #J_winopenPlay {' +
 '.ks-ie7 .track-play-menu .arrow {' +
 '  background-image: url("http://gtms03.alicdn.com/tps/i3/T1ZNuzFrtaXXbeUgbb-9-18.png");' +
 '}' +
-'.icon-OldPlay {' +
-//给旧版播放器弹窗图标设置CSS
+'.icon-OldPlay {' + // 旧版播放器弹窗图标CSS
 '  background-image: url("http://bbsdata.gztwkadokawa.com/album/201405/28/225839pgklmuagcg25gcrr.png"); background-repeat: no-repeat;' +
 '}' +
 '.icon-OldPlay {' +
 '  background-position: 0px -527px;' +
 '}' +
-'.icon-NewPlay {' +
-//给新版播放器弹窗图标设置CSS
+'.icon-NewPlay {' + //新版播放器弹窗图标CSS
 '  background-image: url("http://bbsdata.gztwkadokawa.com/album/201405/28/225839pgklmuagcg25gcrr.png"); background-repeat: no-repeat;' +
 '}' +
 '.icon-NewPlay {' +
 '  background-position: 0px -545px;' +
 '}' +
-'.icon-ListeningPlay {' +
-//给直播间弹窗图标设置CSS
+'.icon-ListeningPlay {' + //直播间弹窗图标CSS
 '  background-image: url("http://bbsdata.gztwkadokawa.com/album/201405/28/225839pgklmuagcg25gcrr.png"); background-repeat: no-repeat;' +
 '}' +
 '.icon-ListeningPlay {' +
@@ -88,13 +85,11 @@ addGlobalStyle('.player-info .track-info .track-controls #J_winopenPlay {' +
 '}');
 
 
-//将按钮元素添加到"更多"后面
-
+// 将按钮元素添加到"更多"后面
 $('#J_trackMore') .after('<a id=J_winopenPlay class=icon-winopenPlay title=弹窗></a>');
 
 
-//隐藏和显示div
-
+// 隐藏和显示div
 $('.icon-winopenPlay') .click(function (e) {
     $('.track-play-menu') .toggle();
 });
@@ -105,8 +100,7 @@ $('*') .click(function (event) {
 });
 
 
-//设置div属性及内容
-
+// 设置div属性及内容
 var str = window.location.href;
 var listening = /^http:\/\/www\.xiami\.com\/play\?uid=\d+$/.exec(str);
 var golistening = /^http:\/\/www\.xiami\.com\/play\?spm=[0.]+\w+&uid=\d+$/.exec(str);
@@ -145,8 +139,7 @@ if (str == listening || str == golistening) {
 };
 
 
-//设置div的left参数
-
+// 设置div的left参数
 function divleft() {
     var woPlayright = document.getElementById('J_winopenPlay') .getBoundingClientRect() .right;
     var J_trackPlayMenuleft = woPlayright + 12 + 'px';
@@ -156,8 +149,7 @@ $('#more_icon') .click(divleft());
 $(window) .resize(divleft);
 
 
-//设置弹窗函数
-
+// 设置弹窗函数
 $(document) .ready(function () {
     $('#J_ListeningPlay') .click(function () {
         ListeningPlay = window.open(str, '', 'scrollbars=0,toolbar=0,status=0,location=0,resizable=1,menubar=0');
@@ -186,29 +178,8 @@ $(document) .ready(function () {
 });
 
 
-//防止直播间联动后，出现卡死现象
-
+// 防止直播间联动后，出现卡死现象
 if (str != listening || str != golistening)
 window.onbeforeunload = function () {
     window.location.reload();
 }
-// 2014.6.10 精选集下拉菜单
-
-// $(".collect-title h3").attr({
-	// id : "J_collect-title",
-	// style : "cursor:pointer"
-// });
-// $("#J_collectScrollView").attr("style", "display: none;");
-// $("#J_albumCover").attr("style", "display: block;");
-// $('#J_collect-title').click(function () {
-	// $('#J_collectScrollView').toggle();
-	// $('#J_albumCover').toggle();
-// });
-// $('#J_createCollect').click(function () {
-	// var J_collectScrollViewstyle = $('#J_collectScrollView').attr("style");
-		// if (J_collectScrollViewstyle == "display: none;") {
-				// $('#J_collectScrollView').toggle();
-				// $('#J_albumCover').toggle();
-		// }
-// });
-

@@ -48,8 +48,6 @@ var updateTab = function(tab) {
   }
   
   if (/addlyric/.test(tab.url) || /addlrc/.test(tab.url)) {
-	//alert ("lyrics");
-	
 	chrome.tabs.executeScript(tab.id, {
 		file : "renderNotes.js",
 		runAt: "document_start"
