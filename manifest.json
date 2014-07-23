@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Xiami Mini (Open Play Special Edition)",
   "description": "Xiami Mini",
-  "version": "1.8",
+  "version": "1.8.2",
   "icons": { "16": "xiami.png",
            "48": "xiami.png",
           "128": "xiami.png" },
