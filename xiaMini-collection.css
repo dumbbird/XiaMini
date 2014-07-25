@@ -92,11 +92,11 @@ margin-top: 60px !important}
 .ui-album-cover {position:fixed; top: 250px; left: -22px}
 .ui-album-sale {position:fixed !important; bottom: 130px !important; left: 10px !important}
 #J_collectScrollView .ks-scrollbar {visibility: hidden} 
-.main-outher {width: 350px !important; padding-right: 5px !important}
+.main-outher {width: 350px ; padding-right: 5px !important}
 .menu-outer {border-bottom: 0px !important}
 .seiya-chatroom {min-width:930px !important; right:350px !important}
 .seiya-chatroom .col-main {right: 0px !important}
-.ui-player-lrc {top: 50px !important; width: 350px !important}
+.ui-player-lrc {top: 50px !important; width: 350px }
 /*
 .ui-lrc-line {
 text-align: center;
