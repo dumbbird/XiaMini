@@ -1,6 +1,6 @@
 $(function () {
 	DelCollections();
-	DelFullscreen();
+	DelLyricsControl();
 })
 function DelCollections() {
 	$titlediv = $('.collect-title'),
@@ -12,17 +12,19 @@ function DelCollections() {
 	$Listdiv.unbind('mouseenter').unbind('mouseleave');
 	$Listdiv.attr("style", "visibility: visible;");
 	$Coverdiv.show();
-	$Salediv.show();
+	//$Salediv.show();
 	$ksdiv.attr("style", "visibility: visible;");
 	$('.collect-title').removeAttr("style");
 }
-function DelFullscreen() {
+function DelLyricsControl() {
+	$("#lyrics_control").attr("style", "display:none;");
 	$("#J_playerLrc").css("font-size", "");
 	$("#J_playerCover").width("250px");
 	//$("#J_albumCover").width(albumCoverwidth[0]);
 	$("#J_lyricScrollWrap").css("width", "250px");
+	if ($('#J_albumSale').css("display") != "none")
+		$("#J_lyricScrollWrap").css("top", "257px");
 	//$(".ui-lrc-line").css("line-height", "");
-	$("#J_lrcWrap").css("padding-right", "5px");
-	$("#J_lrcWrap").css("width", "250px");
-	$("#J_lrcWrap").not("#J_playerCover a").unbind('click');
+	$('#J_lrcWrap').removeAttr("style");
+	
 	}
