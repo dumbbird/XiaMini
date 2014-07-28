@@ -126,6 +126,13 @@ transition-duration: .1s !important;
 -ms-transition-timing-function: ease-in !important;
 transition-timing-function: ease-in !important;}
 
+#lyrics_control {
+margin: 20px 0px;
+text-align:center;
+width: 350px;
+position: relative;
+}
+#lrc_edit, #lrc_fullscreen, #lrc_report {color:#f60; cursor: pointer; margin: 10px; text-decoration: none}
 
 /* Lyrics Edit Page*/
 #ln_xiamini {top: 20px; right: 20px; position: absolute !important}
