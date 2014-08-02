@@ -1,8 +1,8 @@
-{
+﻿{
   "manifest_version": 2,
-  "name": "Xiami Mini (Open Play Special Edition)",
+  "name": "Xiami Mini (t-LRC 虾翻内测版)",
   "description": "Xiami Mini",
-  "version": "1.8.4",
+  "version": "1.9",
   "icons": { "16": "xiami.png",
            "48": "xiami.png",
           "128": "xiami.png" },
@@ -16,7 +16,7 @@
      "default_popup": "popup.html"   
   },
   "permissions": [
-	"storage", "tabs", "http://www.xiami.com/*"
+	"storage", "tabs", "http://www.xiami.com/*", "http://g.tbcdn.cn/*", "webRequest", "webRequestBlocking"
   ],
   "content_scripts": [
    {
@@ -29,7 +29,7 @@
    }
   ],
   "web_accessible_resources": [
-    "xiaMini.css", "xiaMini-album.css", "xiaMini-collection.css", "xiaMini-guess.css", "hideTrans.css", "lyricsnotes.html"
+    "xiaMini.css", "xiaMini-album.css", "xiaMini-collection.css", "xiaMini-guess.css", "hideTrans.css", "lyricsnotes.html", "player.js"
   ]
 }
 

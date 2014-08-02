@@ -70,6 +70,20 @@ chrome.tabs.getAllInWindow(function(tabs) {
   tabs.forEach(updateTab);
 });
 
+chrome.webRequest.onBeforeRequest.addListener(
+    function(details) {
+      return {redirectUrl: chrome.extension.getURL('player.js')};    
+    },
+    {
+        urls: [
+            "http://g.tbcdn.cn/de/music-player/*min.js",
+        ],
+        types: ["script"]
+    },
+    ["blocking"]
+); 
+
+
 chrome.extension.onMessage.addListener(function(req) {
   chrome.tabs.getAllInWindow(function(tabs) {
     tabs.forEach(updateTab);

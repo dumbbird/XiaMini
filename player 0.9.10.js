@@ -1,4 +1,4 @@
-﻿/*! music-player - v0.9.10 build by Kissy-cake 
+/*! music-player - v0.9.10 build by Kissy-cake 
  * @Author: baoma <nongyoubao@alibaba-inc.com> 
  * Copyright (c) XIAMI 
  */!function(){var a=window,b="undefined";a.XiamiPlayer={player_runing:function(a,b){return!1},player_song_start:function(b,c){var d=a.seiya.eventListener;d&&d.fire("player","start",{currentSong:b,list:c})},player_song_end:function(){var b=a.seiya.eventListener;b&&b.fire("player","end")},player_room_lists:function(a,c){b==typeof c&&(c=0),typeof SEIYA!==b&&SEIYA.addSongs(escape("/song/playlist/id/"+a),3),typeof __PLAYER__!==b&&__PLAYER__.PlayerData.set("passtime",c)},player_room_exit:function(){typeof __PLAYER__!==b&&__PLAYER__.PlayerData.exitRoom()}},a.login_callback=function(c){if(c){typeof __SIDEBAR__!==b&&__SIDEBAR__.Collect.sync(),typeof __USER__!==b&&__USER__.sync(),typeof __OVERLAY__!==b&&__OVERLAY__.destroy();var d=a.seiya.eventListener,e=a.seiya.user;d&&e&&e.room_id?d.fire("popup","enterRoom",e.room_id):d.fire("popup","resetMainNav")}},a.taobaoLogin=function(){var b=-1!==location.href.indexOf("www.xiami.com")?"https://login.xiami.com":"",c=location.href;c=c.split("#")[0],c=encodeURIComponent(c),a.open(b+"/member/login?done="+c+"#taobao","_self")},a.openWind=function(b){var c=(a.screen.height-420)/2,d=(a.screen.width-520)/2;a.open(b,"connect_window","height=420, width=560, toolbar=no, menubar=no, scrollbars=yes, resizable=no,top="+c+",left="+d+", location=no, status=no")},a.sinaLogin=function(){a.openWind("/sina?done")},a.qqLogin=function(){a.openWind("/share/connect/type/qzone?done")},a.onbeforeunload=function(){document.getElementById("J_xiamiPlayerSwf").netclose()}}(KISSY);/*
@@ -1566,8 +1566,6 @@ KISSY.add('page/mods/xtpl/lrc-xtpl',function (S, require, exports, module) {
                         var buffer = "";
                         buffer += '\r\n<li class="ui-lrc-line ui-lrc-current">';
                         var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "text", 0, 5);
-						if ("&nbsp;" == id9)	id9 = '&nbsp</li><li class="ui-trans-line ui-trans-current">';	// dumbbirdedit
-						id9 = id9.replace("\n", '</li><li class="ui-trans-line ui-trans-current">&nbsp;');		// dumbbirdedit
                         buffer += renderOutputUtil(id9, false);
                         buffer += '</li>\r\n';
                         return buffer;
@@ -1576,8 +1574,6 @@ KISSY.add('page/mods/xtpl/lrc-xtpl',function (S, require, exports, module) {
                         var buffer = "";
                         buffer += '\r\n<li class="ui-lrc-line">';
                         var id10 = getPropertyOrRunCommandUtil(engine, scope, {}, "text", 0, 7);
-						if ("&nbsp;" == id10)	id10 = '&nbsp</li><li class="ui-trans-line">';	// dumbbirdedit
-						id10 = id10.replace("\n", '</li><li class="ui-trans-line">');			// dumbbirdedit
                         buffer += renderOutputUtil(id10, false);
                         buffer += '</li>\r\n';
                         return buffer;
@@ -1635,10 +1631,10 @@ KISSY.add('page/mods/xtpl/lrcText-xtpl',function (S, require, exports, module) {
                 config3.params = params4;
                 config3.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n<li class="ui-lrc-line">&nbsp;'; // dumbbirdedit
+                    buffer += '\r\n<li class="ui-lrc-line">';
                     var id6 = getPropertyOrRunCommandUtil(engine, scope, {}, "this", 0, 4);
                     buffer += renderOutputUtil(id6, false);
-                    buffer += '&nbsp;</li>\r\n'; // dumbbirdedit
+                    buffer += '</li>\r\n';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config3, "each", 3);
@@ -1693,12 +1689,6 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
     var reg_dis = /^\s*$/;
     //均衡歌词间距的正则
 
-	// dumbbirdedit
-	var trans = /^(\[\d\d\:\d\d(\.\d{1,3})?\])+[^\[\]\n]*^(\n\[translat\])+[^\[\]\n]*/gm;
-	//翻译
-	var qt = /(\[translat\])+/g;
-	//翻译标示的正则
-	
     var LrcExtension = {
         initializer: function() {
             var self = this;
@@ -1710,16 +1700,13 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             self._offsetNum = 0;
             self.LyricsArr = [];
             self.LyricLine = null;
-			self.TransLine = null; // dumbbirdedit
             self.LyricWrap = S.UA.ie && S.UA.ie < 8 ? $("#J_lyricScrollWrap") : $("#J_lyricScrollView");
             self._addEvent();
         },
         _addEvent: function() {
             var self = this;
             self.on("afterIndexChange", function(event) {
-				//alert (event.prevVal, event.newVal);
                 self.changeCurrent(event.prevVal, event.newVal);
-				
             });
         },
         /**
@@ -1780,22 +1767,14 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
         },
         changeCurrent: function(oldIndex, newIndex) {
             var self = this;
-			
             if (oldIndex != -1) {
                 self.LyricLine.item(oldIndex).removeClass("ui-lrc-current");
             }
             if (newIndex != -1) {
                 var a = self.LyricLine.item(newIndex);
                 a.addClass("ui-lrc-current");
-				self._checkPosition(a);
+                self._checkPosition(a);
             }
-			
-			// dumbbirdedit
-			if (-1 != oldIndex && self.TransLine.item(oldIndex).removeClass("ui-trans-current"), -1 != newIndex) { 
-				var e = self.TransLine.item(newIndex); 
-				e.addClass("ui-trans-current");
-			}
-			
         },
         syncTime: function(time) {
             var self = this;
@@ -1874,19 +1853,7 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             };
             self.wrap.html(html);
             self.LyricLine = self.wrap.all(".ui-lrc-line");
-			self.TransLine = self.wrap.all(".ui-trans-line"); //dumbbirdedit
             self.scrollView = ScrollViewManage.render("J_lyricScrollView");
-			
-			// by @哀
-			var transdisscript = "<script type='text/javascript' src='http://g.tbcdn.cn/de/music-player/0.9.10/??common/global-min.js,pages/index/page/init-min.js'></script>"; 
-			$(document.body).append(transdisscript); 
-			var transdisdiv = "<div id='J_transdislrc' onclick='transdislrc()'></div>";
-			$(document.body).append(transdisdiv); 
-			transdislrc = function (){
-				self.LyricLine = self.wrap.all(".ui-lrc-line"),
-				self.TransLine = self.wrap.all(".ui-trans-line"), //dumbbirdedit
-				self.scrollView = ScrollViewManage.render("J_lyricScrollView")
-			}			
         },
         _splitLyric: function(value) {
             var self = this,
@@ -1926,17 +1893,11 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             if (arr_offset != null) {
                 self._offsetNum = Number(arr_offset[1]);
             }
-			
-			var pt = reg_take;						// dumbbirdedit	
-			if (lrcData.match(trans)) pt = trans; 	// dumbbirdedit, switch on translations
-			
-            var arr_lyrics = lrcData.match(pt);		// dumbbirdedit
+            var arr_lyrics = lrcData.match(reg_take);
             var _arr_splitedLyrics = [];
-            for (var i = 0, max = arr_lyrics.length; i < max; i++) {				
+            for (var i = 0, max = arr_lyrics.length; i < max; i++) {
                 var ly = arr_lyrics[i];
-				//alert (arr_lyrics[i]);
                 var arr_tmptime = ly.match(reg_gettimes);
-				ly = ly.replace(qt, "");	// dumbbirdedit，去除翻译标示
                 ly = ly.replace(reg_replacetime, "");
                 //去除时间信息，只保留歌词以便后面形成数组
                 //获取所有的时间信息
@@ -1996,7 +1957,6 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             self._offsetNum = 0;
             self.LyricsArr = [];
             self.LyricLine = null;
-			self.TransLine = null; // dumbbirdedit
             self._hasLyric = false;
         },
         reset: function() {
@@ -3415,8 +3375,8 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                     self.stackBlurCanvasRGB(canvasID, 0, 0, w, h, radius);
                 };
             };
-            img.crossOrigin = 'http://www.xiami.com';
-            img.src = url + '?v=tblur';
+            img.crossOrigin = '*';
+            img.src = url;
         },
         stackBlurImage : function(imageID, canvasID, radius, blurAlphaChannel) {
 
@@ -7135,7 +7095,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
     // @formatter:on
     var $ = Node.all;
 
-    var CoverTpl = '{{#if cover}}<a href="{{^if albumId===0}}http://www.xiami.com/album/{{albumId}}{{else}}http://www.xiami.com/artist/{{artistId}}{{/if}}" target="_blank" title="{{album}}-{{artist}}"><img crossOrigin="http://www.xiami.com" src="{{cover}}?v=tblur" alt="{{album}}-{{artist}}"></a>{{else}}<img src="http://gtms01.alicdn.com/tps/i1/T1THUfFc8jXXaC1Jrl-250-250.png" width="250" height="250" />{{/if}}';
+    var CoverTpl = '{{#if cover}}<a href="{{^if albumId===0}}http://www.xiami.com/album/{{albumId}}{{else}}http://www.xiami.com/artist/{{artistId}}{{/if}}" target="_blank" title="{{album}}-{{artist}}"><img src="{{cover}}?v=sya" alt="{{album}}-{{artist}}"></a>{{else}}<img src="http://gtms01.alicdn.com/tps/i1/T1THUfFc8jXXaC1Jrl-250-250.png" width="250" height="250" />{{/if}}';
     var Tpl_cover = new Xtemplate(CoverTpl);
 
     function player() {
@@ -7220,7 +7180,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 });
                 tip.show();
             }
-
+  
         },
         syncDns: function(dns, ip) {
             var self = this;
@@ -7292,7 +7252,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
             });
 
             self.PlayerPanel.reset(passtime);
-            self.PlayerBlur.render(track.cover);
+            self.PlayerBlur.render(track.cover + "?v=sya");
             self.Fav_btn.attr("data-sid", track.songId);
             self.More_btn.attr("data-sid", track.songId);
             self.Share_btn.attr("data-sid", track.songId);
