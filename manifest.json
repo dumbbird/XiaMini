@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Xiami Mini (t-LRC 虾翻内测版)",
   "description": "Xiami Mini",
-  "version": "1.9",
+  "version": "1.9.2",
   "icons": { "16": "xiami.png",
            "48": "xiami.png",
           "128": "xiami.png" },
@@ -25,7 +25,7 @@
    },
    {
       "matches":    ["http://www.xiami.com/*"],
-      "js":        ["XiaMi paging.user.js", "renderGroup.js"]
+      "js":        ["jquery-2.1.1.min.js", "XiaMi paging.user.js", "renderGroup.js"]
    }
   ],
   "web_accessible_resources": [
