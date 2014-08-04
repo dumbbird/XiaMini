@@ -9,5 +9,13 @@ var loadMini = function() {
   headEl.appendChild(el);
 };
 
+function removeMini() {
+  var el = document.getElementById("g_xiamini");
+  if (el) {
+    el.parentNode.removeChild(el);
+  }
+}
+
+removeMini();
 loadMini();
 
