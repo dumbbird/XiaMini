@@ -1,8 +1,8 @@
 var loadMini = function() {
   //alert("6666");
-  if (document.getElementById("g_xiamini")) return;
+  if (document.getElementById("gg_xiamini")) return;
   var el = document.createElement("link");
-  el.id = "g_xiamini";
+  el.id = "gg_xiamini";
   el.rel = "stylesheet";
   el.href = chrome.extension.getURL("xiaMini-guess.css");
   headEl = document.getElementsByTagName("head")[0];
@@ -12,9 +12,14 @@ var loadMini = function() {
 function removeMini() {
   var el = document.getElementById("g_xiamini");
   if (el) {
-    el.parentNode.removeChild(el);
-  }
-}
+     el.parentNode.removeChild(el);
+	 el = 0;
+   }
+   el = document.getElementById("gc_xiamini");
+   if (el) {
+     el.parentNode.removeChild(el);
+   }
+ }
 
 removeMini();
 loadMini();

@@ -1,5 +1,4 @@
 var loadMini = function() {
-  //alert("6666");
   if (document.getElementById("g_xiamini")) return;
   var el = document.createElement("link");
   el.id = "g_xiamini";
@@ -9,4 +8,17 @@ var loadMini = function() {
   headEl.appendChild(el);
 };
 
+function removeMini() {
+  var el = document.getElementById("gc_xiamini");
+  if (el) {
+     el.parentNode.removeChild(el);
+	 el = 0;
+   }
+   el = document.getElementById("gg_xiamini");
+   if (el) {
+     el.parentNode.removeChild(el);
+   }
+ }
+
+removeMini();
 loadMini();
