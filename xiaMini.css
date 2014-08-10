@@ -135,3 +135,5 @@ position: relative;
 
 /* Lyrics Edit Page*/
 #ln_xiamini {top: 20px; right: 20px; position: absolute !important}
+textarea#editLrcText,
+textarea#editLyricText {font-family: "Courier New";}
