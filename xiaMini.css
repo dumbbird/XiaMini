@@ -56,8 +56,7 @@ li.do_share span {display:none}
 #album_cover p.grade {margin: -45px 0 0 250px !important; z-index:2 !important; position: relative; overflow: auto !important}
 
 td.song_name {width: 300px !important; word-break: break-word !important}
-#lrc {font-size:12.5px !important}
-.lrc_main {line-height:1.6 !important}
+#lrc {font-family: "Courier New"}
 
 /* Single Page Case 1 */
 #song_block .album_relation 

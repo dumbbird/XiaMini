@@ -1,9 +1,9 @@
 ﻿{
   "manifest_version": 2,
   "name": "Xiamini (t-LRC 虾翻内测版)",
-  "description": "去除虾米网多余板块与广告，更方便地使用虾米音乐网 / #V1.9.5 修复跳页功能 / 详情：http://www.xiami.com/group/thread-detail/tid/898395
+  "description": "去除虾米网多余板块与广告，更方便地使用虾米音乐网 / #V1.9.6 微调歌词显示，屏蔽丑陋的音乐馆按钮 / 详情：http://www.xiami.com/group/thread-detail/tid/898395
   ",
-  "version": "1.9.5",
+  "version": "1.9.6",
   "icons": { "16": "xiami.png",
            "48": "xiami.png",
           "128": "xiami.png" },
