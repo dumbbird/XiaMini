@@ -79,9 +79,10 @@ width: 300px !important;
 margin-right: -320px !important;
 margin-top: 60px !important}
 
-
-#relate_song  
-{position: relative ; top:300px !important}
+#relate_song,
+#album_song  
+{position: relative; top:300px !important}
+#album_song table.track_list td {padding: 7px 0}
 
 /* Lyrics Edit Page */
 .set_sec .album_relation {display:none !important;}

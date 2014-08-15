@@ -1,5 +1,4 @@
 var loadMini = function() {
-  //alert("6666");
   if (document.getElementById("g_xiamini")) return;
   var el = document.createElement("link");
   el.id = "g_xiamini";
