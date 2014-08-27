@@ -17,7 +17,16 @@ var updateTab = function(tab) {
 				file : file,
 				runAt: "document_start"
 		}, function() {});
-				
+		
+		// render JS in song page
+		if (/song/.test(tab.url)) {
+			//alert("translist!");
+			chrome.tabs.executeScript(tab.id, {
+				file : "translist.js",
+				runAt: "document_start"
+			}, function() {});		
+		}
+		
 		// render JS in lyricsedit page
 		if (/addlyric/.test(tab.url) || /addlrc/.test(tab.url)) 
 			chrome.tabs.executeScript(tab.id, {
@@ -42,7 +51,7 @@ var updateTab = function(tab) {
 					file : "removeCSS-trans.js",
 					runAt: "document_start"
 				}, function() {});
-		}
+		}		
 	} else {	
 		// Xiamini OFF
 		// remove CSS
@@ -61,10 +70,23 @@ var updateTab = function(tab) {
 };
 
 var updateAfterComplete = function(tab) {
-	// render JS in song page
-	if (/song/.test(tab.url))
+	// render JS in group page
+	if (/group\/thread\-detail/.test(tab.url)) 
+		chrome.tabs.executeScript(tab.id, {
+			file : "hidereply.js",
+			runAt: "document_end"
+		}, function() {});
+		
+	if (/song/.test(tab.url)) 	
 		chrome.tabs.executeScript(tab.id, {
 			file : "albumsong.js",
+			runAt: "document_start"
+		}, function() {});	
+	
+	// render 320k notes in album page
+	if (/album/.test(tab.url))
+		chrome.tabs.executeScript(tab.id, {
+			file : "320k.js",
 			runAt: "document_start"
 		}, function() {});
 };
@@ -101,7 +123,6 @@ chrome.extension.onMessage.addListener(function(req) {
 });
 
 chrome.tabs.onUpdated.addListener(function(id, data, tab) {
-	//alert ("update1!");
 	updateTab(tab);
 	if (data.status == "complete") 
 		updateAfterComplete(tab);	

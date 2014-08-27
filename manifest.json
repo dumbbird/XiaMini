@@ -1,9 +1,12 @@
 ﻿{
   "manifest_version": 2,
-  "name": "Xiamini (t-LRC 虾翻内测版)",
-  "description": "去除虾米网多余板块与广告，更方便地使用虾米音乐网 / #V1.9.7 感谢VV增设单曲页面显示该专辑其他曲目的板块 / 详情：http://www.xiami.com/group/thread-detail/tid/898395
+  "name": "Xiamini 虾米你",
+  "description": "去除虾米网多余板块与广告，更方便地使用虾米音乐网 / #V1.9.9 新功能：小组帖子讨论页面针对回复楼层过多的情况增加展开/折叠开关 (by @van)
+      改进功能1：单曲页面的专辑曲目列表的超长歌名增加滚动显示效果 (by @van)
+      改进功能2：翻页功能优化 (by @哀)
+      改进功能3：歌词翻译列表的搜索功能增强 / 详情：http://www.xiami.com/group/thread-detail/tid/898395
   ",
-  "version": "1.9.7",
+  "version": "1.9.9",
   "icons": { "16": "xiami.png",
            "48": "xiami.png",
           "128": "xiami.png" },
@@ -17,7 +20,8 @@
      "default_popup": "popup.html"   
   },
   "permissions": [
-	"storage", "tabs", "http://www.xiami.com/*", "http://g.tbcdn.cn/*", "webRequest", "webRequestBlocking"
+	"storage", "tabs", "cookies", "http://www.xiami.com/*", "http://g.tbcdn.cn/*", "http://www.baidu.com/*", "http://www.google.com.hk/*", 
+	"webRequest", "webRequestBlocking"
   ],
   "content_scripts": [
    {
@@ -31,7 +35,7 @@
   ],
   "web_accessible_resources": [
     "xiaMini.css", "xiaMini-album.css", "xiaMini-collection.css", "xiaMini-guess.css", 
-	"hideTrans.css", "lyricsnotes.html", "player.js", "albumsong.js"
+	"hideTrans.css", "lyricsnotes.html", "player.js"
   ]
 }
 

@@ -1567,7 +1567,7 @@ KISSY.add('page/mods/xtpl/lrc-xtpl',function (S, require, exports, module) {
                         buffer += '\r\n<li class="ui-lrc-line ui-lrc-current">';
                         var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "text", 0, 5);
 						if ("&nbsp;" == id9)	id9 = '&nbsp</li><li class="ui-trans-line ui-trans-current">';	// dumbbirdedit
-						id9 = id9.replace("\n", '</li><li class="ui-trans-line ui-trans-current">&nbsp;');		// dumbbirdedit
+						id9 = id9.replace("\n", '</li><li class="ui-trans-line ui-trans-current">');		// dumbbirdedit
                         buffer += renderOutputUtil(id9, false);
                         buffer += '</li>\r\n';
                         return buffer;

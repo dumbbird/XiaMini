@@ -80,7 +80,8 @@ margin-right: -320px !important;
 margin-top: 60px !important}
 
 #relate_song,
-#album_song  
+#album_song,
+#trans_list
 {position: relative; top:300px !important}
 #album_song table.track_list td {padding: 7px 0}
 

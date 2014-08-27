@@ -1,4 +1,4 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name        XiaMi Paging
 // @author      Ai
 // @namespace   http://www.xiami.com/u/8154435?spm=0.0.0.0.j2pUVV
@@ -146,20 +146,21 @@ function Paging() {
 				if (!/\/page\//.exec(str)) {
 					if (/space\/lib-song$|space\/lib-album$/.exec(str)) {
 						gopage = str.replace(/$/, "/page/" + valuenumber)
-					} else if (/space\/lib-song\/u$|space\/lib-album\/u$/.exec(str)) {
-						uid = $(".buddy.personal_iconX.personalDropDown").attr("href").match(/\d+/);
-						gopage = str.replace(/$/, "/" + uid + "/page/" + valuenumber)
-					} else if (/\/music\/newalbum$/.exec(str)) {
-						gopage = str.replace(/$/, "/type/all/page/" + valuenumber);
-					} else if (/\/album\/list/.exec(str)) {
-						str = str.replace(/\?/g, "/");
-						str = str.replace(/=/g, "/");
-						str = str.replace(/\&/g, "/");
-						gopage = str + "/page/" + valuenumber;
-					} else if (!/\?spm/.exec(str)) {
-						gopage = str.replace(/(\d+$)/, "$1/page/" + valuenumber)
 					} else {
-						gopage = str.replace(/\?spm/, "/page/" + valuenumber + "?spm")
+						if (/space\/lib-song\/u$|space\/lib-album\/u$/.exec(str)) {
+							uid = $(".buddy.personal_iconX.personalDropDown").attr("href").match(/\d+/);
+							gopage = str.replace(/$/, "/" + uid + "/page/" + valuenumber)
+						} else {
+							if (/\/music\/newalbum$|\/album\/list$/.exec(str)) {
+								gopage = str.replace(/$/, "/page/" + valuenumber)
+							} else {
+								if (!/\?spm/.exec(str)) {
+									gopage = str.replace(/(\d+$)/, "$1/page/" + valuenumber)
+								} else {
+									gopage = str.replace(/\?spm/, "/page/" + valuenumber + "?spm")
+								}
+							}
+						}
 					}
 				} else {
 					gopage = str.replace(/\/page\/\d+/, "/page/" + valuenumber)
