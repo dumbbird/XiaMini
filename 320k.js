@@ -1,6 +1,27 @@
 ﻿var loadQualitynotes = function() {
 	if (document.getElementById("quality_notes")) return;
 
+	function Re_title(ti){ // 歌名处理，可增加
+			ti = ti.replace(/[\(|（|\[].*[\)|）|\]]/g,"");   //去括号内容
+			ti = ti.replace(/\-.*\-/g,""); // 去- -内容
+			ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`]/g," "); //去引号
+			ti = ti.replace(/\s+/g,"");  // 去空格
+			ti = ti.toLowerCase(); // 小写
+			return ti;   
+		}
+	function Re_title2(ti){ //隔离类
+			ti = ti.replace(/[\(|（|\[].*[\)|）|\]]/g,"");
+			ti = ti.replace(/\-.*\-/g,"");
+			ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`]/g," ");
+			return ti;   
+		}
+	function Re_title3(ti){ //中断类
+			ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`|;|:]/g,"+");
+			ti = ti.replace(/\s+/g,"");
+			ti = ti.toLowerCase();
+			return ti;
+		}
+		
 	var CurrentUrl = window.location.href;
 	if (CurrentUrl.indexOf("/album/") != -1) {
 		var str = document.cookie.split("; ");
@@ -22,7 +43,7 @@
 		var albumTitle = keywords[0].replace(/专辑/, "");
 		var albumArtist = keywords[1].replace(albumTitle, "");
 		//alert(albumTitle); alert(albumArtist);
-		var SearchUrl = "/space/lib-album?" + token + "&u=4275776&key=" + albumTitle + "+" + albumArtist;
+		var SearchUrl = "/space/lib-album?" + token + "&u=4275776&key=" + Re_title3(albumTitle) + "+" + albumArtist;
 		//alert (SearchUrl);
 		var xmlhttp;
 	
