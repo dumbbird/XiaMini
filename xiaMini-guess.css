@@ -85,9 +85,6 @@ margin-top: 60px !important}
 {position: relative; top:300px !important}
 #album_song table.track_list td {padding: 7px 0}
 
-/* Lyrics Edit Page */
-.set_sec .album_relation {display:none !important;}
-
 /* player */
 #J_mainWrap {padding-left: 220px; padding-right: 350px}
 .ui-album-cover {position:fixed; top: 250px; left: -22px}
