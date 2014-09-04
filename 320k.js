@@ -1,4 +1,7 @@
-﻿var loadQualitynotes = function() {
+﻿// 从320K专门店获取音质信息，并展示在专辑页面右侧。
+// 版本号：1.10.0.2
+
+var loadQualitynotes = function() {
 	if (document.getElementById("quality_notes")) return;
 
 	function Re_title(ti){ // 歌名处理，可增加
@@ -16,14 +19,14 @@
 			return ti;   
 		}
 	function Re_title3(ti){ //中断类
-			ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`|;|:]/g,"+");
+			ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`|;|:|,]/g,"+");
 			ti = ti.replace(/\s+/g,"");
 			ti = ti.toLowerCase();
 			return ti;
 		}
 		
 	var CurrentUrl = window.location.href;
-	if (CurrentUrl.indexOf("/album/") != -1) {
+	if (CurrentUrl.indexOf("xiami.com/album/") != -1) {
 		var str = document.cookie.split("; ");
 		//var token = str.match(/_xiamitoken=\w+/);
 		//alert (token);
@@ -38,10 +41,12 @@
 		var ReUrl = arr[1].substring(arr[1].indexOf("/"));
 		var albumID = ReUrl.replace(/\/album\//, "");
 		albumID = albumID.replace(/\?spm=.+/, "");
-		var keywords;
-		keywords = $("meta[name='keywords']").attr("content").split(", ");
-		var albumTitle = keywords[0].replace(/专辑/, "");
-		var albumArtist = keywords[1].replace(albumTitle, "");
+		//var keywords;		keywords = $("meta[name='keywords']").attr("content").split(", ");
+		var albumTitle = $('#title h1').contents().filter(function() {
+				return this.nodeType == 3;
+			}).text();
+		var albumArtist = $('#album_info table tbody').children().first().children().last().text();
+		//keywords[1].replace(albumTitle, "");
 		//alert(albumTitle); alert(albumArtist);
 		var SearchUrl = "/space/lib-album?" + token + "&u=4275776&key=" + Re_title3(albumTitle) + "+" + albumArtist;
 		//alert (SearchUrl);

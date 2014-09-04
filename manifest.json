@@ -6,7 +6,7 @@
       改进功能2：翻页功能优化 (by @哀)
       改进功能3：歌词翻译列表的搜索功能增强 / 详情：http://www.xiami.com/group/thread-detail/tid/898395
   ",
-  "version": "1.9.9",
+  "version": "1.10.0",
   "icons": { "16": "xiami.png",
            "48": "xiami.png",
           "128": "xiami.png" },

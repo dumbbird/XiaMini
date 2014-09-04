@@ -28,11 +28,11 @@ var updateTab = function(tab) {
 		}
 		
 		// render JS in lyricsedit page
-		if (/addlyric/.test(tab.url) || /addlrc/.test(tab.url)) 
-			chrome.tabs.executeScript(tab.id, {
-				file : "renderNotes.js",
-				runAt: "document_start"
-			}, function() {}); 
+		// if (/addlyric/.test(tab.url) || /addlrc/.test(tab.url)) 
+			// chrome.tabs.executeScript(tab.id, {
+				// file : "renderNotes.js",
+				// runAt: "document_start"
+			// }, function() {}); 
 		
 		// render JS in player page
 		if (/play?/.test(tab.url)) {
