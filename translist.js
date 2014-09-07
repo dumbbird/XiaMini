@@ -1,23 +1,24 @@
 ﻿// 从歌词组帖子中获取翻译贴，并展示在单曲页面右侧。
-// 版本号：1.10.1.1
+// 版本号：1.10.1.2
 
 var loadTranslist = function () {
 
 	function Re_title(ti) { // 歌名处理，可增加
-		ti = ti.replace(/[\(|（|\[].*[\)|）|\]]/g, ""); //去括号内容
-		ti = ti.replace(/\-.*\-/g, ""); // 去- -内容
-		ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`]/g, " "); //去引号
-		ti = ti.replace(/\s+/g, ""); // 去空格
-		ti = ti.toLowerCase(); // 小写
+		ti = ti.replace(/[\(|（|\[].*[\)|）|\]]/g, ""); 		//去括号内容
+		ti = ti.replace(/\-.*\-/g, ""); 						// 去- -内容
+		ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`]/g, " "); 	//去引号
+		ti = ti.replace(/\s+/g, ""); 							// 去空格
+		ti = ti.toLowerCase(); 									// 小写
 		return ti;
 	}
 	function Re_title2(ti) { //隔离类
-		ti = ti.replace(/[\(|（|\[].*[\)|）|\]]/g, "");
-		ti = ti.replace(/\-.*\-/g, "");
-		ti = ti.replace(/['|‘|＇|｀|’|`]/g, "%27");
-		ti = ti.replace(/["|“|”|＂|〃]/g, "\"");
-		ti = ti.replace(/[ \t]+$/, ""); // 去掉行首行末空格
-		ti = ti.replace(/^[ \t]+/, ""); // 去掉行首行末空格
+		ti = ti.replace(/[\(|（|\[].*[\)|）|\]]/g, "");	// 去括号内容
+		ti = ti.replace(/ \-.*\-/g, "");				// 去- -内容
+		ti = ti.replace(/['|‘|＇|｀|’|`]/g, "'");		// 统一单撇
+		ti = ti.replace(/["|“|”|＂|〃]/g, "\"");		// 统一双撇
+		ti = ti.replace(/[~|～]/g, "~");				// 统一波浪
+		ti = ti.replace(/[ \t]+$/, ""); 				// 去掉行首行末空格
+		ti = ti.replace(/^[ \t]+/, ""); 				// 去掉行首行末空格
 		return ti;
 	}
 	function Re_title3(ti) { //中断类
@@ -68,7 +69,6 @@ var loadTranslist = function () {
 		var Songtitle = $('#title h1').contents().filter(function () {
 				return this.nodeType == 3;
 			}).text();
-		//alert(Songtitle);
 		var lyricsKey;
 		var keyLength = 3;
 		if ($('#lrc').find('.lrc_main').length != 0) {
@@ -77,13 +77,15 @@ var loadTranslist = function () {
 				lyricsKey[i] = Re_title2(lyricsKey[i]);
 			//alert(lyricsKey);
 		}
-
-		//var SearchUrl = "/group/searchingroup/id/13001?" + token + "&key=" + ReUrl + "&submit=搜+索";
-		var SearchUrl = "/group/searchingroup/id/13001?" + token + "&key=" + Re_title2(Songtitle) + "&submit=搜+索";
-		var SearchUrl_baidu = "//www.baidu.com/s?wd=翻译%20赏析%20" + Songtitle + "%20site%3Awww.xiami.com"
+		
+		var SearchKey = Re_title2(Songtitle);
+		SearchKey = SearchKey.replace("'", "%27");
+		//alert(Songtitle+"...."+SearchKey);
+		var SearchUrl = "/group/searchingroup/id/13001?" + token + "&key=" + SearchKey + "&submit=搜+索";
+		var SearchUrl_baidu = "//www.baidu.com/s?wd=翻译%20赏析%20" + SearchKey + "%20site%3Awww.xiami.com"
 			 + "&ie=utf-8&tn=baiduhome_pg&f=8&rsv_bp=1&rsv_spt=1&rsv_enter=1&rsv_sug3=56&rsv_sug4=4530&rsv_sug2=0&inputT=2104&rsv_n=2&rsv_sug1=2";
 		var SearchUrl_google = "//www.google.com.hk/?gws_rd=ssl#newwindow=1&q="
-			 + "翻译+赏析+" + Songtitle + "+site:xiami.com";
+			 + "翻译+赏析+" + SearchKey + "+site:xiami.com";
 
 		var blacklist_post = new Array('/group/thread-detail/tid/480745',
 				'/group/thread-detail/tid/330310'); //搜索黑名单
@@ -98,15 +100,6 @@ var loadTranslist = function () {
 		if (transList == buffer)
 			Search_baidu(xhr(SearchUrl_baidu, 'get', 0));  //处理百度搜索结果
 
-		/*
-		if (flag == 2){
-
-		var SearchUrl2 = "/group/searchingroup/id/13001?" + token + "&key=" + Re_title2(Songtitle) + lyricsKey + "&submit=搜+索";
-		//alert(SearchUrl2);
-		AlbumRequest(SearchUrl2);
-		}
-		}*/
-
 		transList += '</tbody></table>';
 		transList += '<div id="trans_note" class="blank10"><p>想分享更好的翻译版本？或写写自己对歌词的理解？请点击上方的添加版本按钮。</p></div>';
 		transList += '</div>';
@@ -118,11 +111,10 @@ var loadTranslist = function () {
 			var ResultsHtml = result;
 			var AllResults = $(ResultsHtml).find(".title");
 			var ResultsNum = AllResults.length;
-			//alert (ResultsNum);
 			var postUrl,
-			postTitle,
-			authorUrl,
-			authorName;
+				postTitle,
+				authorUrl,
+				authorName;
 			for (var i = 1; i < ResultsNum; i++) {
 				postUrl = $(AllResults).eq(i).find("a").attr('href');
 				if (blacklist_post.indexOf(postUrl) != -1)
@@ -133,33 +125,33 @@ var loadTranslist = function () {
 				authorName = $(AllResults).eq(i).next().text();
 				//alert(Re_title(postTitle)+'....'+Re_title(Songtitle));
 
-				var realSongtitle = Re_title2(Songtitle); // 获取真正的曲目标题，去掉标题中的括号等信息
-				//alert(realSongtitle);
-				if (postTitle.indexOf('翻译') == -1 && postTitle.indexOf('虾翻') == -1 && postTitle.indexOf('赏析') == -1
-					 || Re_title3(postTitle).indexOf(Re_title(Songtitle)) == -1)
+				var realSongtitle = Re_title2(Songtitle).toLowerCase(); // 获取真正的曲目标题，去掉标题中的括号等信息
+				if (postTitle.indexOf('翻译') == -1 && postTitle.indexOf('虾翻') == -1 
+					&& postTitle.indexOf('赏析') == -1 && postTitle.indexOf('| t-LRC') == -1
+					 /*|| Re_title3(postTitle).indexOf(Re_title(Songtitle)) == -1*/)
 					continue;
 
-				var realPosttitle = postTitle.split("】")[1];
-				realPosttitle = realPosttitle.replace(/[\(|（|\[].*[\)|）|\]]/g, "");
-				realPosttitle = realPosttitle.replace(/[ \t]+$/, "");
-				realPosttitle = realPosttitle.replace(/^[ \t]+/, "");
+				var realPosttitle = postTitle.split("】")[1];				
+				realPosttitle = Re_title2(realPosttitle);
+				if (realPosttitle == "")
+					continue;
+				
 				if (realPosttitle.indexOf(" \/ ") != -1) {
-					realPosttitle = realPosttitle.split(" \/ ")[0];
-					alert(realPosttitle);
-					if (realPosttitle != realSongtitle)
-						continue;
+					realPosttitle = realPosttitle.split(" \/ ")[0].toLowerCase();				
+				}
+				else {
+					var lastIndex = realPosttitle.lastIndexOf(" ");
+					realPosttitle = realPosttitle.substring(0,lastIndex).toLowerCase();
 				}
 				// 获取真正的帖子标题，去掉帖子【翻译】等前缀以及括号等后缀
-				//alert(postTitle);
-				//alert(realPosttitle);
-				//alert(realPosttitle.split(" ").length);
-				else if (realPosttitle == "" || (realPosttitle.split(" ").length - realSongtitle.split(" ").length != 1))
+				//alert(realSongtitle+'....'+postTitle+'....'+realPosttitle);
+				
+				if (realPosttitle != realSongtitle)
 					continue;
 
 				if (TransArr.indexOf(postUrl) == -1) {
 					// 检查地址是否重复
 					//alert(postUrl);
-					//if(PostRequest("https://www.xiami.com" + postUrl) == false) 	continue;
 					
 					// if (检查歌词内容(xhr(postUrl, 'get', 0)) == 0) 跳过;
 
@@ -172,9 +164,7 @@ var loadTranslist = function () {
 
 				}
 			}
-
-		}
-		
+		}	
 		
 		/*function 检查歌词内容(result){
 			处理;
