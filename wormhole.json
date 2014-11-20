@@ -1,117 +1,12 @@
 {
-  "linlin": {
-    "-xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-    "trackList": [
-      {
-        "track": {
-          "title": "第二性",
-          "song_id": "1773706176",
-          "album_id": "1115983579",
-          "album_name": "呸",
-          "artist": "蔡依林",
-          "location": "http://m2.music.126.net/-5NsydM35dfKQXVGNDY6wQ==/2536573326985157.mp3",
-          "album_pic": "http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"
-        }
-      },
-      {
-        "track": {
-          "title": "Play我呸",
-          "song_id": "1773652867",
-          "album_id": "1115983579",
-          "album_name": "呸",
-          "artist": "蔡依林",
-          "location": "http://m2.music.126.net/mP1QZlLJhpJBf3JjpcKHCw==/3241360278732861.mp3",
-          "album_pic": "http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"
-        }
-      },
-      {
-        "track": {
-          "title": "美杜莎",
-          "song_id": "1773706178",
-          "album_id": "1115983579",
-          "album_name": "呸",
-          "artist": "蔡依林",
-          "location": "http://m2.music.126.net/rcMQQx3kR3ku-OY6FLIvFg==/3225967116650943.mp3",
-          "album_pic": "http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"
-        }
-      },
-      {
-        "track": {
-          "title": "唇语",
-          "song_id": "1773706179",
-          "album_id": "1115983579",
-          "album_name": "呸",
-          "artist": "蔡依林",
-          "location": "http://m2.music.126.net/Xv2Sf77h3-tGVO9LyS1Ufw==/2542070885110215.mp3",
-          "album_pic": "http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"
-        }
-      },
-      {
-        "track": {
-          "title": "I'm Not Yours",
-          "song_id": "1773706180",
-          "album_id": "1115983579",
-          "album_name": "呸",
-          "artist": "蔡依林 / 安室奈美恵",
-          "location": "http://m2.music.126.net/yPDCGHu-y7xIoP1AuKhloA==/3238061744558101.mp3",
-          "album_pic": "http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"
-        }
-      },
-      {
-        "track": {
-          "title": "自爱自受",
-          "song_id": "1773706181",
-          "album_id": "1115983579",
-          "album_name": "呸",
-          "artist": "蔡依林",
-          "location": "http://m2.music.126.net/2wG-lFIOBwspEf5OGuQkdw==/3239161256181071.mp3",
-          "album_pic": "http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"
-        }
-      },
-      {
-        "track": {
-          "title": "Miss Trouble",
-          "song_id": "1773706182",
-          "album_id": "1115983579",
-          "album_name": "呸",
-          "artist": "蔡依林",
-          "location": "http://m2.music.126.net/SNt4D18_H-oHvshg2Z_7Wg==/6671836558459091.mp3",
-          "album_pic": "http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"
-        }
-      },
-      {
-        "track": {
-          "title": "电话皇后",
-          "song_id": "1773592238",
-          "album_id": "1115983579",
-          "album_name": "呸",
-          "artist": "蔡依林",
-          "location": "http://m1.music.126.net/tjjZ8Zbofutt6oqnKGENIA==/3241360279436384.mp3",
-          "album_pic": "http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"
-        }
-      },
-      {
-        "track": {
-          "title": "第三人称",
-          "song_id": "1773695952",
-          "album_id": "1115983579",
-          "album_name": "呸",
-          "artist": "蔡依林",
-          "location": "http://m2.music.126.net/j3Z1xadg7MEfgjZOSVmMgA==/3228166139912099.mp3",
-          "album_pic": "http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"
-        }
-      },
-      {
-        "track": {
-          "title": "不一样又怎样",
-          "song_id": "1773706185",
-          "album_id": "1115983579",
-          "album_name": "呸",
-          "artist": "蔡依林",
-          "location": "http://m1.music.126.net/68RUQmIOKgnOL2kHZaLEfg==/6621259023570154.mp3",
-          "album_pic": "http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"
-        }
-      }
-    ]
-  }
+  "1773706176": { "song_id":1773706176, "title":"第二性", "album_name":"呸", "album_id":1115983579, "artist":"蔡依林", "location":"http://m2.music.126.net/-5NsydM35dfKQXVGNDY6wQ==/2536573326985157.mp3", "album_pic":"http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"},
+  "1773652867": { "song_id":1773652867, "title":"Play我呸", "album_name":"呸", "album_id":1115983579, "artist":"蔡依林", "location":"http://m2.music.126.net/mP1QZlLJhpJBf3JjpcKHCw==/3241360278732861.mp3", "album_pic":"http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"},
+  "1773706178": { "song_id":1773706178, "title":"美杜莎", "album_name":"呸", "album_id":1115983579, "artist":"蔡依林", "location":"http://m2.music.126.net/rcMQQx3kR3ku-OY6FLIvFg==/3225967116650943.mp3", "album_pic":"http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"},
+  "1773706179": { "song_id":1773706179, "title":"唇语", "album_name":"呸", "album_id":1115983579, "artist":"蔡依林", "location":"http://m2.music.126.net/Xv2Sf77h3-tGVO9LyS1Ufw==/2542070885110215.mp3", "album_pic":"http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"},
+  "1773706180": { "song_id":1773706180, "title":"I'm Not Yours", "album_name":"呸", "album_id":1115983579, "artist":"蔡依林 / 安室奈美恵", "location":"http://m2.music.126.net/yPDCGHu-y7xIoP1AuKhloA==/3238061744558101.mp3", "album_pic":"http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"},
+  "1773706181": { "song_id":1773706181, "title":"自爱自受", "album_name":"呸", "album_id":1115983579, "artist":"蔡依林", "location":"http://m2.music.126.net/2wG-lFIOBwspEf5OGuQkdw==/3239161256181071.mp3", "album_pic":"http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"},
+  "1773706182": { "song_id":1773706182, "title":"Miss Trouble", "album_name":"呸", "album_id":1115983579, "artist":"蔡依林", "location":"http://m2.music.126.net/SNt4D18_H-oHvshg2Z_7Wg==/6671836558459091.mp3", "album_pic":"http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"},
+  "1773592238": { "song_id":1773592238, "title":"电话皇后", "album_name":"呸", "album_id":1115983579, "artist":"蔡依林", "location":"http://m1.music.126.net/tjjZ8Zbofutt6oqnKGENIA==/3241360279436384.mp3", "album_pic":"http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"},
+  "1773695952": { "song_id":1773695952, "title":"第三人称", "album_name":"呸", "album_id":1115983579, "artist":"蔡依林", "location":"http://m2.music.126.net/j3Z1xadg7MEfgjZOSVmMgA==/3228166139912099.mp3", "album_pic":"http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"},
+  "1773706185": { "song_id":1773706185, "title":"不一样又怎样", "album_name":"呸", "album_id":1115983579, "artist":"蔡依林", "location":"http://m1.music.126.net/68RUQmIOKgnOL2kHZaLEfg==/6621259023570154.mp3", "album_pic":"http://img.xiami.net/images/album/img54/1354/11159835791415983579_2.jpeg"}
 }
