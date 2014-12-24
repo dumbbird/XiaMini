@@ -3,7 +3,7 @@
 		
 	var CurrentUrl = window.location.href;
 	if (CurrentUrl.indexOf("/group/thread-detail/") != -1) {
-		var MaxReply = 2; // 最多显示数量
+		var MaxReply = 5; // 最多显示数量
 		var ReplyArr = new Array(); //记录加了隐藏开关的楼号
 		var total_topic = $('div.parent_post'); //有回复的楼数
 		for (var i=0;i<total_topic.length;i++) {

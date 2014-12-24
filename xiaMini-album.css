@@ -28,6 +28,7 @@
 
 
 /* album and single page */
+
 #nav,
 .adm_block.mgt20,
 #song_fans_block,
@@ -39,6 +40,7 @@
 #wrapper div#title {padding: 20px 0 10px 30px !important;}
 
 /* album page */
+
 #album_info {min-height: 250px !important;}
 #album_rank {float: left !important;}
 #album_info table {float:right !important; width: 250px; padding: 5px !important }
@@ -47,3 +49,47 @@
 #album_cover p.grade {margin: -45px 0 0 250px !important; z-index:2 !important; position: relative; overflow: auto !important}
 #taobao_cd {display:none !important}
 td.song_name {width: 300px !important; word-break: break-word !important}
+
+#do_buy i{
+	background: url('icon.png') no-repeat !important;
+	background-position: -75px -224px !important;
+}
+#do_buy .wrap:hover i{
+	background-position: -60px -89px !important;
+}
+/* 
+a.wormhole {
+	background: url(.png) 0 0 no-repeat;
+}*/
+
+/* classical album page */
+
+.track_list tr.same_group td.chkbox {
+  border-left: 2px solid #f60;
+}
+.track_list a.slide_down,
+.track_list a.slide_up {
+  display:block;
+  width:17px;
+  height:17px;
+  background-image:url(http://img.xiami.net/res/img/default/slide_group.gif);
+  float:right;
+  margin: 0 0 0 5px;
+}
+.track_list a.slide_down {
+  background-position:0 0;
+}
+.track_list a.slide_down:hover {
+  background-position:0 -17px;
+}
+.track_list a.slide_up {
+  background-position:0 -34px !important;
+}
+.track_list a.slide_up:hover {
+  background-position:0 -51px !important;
+}
+.vicos{background:url( http://img.xiami.net/res/img/default/verify_ico.gif) 100% 0 no-repeat; padding-right:18px;}
+
+h3.work_title {
+	font-style: italic;	
+}

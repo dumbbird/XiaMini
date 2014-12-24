@@ -38,6 +38,7 @@ page/mods/player/player-roam
 page/mods/player/player-log
 utils/dd/plugin/scroll
 page/mods/player/player-drag
+page/mods/player/player-cover
 page/mods/data/center
 page/mods/xtpl/trackInfo-xtpl
 utils/tip/index
@@ -1566,7 +1567,7 @@ KISSY.add('page/mods/xtpl/lrc-xtpl',function (S, require, exports, module) {
                         var buffer = "";
                         buffer += '\r\n<li class="ui-lrc-line ui-lrc-current">';
                         var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "text", 0, 5);
-						if ("&nbsp;" == id9)	id9 = '&nbsp</li><li class="ui-trans-line ui-trans-current">';	// dumbbirdedit
+						if ("&nbsp;" == id9)	id9 = '&nbsp;</li>';											// dumbbirdedit
 						id9 = id9.replace("\n", '</li><li class="ui-trans-line ui-trans-current">');		// dumbbirdedit
                         buffer += renderOutputUtil(id9, false);
                         buffer += '</li>\r\n';
@@ -1576,8 +1577,8 @@ KISSY.add('page/mods/xtpl/lrc-xtpl',function (S, require, exports, module) {
                         var buffer = "";
                         buffer += '\r\n<li class="ui-lrc-line">';
                         var id10 = getPropertyOrRunCommandUtil(engine, scope, {}, "text", 0, 7);
-						if ("&nbsp;" == id10)	id10 = '&nbsp</li><li class="ui-trans-line">';	// dumbbirdedit
-						id10 = id10.replace("\n", '</li><li class="ui-trans-line">');			// dumbbirdedit
+						if ("&nbsp;" == id10) id10 = '&nbsp;</li>';						// dumbbirdedit
+						id10 = id10.replace("\n", '</li><li class="ui-trans-line">');	// dumbbirdedit
                         buffer += renderOutputUtil(id10, false);
                         buffer += '</li>\r\n';
                         return buffer;
@@ -1635,10 +1636,18 @@ KISSY.add('page/mods/xtpl/lrcText-xtpl',function (S, require, exports, module) {
                 config3.params = params4;
                 config3.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n<li class="ui-lrc-line">&nbsp;'; // dumbbirdedit
+                    buffer += '\r\n<li class="ui-lrc-line">';
                     var id6 = getPropertyOrRunCommandUtil(engine, scope, {}, "this", 0, 4);
-                    buffer += renderOutputUtil(id6, false);
-                    buffer += '&nbsp;</li>\r\n'; // dumbbirdedit
+					
+					// dumbbirdedit
+					//alert(renderOutputUtil(id6, false));
+					if (renderOutputUtil(id6, false).replace(/^\s\s*/, '').replace(/\s\s*$/, '') == ""){						
+						buffer += "&nbsp;";
+					}
+					else
+						buffer += renderOutputUtil(id6, false);					
+                    
+					buffer += '</li>\r\n';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config3, "each", 3);
@@ -1743,10 +1752,63 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             self.set("songId", sid);
             self.clearLyric();
             if (status) {
-                self.lyricLoadComplete(text);
+				if (text.indexOf("<br") != -1) {
+					text = text.replace(/\n/g, "");				// dumbbirdedit
+					//alert(text);
+					text = text.replace(/\<br \/\>/g, "\n");	// dumbbirdedit
+					//alert(text);
+				}
+				self.lyricLoadComplete(text);
             } else {
                 self.noLyric();
             }
+			
+			// by @dumbbird, inspired by @哀
+			//alert("render/reset");
+			rendertxt = function (){
+				function xhr(u, m, a, d, c) {
+					var xmlhttp,
+					S_Result;
+					var url = u || '';
+					var method = m || 'get';
+					var async = a || 0;
+					var postdata = d || '';
+					xmlhttp = new XMLHttpRequest;
+					xmlhttp.onreadystatechange = callback;
+					xmlhttp.open(method, url, async);
+					xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+					xmlhttp.send(postdata);
+					function callback() {
+						if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+							S_Result = xmlhttp.responseText;
+							if (c) {
+								c.call(this, S_Result);
+							} //异步方式使用回调函数处理
+						}
+					}
+					return S_Result; //同步方式可以取得返回值
+				}
+				var lyrictxt = "";
+				xhr("http://www.xiami.com/radio/lyric/sid/"+sid, 'get', 1, "",function(ResultsHtml){
+					//alert(ResultsHtml);
+					lyrictxt = ResultsHtml.replace(/\n/g, "");
+					//alert(lyrictxt);
+					lyrictxt = lyrictxt.replace(/\<br \/\>/g, "\n");
+					//alert(lyrictxt);
+					if (lyrictxt)
+						self.lyricLoadComplete(lyrictxt);
+					else
+						self.noLyric();
+				});					
+			}
+			resetlrc = function (){
+				if (status) {
+					self.lyricLoadComplete(text);
+					//document.getElementsByTagName("ui-lrc-line ui-lrc-current")[0].removeClass("ui-lrc-current");
+				} else {
+					self.noLyric();
+				}
+			}
         },
         /**
          * 歌词加载完成
@@ -1777,11 +1839,19 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             self.wrap.html(html);
             self.LyricLine = self.wrap.all(".ui-lrc-line");
             self.scrollView = ScrollViewManage.render("J_lyricScrollView");
+			
+			// dumbbirdedit, inspired by @哀
+			var el = document.getElementById("lrc_trans");
+			el.setAttribute("style", "color:lightgray");
+			el.setAttribute("status", "txt");
+			el.setAttribute("title", "文本歌词");
+			
         },
         changeCurrent: function(oldIndex, newIndex) {
             var self = this;
 			
             if (oldIndex != -1) {
+				self.LyricLine.item(0).removeClass("ui-lrc-current");	// dumbbirdedit
                 self.LyricLine.item(oldIndex).removeClass("ui-lrc-current");
             }
             if (newIndex != -1) {
@@ -1791,7 +1861,8 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             }
 			
 			// dumbbirdedit
-			if (-1 != oldIndex && self.TransLine.item(oldIndex).removeClass("ui-trans-current"), -1 != newIndex) { 
+			if (-1 != oldIndex && self.TransLine.item(oldIndex).removeClass("ui-trans-current"), -1 != newIndex) {
+				self.TransLine.item(0).removeClass("ui-trans-current");			
 				var e = self.TransLine.item(newIndex); 
 				e.addClass("ui-trans-current");
 			}
@@ -1877,15 +1948,26 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 			self.TransLine = self.wrap.all(".ui-trans-line"); //dumbbirdedit
             self.scrollView = ScrollViewManage.render("J_lyricScrollView");
 			
+			// dumbbirdedit
+			if (roll) {
+				var el = document.getElementById("lrc_trans");
+				if (document.getElementById("t_xiamini") /*&& document.getElementsByClassName("ui-trans-line").length != 0*/) {
+					el.setAttribute("style", "color:green");
+					el.setAttribute("status", "lrc");
+					el.setAttribute("title", "LRC开启/t-LRC关闭中 (翻译隐藏)");
+				} else {
+					el.setAttribute("style", "color:#f60");
+					el.setAttribute("status", "tlrc");
+					el.setAttribute("title", "LRC/t-LRC开启中");
+				}
+			}
 			// by @哀
-			var transdisscript = "<script type='text/javascript' src='http://g.tbcdn.cn/de/music-player/0.9.10/??common/global-min.js,pages/index/page/init-min.js'></script>"; 
-			$(document.body).append(transdisscript); 
-			var transdisdiv = "<div id='J_transdislrc' onclick='transdislrc()'></div>";
-			$(document.body).append(transdisdiv); 
+			//alert("transdislrc");
 			transdislrc = function (){
+				//alert("transdislrc");
 				self.LyricLine = self.wrap.all(".ui-lrc-line"),
 				self.TransLine = self.wrap.all(".ui-trans-line"), //dumbbirdedit
-				self.scrollView = ScrollViewManage.render("J_lyricScrollView")
+				self.scrollView = ScrollViewManage.render("J_lyricScrollView");
 			}			
         },
         _splitLyric: function(value) {
@@ -1934,17 +2016,21 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             var _arr_splitedLyrics = [];
             for (var i = 0, max = arr_lyrics.length; i < max; i++) {				
                 var ly = arr_lyrics[i];
-				//alert (arr_lyrics[i]);
                 var arr_tmptime = ly.match(reg_gettimes);
 				ly = ly.replace(qt, "");	// dumbbirdedit，去除翻译标示
                 ly = ly.replace(reg_replacetime, "");
+				
                 //去除时间信息，只保留歌词以便后面形成数组
                 //获取所有的时间信息
                 if (arr_tmptime.length == 1) {
                     var arr_single = {};
                     arr_single["time"] = self._minuteToecond(arr_tmptime[0]);
                     if (reg_dis.test(ly)) {
-                        ly = "&nbsp;";
+						// dumbbirdedit
+						if (pt == trans)
+							ly = "&nbsp;\n&nbsp;";
+                        else
+							ly = "&nbsp;";
                     };
                     arr_single["text"] = ly;
                     _arr_splitedLyrics.push(arr_single);
@@ -1954,7 +2040,11 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
                     var arr_single = {};
                     arr_single["time"] = self._minuteToecond(arr_tmptime[k]);
                     if (reg_dis.test(ly)) {
-                        ly = "&nbsp;";
+						//dumbbirdedit
+                        if (pt == trans)
+							ly = "&nbsp;\n&nbsp;";
+                        else
+							ly = "&nbsp;";
                     };
                     arr_single["text"] = ly;
                     _arr_splitedLyrics.push(arr_single);
@@ -1977,6 +2067,13 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
         },
         _setTxtLyrics: function(value) {
             var self = this;
+			
+			// dumbbirdedit, inspired by @哀
+			var el = document.getElementById("lrc_trans");
+			el.setAttribute("style", "color:lightgray");
+			el.setAttribute("status", "txt");
+			el.setAttribute("title", "文本歌词");
+			
             if (value == "") {
                 self.noLyric();
                 return false;
@@ -1984,9 +2081,8 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             } else {
                 var lycArray = value.split("\n");
                 lycArray.unshift("文本歌词");
-                self._show(false, lycArray);
-            }
-
+                self._show(false, lycArray);			
+            }			
         },
         /**
          * 清除歌词面板
@@ -2124,14 +2220,15 @@ KISSY.add('page/mods/player/player-sale',['io', 'utils/base'], function(S, requi
                 },
                 dataType: 'json',
                 success: function(response) {
-                    if (response.status && !! response.data) {
-                        if ('function' === typeof successCallback) {
-                            self.dataCache['a' + obj.albumid] = response.data[0];
-                            var html = self.formatTemplate(response.data[0], obj);
-                            successCallback(html);
-                        }
+                    if (response.status && !!response.data) {
+                        self.dataCache['a' + obj.albumid] = response.data[0];
+                        var html = self.formatTemplate(response.data[0], obj);
+                        successCallback(html);
                     } else {
-                        if ('function' === typeof errorCallback) {
+                        if (!!response.url) {
+                            var html = self.noneTemplate(response.url, obj)
+                            successCallback(html)
+                        } else {
                             errorCallback()
                         }
                     }
@@ -2146,7 +2243,12 @@ KISSY.add('page/mods/player/player-sale',['io', 'utils/base'], function(S, requi
         formatTemplate: function(data, param) {
             S.log(param)
             var param = S.param(param);
-            return '<a onclick="javascript:goldlog.record(\'/xiamipc.1.12\',\'\',\'' + param + '\',\'H46807196\')" href="' + data.url + '" target="_blank"><s>CD原价￥' + (data.normal_price | 0) + '</s><span>￥<em>' + (data.discount_price | 0) + '</em></span></a>';
+            return '<a class="taobao" onclick="javascript:goldlog.record(\'/xiamipc.1.12\',\'\',\'' + param + '\',\'H46807196\')" href="' + data.url + '" target="_blank"><s>￥' + (data.normal_price | 0) + '</s><i>' + Number(data.discount / 100).toFixed(1) + '折</i><span>￥<em>' + (data.discount_price | 0) + '</em></span></a>';
+        },
+        noneTemplate: function(url, param) {
+            param.action = 'search'
+            var param = S.param(param);
+            return '<a class="none" onclick="javascript:goldlog.record(\'/xiamipc.1.12\',\'\',\'' + param + '\',\'H46807196\')" href="' + url + '" target="_blank">去音乐馆淘一下</a>';
         }
     }
 
@@ -2280,6 +2382,7 @@ KISSY.add('page/mods/player/player-lister',['node', 'base', 'json'], function(S,
             self.fire("playerRuning");
         },
         lyricComplete: function(status, text) {
+
             var self = this;
             self.fire("lyricComplete", {
                 "status": status,
@@ -3013,7 +3116,7 @@ KISSY.add('page/mods/xtpl/trackItem-xtpl',function (S, require, exports, module)
             var config9 = {};
             config9.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n';
+                buffer += '\n';
                 var config0 = {};
                 var params1 = [];
                 var id2 = getPropertyUtil(engine, scope, "xindex", 0, 2);
@@ -3022,7 +3125,7 @@ KISSY.add('page/mods/xtpl/trackItem-xtpl',function (S, require, exports, module)
                 config0.params = params1;
                 config0.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n<div class="ui-row-item ui-track-item ui-track-current" data-index="';
+                    buffer += '\n<div class="ui-row-item ui-track-item ui-track-current" data-index="';
                     var id4 = getPropertyUtil(engine, scope, "xindex", 0, 3);
                     buffer += renderOutputUtil(id4 + (1), true);
                     buffer += '" data-sid="';
@@ -3034,12 +3137,12 @@ KISSY.add('page/mods/xtpl/trackItem-xtpl',function (S, require, exports, module)
                     buffer += '" data-type="track" id="J_trackList';
                     var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 3);
                     buffer += renderOutputUtil(id7, true);
-                    buffer += '">\r\n';
+                    buffer += '">\n';
                     return buffer;
                 };
                 config0.inverse = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n<div class="ui-row-item ui-track-item" data-sid="';
+                    buffer += '\n<div class="ui-row-item ui-track-item" data-sid="';
                     var id8 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 5);
                     buffer += renderOutputUtil(id8, true);
                     buffer += '" data-index="';
@@ -3051,11 +3154,11 @@ KISSY.add('page/mods/xtpl/trackItem-xtpl',function (S, require, exports, module)
                     buffer += '" data-type="track" id="J_trackList';
                     var id11 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 5);
                     buffer += renderOutputUtil(id11, true);
-                    buffer += '">\r\n';
+                    buffer += '">\n';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config0, "if", 2);
-                buffer += '\r\n<div class="ui-track-main">\r\n\t<div class="ui-track-checkbox">\r\n\t\t';
+                buffer += '\n<div class="ui-track-main">\n\t<div class="ui-track-checkbox">\n\t\t';
                 var config12 = {};
                 var params13 = [];
                 var id14 = getPropertyUtil(engine, scope, "shield", 0, 9);
@@ -3063,31 +3166,31 @@ KISSY.add('page/mods/xtpl/trackItem-xtpl',function (S, require, exports, module)
                 config12.params = params13;
                 config12.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t<input type="checkbox" class="ui-track-item-id" name="track" id="J_track';
+                    buffer += '\n\t\t<input type="checkbox" class="ui-track-item-id" name="track" id="J_track';
                     var id15 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 10);
                     buffer += renderOutputUtil(id15, true);
                     buffer += '" value="';
                     var id16 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 10);
                     buffer += renderOutputUtil(id16, true);
-                    buffer += '" disabled="disabled" />\r\n\t\t';
+                    buffer += '" disabled="disabled" />\n\t\t';
                     return buffer;
                 };
                 config12.inverse = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t<input type="checkbox" class="ui-track-item-id" name="track" id="J_track';
+                    buffer += '\n\t\t<input type="checkbox" class="ui-track-item-id" name="track" id="J_track';
                     var id17 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 12);
                     buffer += renderOutputUtil(id17, true);
                     buffer += '" value="';
                     var id18 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 12);
                     buffer += renderOutputUtil(id18, true);
-                    buffer += '" />\r\n\t\t';
+                    buffer += '" />\n\t\t';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config12, "if", 9);
-                buffer += '\r\n\t</div>\r\n\t<div class="ui-track-sort"><em>';
+                buffer += '\n\t</div>\n\t<div class="ui-track-sort"><em>';
                 var id19 = getPropertyUtil(engine, scope, "xindex", 0, 15);
                 buffer += renderOutputUtil(id19 + (1), true);
-                buffer += '</em></div>\r\n\t<div class="ui-row-item-body">\r\n\t\t<div class="ui-row-item-column c1" data-id="';
+                buffer += '</em></div>\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1" data-id="';
                 var id20 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 17);
                 buffer += renderOutputUtil(id20, true);
                 buffer += '"><span title="';
@@ -3096,63 +3199,112 @@ KISSY.add('page/mods/xtpl/trackItem-xtpl',function (S, require, exports, module)
                 buffer += '">';
                 var id22 = getPropertyOrRunCommandUtil(engine, scope, {}, "title", 0, 17);
                 buffer += renderOutputUtil(id22, false);
-                buffer += '</span></div>\r\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
-                var id23 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 18);
-                buffer += renderOutputUtil(id23, true);
-                buffer += '">';
-                var id24 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistfun", 0, 18);
-                buffer += renderOutputUtil(id24, false);
-                buffer += '</div>\r\n\t\t<div class="ui-row-item-column c3" data-album-id="';
-                var id25 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 19);
-                buffer += renderOutputUtil(id25, true);
-                buffer += '"><a href="http://www.xiami.com/album/';
-                var id26 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 19);
-                buffer += renderOutputUtil(id26, true);
-                buffer += '" target="_blank" title="';
-                var id27 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 19);
-                buffer += renderOutputUtil(id27, false);
-                buffer += '">';
-                var id28 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 19);
-                buffer += renderOutputUtil(id28, false);
-                buffer += '</a></div>\r\n\t</div>\r\n\t<div class="ui-track-control">\r\n\t\t';
-                var config29 = {};
-                var params30 = [];
-                var id31 = getPropertyUtil(engine, scope, "grade", 0, 22);
-                params30.push((id31 * (1)) === (-1));
-                config29.params = params30;
-                config29.fn = function (scope) {
+                buffer += '</span></div>\n\t\t';
+                var config23 = {};
+                var params24 = [];
+                var id25 = getPropertyUtil(engine, scope, "isAd", 0, 18);
+                params24.push(id25);
+                config23.params = params24;
+                config23.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t<a class="fav-btn icon-track-fav" data-type="track" data-event="fav" title="收藏"></a>\r\n\t\t';
+                    buffer += '\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
+                    var id26 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 19);
+                    buffer += renderOutputUtil(id26, true);
+                    buffer += '">';
+                    var id27 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistfun", 0, 19);
+                    buffer += renderOutputUtil(id27, false);
+                    buffer += '</div>\n\t\t<div class="ui-row-item-column c3" data-album-id="';
+                    var id28 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 20);
+                    buffer += renderOutputUtil(id28, true);
+                    buffer += '"><a href="http://www.xiami.com/album/';
+                    var id29 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 20);
+                    buffer += renderOutputUtil(id29, true);
+                    buffer += '" target="_blank" title="';
+                    var id30 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 20);
+                    buffer += renderOutputUtil(id30, false);
+                    buffer += '">';
+                    var id31 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 20);
+                    buffer += renderOutputUtil(id31, false);
+                    buffer += '</a></div>\n\t\t';
                     return buffer;
                 };
-                config29.inverse = function (scope) {
-                    var buffer = "";
-                    buffer += '\r\n\t\t<a class="fav-btn icon-track-faved" data-type="track" data-event="fav" title="取消收藏"></a>\r\n\t\t';
-                    return buffer;
-                };
-                buffer += runBlockCommandUtil(engine, scope, config29, "if", 22);
-                buffer += '\r\n\t\t<a class="more-btn icon-track-more" data-type="track" data-event="more" title="更多"></a>\r\n\t\t<a class="delete-btn icon-track-delete" data-type="track" data-event="delete" title="删除"></a>\r\n\t</div>\r\n</div>\r\n<div class="ui-roam-wrap" id="J_roamWrap';
-                var id32 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 31);
-                buffer += renderOutputUtil(id32, true);
-                buffer += '">\r\n\t';
+                var inverse32 = config23.fn;
+                config23.fn = config23.inverse;
+                config23.inverse = inverse32;
+                buffer += runBlockCommandUtil(engine, scope, config23, "if", 18);
+                buffer += '\n\t</div>\n\t<div class="ui-track-control">\n\t\t';
                 var config33 = {};
                 var params34 = [];
-                var id35 = getPropertyUtil(engine, scope, "xindex", 0, 32);
-                var id36 = getPropertyUtil(engine, scope, "index", 1, 32);
-                params34.push(id35 === id36);
+                var id35 = getPropertyUtil(engine, scope, "isAd", 0, 24);
+                params34.push(id35);
                 config33.params = params34;
                 config33.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t<div class="ui-roam-head"><a class="ui-roam-open" data-event="roam">漫游相似歌曲</a></div>\r\n\t';
+                    buffer += '\n\t\t';
+                    var config36 = {};
+                    var params37 = [];
+                    var id38 = getPropertyUtil(engine, scope, "grade", 0, 25);
+					if ((id38 * (1)) === (-2)) {
+						buffer += '\n\t\t<a class="icon-wormhole" title="穿越中" href="/collect/552436" target="_blank"></a>\n\t\t';
+					} else {
+						params37.push((id38 * (1)) === (-1));
+						config36.params = params37;
+						config36.fn = function (scope) {
+							var buffer = "";
+							buffer += '\n\t\t<a class="fav-btn icon-track-fav" data-type="track" data-event="fav" title="收藏"></a>\n\t\t';
+							return buffer;
+						};
+						config36.inverse = function (scope) {
+							var buffer = "";
+							buffer += '\n\t\t<a class="fav-btn icon-track-faved" data-type="track" data-event="fav" title="取消收藏"></a>\n\t\t';
+							return buffer;
+						};
+						buffer += runBlockCommandUtil(engine, scope, config36, "if", 25);
+					}
+                    buffer += '\n\t\t<a class="more-btn icon-track-more" data-type="track" data-event="more" title="更多"></a>\n\t\t';
                     return buffer;
                 };
-                config33.inverse = function (scope) {
+                var inverse39 = config33.fn;
+                config33.fn = config33.inverse;
+                config33.inverse = inverse39;
+                buffer += runBlockCommandUtil(engine, scope, config33, "if", 24);
+                buffer += '\n\t\t<a class="delete-btn icon-track-delete" data-type="track" data-event="delete" title="删除"></a>\n\t</div>\n</div>\n';
+                var config40 = {};
+                var params41 = [];
+                var id42 = getPropertyUtil(engine, scope, "isAd", 0, 35);
+                params41.push(id42);
+                config40.params = params41;
+                config40.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t<div class="ui-roam-head"></div>\r\n\t';
+                    buffer += '\n<div class="ui-roam-wrap" id="J_roamWrap';
+                    var id43 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 36);
+                    buffer += renderOutputUtil(id43, true);
+                    buffer += '">\n\t';
+                    var config44 = {};
+                    var params45 = [];
+                    var id46 = getPropertyUtil(engine, scope, "xindex", 0, 37);
+                    var id47 = getPropertyUtil(engine, scope, "index", 1, 37);
+                    params45.push(id46 === id47);
+                    config44.params = params45;
+                    config44.fn = function (scope) {
+                        var buffer = "";
+                        buffer += '\n\t<div class="ui-roam-head"><a class="ui-roam-open" data-event="roam">漫游相似歌曲</a></div>\n\t';
+                        return buffer;
+                    };
+                    config44.inverse = function (scope) {
+                        var buffer = "";
+                        buffer += '\n\t<div class="ui-roam-head"></div>\n\t';
+                        return buffer;
+                    };
+                    buffer += runBlockCommandUtil(engine, scope, config44, "if", 37);
+                    buffer += '\n</div>\n';
                     return buffer;
                 };
-                buffer += runBlockCommandUtil(engine, scope, config33, "if", 32);
-                buffer += '\r\n</div>\r\n</div>\r\n';
+                var inverse48 = config40.fn;
+                config40.fn = config40.inverse;
+                config40.inverse = inverse48;
+                buffer += runBlockCommandUtil(engine, scope, config40, "if", 35);
+                buffer += '\n</div>\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config9, "data", 1);
@@ -3181,7 +3333,6 @@ KISSY.add('page/mods/player/player-tracks',['node', 'base', 'anim', 'xtemplate',
             self._trackCount = $("#J_trackCount");
             self._scrollLock = null;
             self._viewIndex = -1;
-
             self.scrollView = ScrollViewManage.render("J_tracksScrollView");
         },
         append: function(arr, removes, sid) {
@@ -3230,6 +3381,7 @@ KISSY.add('page/mods/player/player-tracks',['node', 'base', 'anim', 'xtemplate',
                 index: -1
             };
             var html = self.TPL_track.render(data);
+
             Node.one("#J_trackList" + sid).after(html);
             $("#J_checkAll_track").prop('checked', false);
             self.sortTrackList();
@@ -3274,6 +3426,7 @@ KISSY.add('page/mods/player/player-tracks',['node', 'base', 'anim', 'xtemplate',
         },
         highCurrentTrack: function(sid, status) {
             var self = this;
+
             if (status !== "roam") {
                 var target = self.tracksWrap.one("#J_trackList" + sid),
                     offset = {
@@ -3286,12 +3439,15 @@ KISSY.add('page/mods/player/player-tracks',['node', 'base', 'anim', 'xtemplate',
                 };
                 if (target) {
                     target.addClass("ui-track-current");
-                    target.one(".ui-roam-head").html('<a class="ui-roam-open" data-event="roam">漫游相似歌曲</a>').show();
+                    //@zhongtang
+                    if(target.one(".ui-roam-head")){
+                        target.one(".ui-roam-head").html('<a class="ui-roam-open" data-event="roam">漫游相似歌曲</a>').show();
+                    }
                     target.one(".ui-track-sort").removeClass("ui-track-sort-roam");
                     offset = target.offset();
                     index = target.attr('data-index');
                 };
-                
+
                 if (S.UA.ie !== 7 || S.UA.ie !== 6) {
                     self._scrollLock && self._scrollLock.cancel();
                     self._scrollLock = S.later(function() {
@@ -3372,15 +3528,15 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
     var shg_table = [9, 11, 12, 13, 13, 14, 14, 15, 15, 15, 15, 16, 16, 16, 16, 17, 17, 17, 17, 17, 17, 17, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24];
     var stackBlurExtension = {
-        initializer : function() {
+        initializer: function() {
             var self = this;
             self.id = null;
         },
-        render : function(url, canvasID, radius, blurAlphaChannel) {
+        render: function(url, canvasID, radius, blurAlphaChannel) {
             var self = this;
             self.id = canvasID;
             var canvas = document.getElementById(canvasID);
-            if (! canvas || ! canvas.getContext) {
+            if (!canvas || !canvas.getContext || !url) {
                 return;
             }
             var w = $(canvas).width();
@@ -3394,7 +3550,8 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                 var iw = img.width;
                 var ih = img.height;
                 var imgRatio = iw / ih;
-                var catW = 0, catH = 0;
+                var catW = 0,
+                    catH = 0;
                 context.clearRect(0, 0, w, h);
                 if (imgRatio < canvasRatio) {
                     catH = iw / canvasRatio;
@@ -3416,9 +3573,9 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                 };
             };
             img.crossOrigin = 'http://www.xiami.com';
-            img.src = url + '?v=tblur';
+            img.src = url + '?v=bgblur';
         },
-        stackBlurImage : function(imageID, canvasID, radius, blurAlphaChannel) {
+        stackBlurImage: function(imageID, canvasID, radius, blurAlphaChannel) {
 
             var img = document.getElementById(imageID);
             var w = img.naturalWidth;
@@ -3444,7 +3601,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                 stackBlurCanvasRGB(canvasID, 0, 0, w, h, radius);
         },
 
-        stackBlurCanvasRGBA : function(id, top_x, top_y, width, height, radius) {
+        stackBlurCanvasRGBA: function(id, top_x, top_y, width, height, radius) {
             var self = this;
             if (isNaN(radius) || radius < 1)
                 return;
@@ -3458,7 +3615,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                 try {
                     imageData = context.getImageData(top_x, top_y, width, height);
                     S.log("getImageData success a");
-                } catch(e) {
+                } catch (e) {
                     // NOTE: this part is supposedly only needed if you want to work with local files
                     // so it might be okay to remove the whole try/catch block and just use
                     // imageData = context.getImageData( top_x, top_y, width, height );
@@ -3466,13 +3623,13 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                         netscape.security.PrivilegeManager.enablePrivilege("UniversalBrowserRead");
                         imageData = context.getImageData(top_x, top_y, width, height);
                         S.log("getImageData success b");
-                    } catch(e) {
+                    } catch (e) {
                         //alert("Cannot access local image");
                         throw new Error("unable to access local image data: " + e);
                         return;
                     }
                 }
-            } catch(e) {
+            } catch (e) {
                 //alert("Cannot access image");
                 self.fire("notImageDate");
                 throw new Error(e);
@@ -3487,11 +3644,11 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
             var widthMinus1 = width - 1;
             var heightMinus1 = height - 1;
             var radiusPlus1 = radius + 1;
-            var sumFactor = radiusPlus1 * (radiusPlus1 + 1 ) / 2;
+            var sumFactor = radiusPlus1 * (radiusPlus1 + 1) / 2;
 
             var stackStart = self.BlurStack();
             var stack = stackStart;
-            for( i = 1; i < div; i++ ) {
+            for (i = 1; i < div; i++) {
                 stack = stack.next = self.BlurStack();
                 if (i == radiusPlus1)
                     var stackEnd = stack;
@@ -3505,13 +3662,13 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
             var mul_sum = mul_table[radius];
             var shg_sum = shg_table[radius];
 
-            for( y = 0; y < height; y++ ) {
+            for (y = 0; y < height; y++) {
                 r_in_sum = g_in_sum = b_in_sum = a_in_sum = r_sum = g_sum = b_sum = a_sum = 0;
 
-                r_out_sum = radiusPlus1 * ( pr = pixels[yi] );
-                g_out_sum = radiusPlus1 * ( pg = pixels[yi + 1] );
-                b_out_sum = radiusPlus1 * ( pb = pixels[yi + 2] );
-                a_out_sum = radiusPlus1 * ( pa = pixels[yi + 3] );
+                r_out_sum = radiusPlus1 * (pr = pixels[yi]);
+                g_out_sum = radiusPlus1 * (pg = pixels[yi + 1]);
+                b_out_sum = radiusPlus1 * (pb = pixels[yi + 2]);
+                a_out_sum = radiusPlus1 * (pa = pixels[yi + 3]);
 
                 r_sum += sumFactor * pr;
                 g_sum += sumFactor * pg;
@@ -3520,7 +3677,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                 stack = stackStart;
 
-                for( i = 0; i < radiusPlus1; i++ ) {
+                for (i = 0; i < radiusPlus1; i++) {
                     stack.r = pr;
                     stack.g = pg;
                     stack.b = pb;
@@ -3528,12 +3685,12 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                     stack = stack.next;
                 }
 
-                for( i = 1; i < radiusPlus1; i++ ) {
-                    p = yi + ((widthMinus1 < i ? widthMinus1 : i ) << 2 );
-                    r_sum += (stack.r = ( pr = pixels[p])) * ( rbs = radiusPlus1 - i );
-                    g_sum += (stack.g = ( pg = pixels[p + 1])) * rbs;
-                    b_sum += (stack.b = ( pb = pixels[p + 2])) * rbs;
-                    a_sum += (stack.a = ( pa = pixels[p + 3])) * rbs;
+                for (i = 1; i < radiusPlus1; i++) {
+                    p = yi + ((widthMinus1 < i ? widthMinus1 : i) << 2);
+                    r_sum += (stack.r = (pr = pixels[p])) * (rbs = radiusPlus1 - i);
+                    g_sum += (stack.g = (pg = pixels[p + 1])) * rbs;
+                    b_sum += (stack.b = (pb = pixels[p + 2])) * rbs;
+                    a_sum += (stack.a = (pa = pixels[p + 3])) * rbs;
 
                     r_in_sum += pr;
                     g_in_sum += pg;
@@ -3545,7 +3702,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                 stackIn = stackStart;
                 stackOut = stackEnd;
-                for( x = 0; x < width; x++ ) {
+                for (x = 0; x < width; x++) {
                     pixels[yi + 3] = pa = (a_sum * mul_sum) >> shg_sum;
                     if (pa != 0) {
                         pa = 255 / pa;
@@ -3566,7 +3723,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                     b_out_sum -= stackIn.b;
                     a_out_sum -= stackIn.a;
 
-                    p = (yw + (( p = x + radius + 1 ) < widthMinus1 ? p : widthMinus1 ) ) << 2;
+                    p = (yw + ((p = x + radius + 1) < widthMinus1 ? p : widthMinus1)) << 2;
 
                     r_in_sum += (stackIn.r = pixels[p]);
                     g_in_sum += (stackIn.g = pixels[p + 1]);
@@ -3580,10 +3737,10 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                     stackIn = stackIn.next;
 
-                    r_out_sum += ( pr = stackOut.r );
-                    g_out_sum += ( pg = stackOut.g );
-                    b_out_sum += ( pb = stackOut.b );
-                    a_out_sum += ( pa = stackOut.a );
+                    r_out_sum += (pr = stackOut.r);
+                    g_out_sum += (pg = stackOut.g);
+                    b_out_sum += (pb = stackOut.b);
+                    a_out_sum += (pa = stackOut.a);
 
                     r_in_sum -= pr;
                     g_in_sum -= pg;
@@ -3597,14 +3754,14 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                 yw += width;
             }
 
-            for( x = 0; x < width; x++ ) {
+            for (x = 0; x < width; x++) {
                 g_in_sum = b_in_sum = a_in_sum = r_in_sum = g_sum = b_sum = a_sum = r_sum = 0;
 
                 yi = x << 2;
-                r_out_sum = radiusPlus1 * ( pr = pixels[yi]);
-                g_out_sum = radiusPlus1 * ( pg = pixels[yi + 1]);
-                b_out_sum = radiusPlus1 * ( pb = pixels[yi + 2]);
-                a_out_sum = radiusPlus1 * ( pa = pixels[yi + 3]);
+                r_out_sum = radiusPlus1 * (pr = pixels[yi]);
+                g_out_sum = radiusPlus1 * (pg = pixels[yi + 1]);
+                b_out_sum = radiusPlus1 * (pb = pixels[yi + 2]);
+                a_out_sum = radiusPlus1 * (pa = pixels[yi + 3]);
 
                 r_sum += sumFactor * pr;
                 g_sum += sumFactor * pg;
@@ -3613,7 +3770,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                 stack = stackStart;
 
-                for( i = 0; i < radiusPlus1; i++ ) {
+                for (i = 0; i < radiusPlus1; i++) {
                     stack.r = pr;
                     stack.g = pg;
                     stack.b = pb;
@@ -3623,13 +3780,13 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                 yp = width;
 
-                for( i = 1; i <= radius; i++ ) {
-                    yi = (yp + x ) << 2;
+                for (i = 1; i <= radius; i++) {
+                    yi = (yp + x) << 2;
 
-                    r_sum += (stack.r = ( pr = pixels[yi])) * ( rbs = radiusPlus1 - i );
-                    g_sum += (stack.g = ( pg = pixels[yi + 1])) * rbs;
-                    b_sum += (stack.b = ( pb = pixels[yi + 2])) * rbs;
-                    a_sum += (stack.a = ( pa = pixels[yi + 3])) * rbs;
+                    r_sum += (stack.r = (pr = pixels[yi])) * (rbs = radiusPlus1 - i);
+                    g_sum += (stack.g = (pg = pixels[yi + 1])) * rbs;
+                    b_sum += (stack.b = (pb = pixels[yi + 2])) * rbs;
+                    a_sum += (stack.a = (pa = pixels[yi + 3])) * rbs;
 
                     r_in_sum += pr;
                     g_in_sum += pg;
@@ -3646,14 +3803,14 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                 yi = x;
                 stackIn = stackStart;
                 stackOut = stackEnd;
-                for( y = 0; y < height; y++ ) {
+                for (y = 0; y < height; y++) {
                     p = yi << 2;
                     pixels[p + 3] = pa = (a_sum * mul_sum) >> shg_sum;
                     if (pa > 0) {
                         pa = 255 / pa;
-                        pixels[p] = ((r_sum * mul_sum) >> shg_sum ) * pa;
-                        pixels[p + 1] = ((g_sum * mul_sum) >> shg_sum ) * pa;
-                        pixels[p + 2] = ((b_sum * mul_sum) >> shg_sum ) * pa;
+                        pixels[p] = ((r_sum * mul_sum) >> shg_sum) * pa;
+                        pixels[p + 1] = ((g_sum * mul_sum) >> shg_sum) * pa;
+                        pixels[p + 2] = ((b_sum * mul_sum) >> shg_sum) * pa;
                     } else {
                         pixels[p] = pixels[p + 1] = pixels[p + 2] = 0;
                     }
@@ -3668,7 +3825,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                     b_out_sum -= stackIn.b;
                     a_out_sum -= stackIn.a;
 
-                    p = (x + ((( p = y + radiusPlus1) < heightMinus1 ? p : heightMinus1 ) * width )) << 2;
+                    p = (x + (((p = y + radiusPlus1) < heightMinus1 ? p : heightMinus1) * width)) << 2;
 
                     r_sum += (r_in_sum += (stackIn.r = pixels[p]));
                     g_sum += (g_in_sum += (stackIn.g = pixels[p + 1]));
@@ -3677,10 +3834,10 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                     stackIn = stackIn.next;
 
-                    r_out_sum += ( pr = stackOut.r );
-                    g_out_sum += ( pg = stackOut.g );
-                    b_out_sum += ( pb = stackOut.b );
-                    a_out_sum += ( pa = stackOut.a );
+                    r_out_sum += (pr = stackOut.r);
+                    g_out_sum += (pg = stackOut.g);
+                    b_out_sum += (pb = stackOut.b);
+                    a_out_sum += (pa = stackOut.a);
 
                     r_in_sum -= pr;
                     g_in_sum -= pg;
@@ -3697,7 +3854,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
             self.set("id", self.id);
         },
 
-        stackBlurCanvasRGB : function(id, top_x, top_y, width, height, radius) {
+        stackBlurCanvasRGB: function(id, top_x, top_y, width, height, radius) {
             var self = this;
             if (isNaN(radius) || radius < 1)
                 return;
@@ -3710,7 +3867,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
             try {
                 try {
                     imageData = context.getImageData(top_x, top_y, width, height);
-                } catch(e) {
+                } catch (e) {
 
                     // NOTE: this part is supposedly only needed if you want to work with local files
                     // so it might be okay to remove the whole try/catch block and just use
@@ -3718,13 +3875,13 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                     try {
                         netscape.security.PrivilegeManager.enablePrivilege("UniversalBrowserRead");
                         imageData = context.getImageData(top_x, top_y, width, height);
-                    } catch(e) {
+                    } catch (e) {
                         //alert("Cannot access local image");
                         throw new Error("unable to access local image data: " + e);
                         return;
                     }
                 }
-            } catch(e) {
+            } catch (e) {
                 //alert("Cannot access image");
                 throw new Error("unable to access image data: " + e);
             }
@@ -3738,11 +3895,11 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
             var widthMinus1 = width - 1;
             var heightMinus1 = height - 1;
             var radiusPlus1 = radius + 1;
-            var sumFactor = radiusPlus1 * (radiusPlus1 + 1 ) / 2;
+            var sumFactor = radiusPlus1 * (radiusPlus1 + 1) / 2;
 
             var stackStart = self.BlurStack();
             var stack = stackStart;
-            for( i = 1; i < div; i++ ) {
+            for (i = 1; i < div; i++) {
                 stack = stack.next = self.BlurStack();
                 if (i == radiusPlus1)
                     var stackEnd = stack;
@@ -3756,12 +3913,12 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
             var mul_sum = mul_table[radius];
             var shg_sum = shg_table[radius];
 
-            for( y = 0; y < height; y++ ) {
+            for (y = 0; y < height; y++) {
                 r_in_sum = g_in_sum = b_in_sum = r_sum = g_sum = b_sum = 0;
 
-                r_out_sum = radiusPlus1 * ( pr = pixels[yi] );
-                g_out_sum = radiusPlus1 * ( pg = pixels[yi + 1] );
-                b_out_sum = radiusPlus1 * ( pb = pixels[yi + 2] );
+                r_out_sum = radiusPlus1 * (pr = pixels[yi]);
+                g_out_sum = radiusPlus1 * (pg = pixels[yi + 1]);
+                b_out_sum = radiusPlus1 * (pb = pixels[yi + 2]);
 
                 r_sum += sumFactor * pr;
                 g_sum += sumFactor * pg;
@@ -3769,18 +3926,18 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                 stack = stackStart;
 
-                for( i = 0; i < radiusPlus1; i++ ) {
+                for (i = 0; i < radiusPlus1; i++) {
                     stack.r = pr;
                     stack.g = pg;
                     stack.b = pb;
                     stack = stack.next;
                 }
 
-                for( i = 1; i < radiusPlus1; i++ ) {
-                    p = yi + ((widthMinus1 < i ? widthMinus1 : i ) << 2 );
-                    r_sum += (stack.r = ( pr = pixels[p])) * ( rbs = radiusPlus1 - i );
-                    g_sum += (stack.g = ( pg = pixels[p + 1])) * rbs;
-                    b_sum += (stack.b = ( pb = pixels[p + 2])) * rbs;
+                for (i = 1; i < radiusPlus1; i++) {
+                    p = yi + ((widthMinus1 < i ? widthMinus1 : i) << 2);
+                    r_sum += (stack.r = (pr = pixels[p])) * (rbs = radiusPlus1 - i);
+                    g_sum += (stack.g = (pg = pixels[p + 1])) * rbs;
+                    b_sum += (stack.b = (pb = pixels[p + 2])) * rbs;
 
                     r_in_sum += pr;
                     g_in_sum += pg;
@@ -3791,7 +3948,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                 stackIn = stackStart;
                 stackOut = stackEnd;
-                for( x = 0; x < width; x++ ) {
+                for (x = 0; x < width; x++) {
                     pixels[yi] = (r_sum * mul_sum) >> shg_sum;
                     pixels[yi + 1] = (g_sum * mul_sum) >> shg_sum;
                     pixels[yi + 2] = (b_sum * mul_sum) >> shg_sum;
@@ -3804,7 +3961,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                     g_out_sum -= stackIn.g;
                     b_out_sum -= stackIn.b;
 
-                    p = (yw + (( p = x + radius + 1 ) < widthMinus1 ? p : widthMinus1 ) ) << 2;
+                    p = (yw + ((p = x + radius + 1) < widthMinus1 ? p : widthMinus1)) << 2;
 
                     r_in_sum += (stackIn.r = pixels[p]);
                     g_in_sum += (stackIn.g = pixels[p + 1]);
@@ -3816,9 +3973,9 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                     stackIn = stackIn.next;
 
-                    r_out_sum += ( pr = stackOut.r );
-                    g_out_sum += ( pg = stackOut.g );
-                    b_out_sum += ( pb = stackOut.b );
+                    r_out_sum += (pr = stackOut.r);
+                    g_out_sum += (pg = stackOut.g);
+                    b_out_sum += (pb = stackOut.b);
 
                     r_in_sum -= pr;
                     g_in_sum -= pg;
@@ -3831,13 +3988,13 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                 yw += width;
             }
 
-            for( x = 0; x < width; x++ ) {
+            for (x = 0; x < width; x++) {
                 g_in_sum = b_in_sum = r_in_sum = g_sum = b_sum = r_sum = 0;
 
                 yi = x << 2;
-                r_out_sum = radiusPlus1 * ( pr = pixels[yi]);
-                g_out_sum = radiusPlus1 * ( pg = pixels[yi + 1]);
-                b_out_sum = radiusPlus1 * ( pb = pixels[yi + 2]);
+                r_out_sum = radiusPlus1 * (pr = pixels[yi]);
+                g_out_sum = radiusPlus1 * (pg = pixels[yi + 1]);
+                b_out_sum = radiusPlus1 * (pb = pixels[yi + 2]);
 
                 r_sum += sumFactor * pr;
                 g_sum += sumFactor * pg;
@@ -3845,7 +4002,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                 stack = stackStart;
 
-                for( i = 0; i < radiusPlus1; i++ ) {
+                for (i = 0; i < radiusPlus1; i++) {
                     stack.r = pr;
                     stack.g = pg;
                     stack.b = pb;
@@ -3854,12 +4011,12 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                 yp = width;
 
-                for( i = 1; i <= radius; i++ ) {
-                    yi = (yp + x ) << 2;
+                for (i = 1; i <= radius; i++) {
+                    yi = (yp + x) << 2;
 
-                    r_sum += (stack.r = ( pr = pixels[yi])) * ( rbs = radiusPlus1 - i );
-                    g_sum += (stack.g = ( pg = pixels[yi + 1])) * rbs;
-                    b_sum += (stack.b = ( pb = pixels[yi + 2])) * rbs;
+                    r_sum += (stack.r = (pr = pixels[yi])) * (rbs = radiusPlus1 - i);
+                    g_sum += (stack.g = (pg = pixels[yi + 1])) * rbs;
+                    b_sum += (stack.b = (pb = pixels[yi + 2])) * rbs;
 
                     r_in_sum += pr;
                     g_in_sum += pg;
@@ -3875,7 +4032,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                 yi = x;
                 stackIn = stackStart;
                 stackOut = stackEnd;
-                for( y = 0; y < height; y++ ) {
+                for (y = 0; y < height; y++) {
                     p = yi << 2;
                     pixels[p] = (r_sum * mul_sum) >> shg_sum;
                     pixels[p + 1] = (g_sum * mul_sum) >> shg_sum;
@@ -3889,7 +4046,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
                     g_out_sum -= stackIn.g;
                     b_out_sum -= stackIn.b;
 
-                    p = (x + ((( p = y + radiusPlus1) < heightMinus1 ? p : heightMinus1 ) * width )) << 2;
+                    p = (x + (((p = y + radiusPlus1) < heightMinus1 ? p : heightMinus1) * width)) << 2;
 
                     r_sum += (r_in_sum += (stackIn.r = pixels[p]));
                     g_sum += (g_in_sum += (stackIn.g = pixels[p + 1]));
@@ -3897,9 +4054,9 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
 
                     stackIn = stackIn.next;
 
-                    r_out_sum += ( pr = stackOut.r );
-                    g_out_sum += ( pg = stackOut.g );
-                    b_out_sum += ( pb = stackOut.b );
+                    r_out_sum += (pr = stackOut.r);
+                    g_out_sum += (pg = stackOut.g);
+                    b_out_sum += (pb = stackOut.b);
 
                     r_in_sum -= pr;
                     g_in_sum -= pg;
@@ -3914,7 +4071,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
             context.putImageData(imageData, top_x, top_y);
             self.set("id", self.id);
         },
-        BlurStack : function() {
+        BlurStack: function() {
             var bs = {};
             bs.r = 0;
             bs.g = 0;
@@ -3926,9 +4083,9 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
     };
 
     var stackBlurAttrs = {
-        ATTRS : {
-            id : {
-                value : "none"
+        ATTRS: {
+            id: {
+                value: "none"
             }
         }
     };
@@ -3938,7 +4095,7 @@ KISSY.add('utils/blur/stackBlur',function(S, Node, Base) {
     return stackBlur;
 
 }, {
-    requires : ["node", "base"]
+    requires: ["node", "base"]
 });
 
 /**
@@ -3961,7 +4118,7 @@ KISSY.add('page/mods/player/player-blur',['node', 'base', 'anim', 'utils/blur/st
             self.BlurUtil = new Blur();
             var canvasElEven = document.createElement('canvas');
             var canvasElOdd = document.createElement('canvas');
-            if (canvasElEven.getContext && ! S.UA.ie) {
+            if (canvasElEven.getContext && !S.UA.ie) {
                 self.set("support", true);
 
                 self.canvasElEven = $(canvasElEven);
@@ -3989,6 +4146,9 @@ KISSY.add('page/mods/player/player-blur',['node', 'base', 'anim', 'utils/blur/st
         },
         _onSetUrl : function(val) {
             S.log("Blur _onSetUrl");
+            if (!val) {
+                return;
+            };
             var self = this;
             var i = layerIndex += 1;
             i = i % 2;
@@ -3998,6 +4158,9 @@ KISSY.add('page/mods/player/player-blur',['node', 'base', 'anim', 'utils/blur/st
         render : function(url) {
             var self = this;
             S.log(self.get("support"), "", "Blur render");
+            if (url == self.get('url')) {
+                return true;
+            };
             if (self.get("support") && ! S.UA.ie) {
                 self.set('url', url);
             }
@@ -4050,7 +4213,7 @@ KISSY.add('page/mods/player/player-blur',['node', 'base', 'anim', 'utils/blur/st
     };
 
     module.exports = Base.extend(playerBlurExtension, playerBlurAttrs);
-}); 
+});
 /**
  * @author noyobo
  * @mail nongyoubao@alibaba-inc.com
@@ -4103,12 +4266,15 @@ KISSY.add('page/mods/player/player-data',['base', 'json', 'io', 'utils/base', '.
         for (var j, x, i = v.length; i; j = parseInt(Math.random() * i), x = v[--i], v[i] = v[j], v[j] = x);
         return v;
     };
+
     Array.remove = function(array, from, to) {
         var rest = array.slice((to || from) + 1 || array.length);
         array.length = from < 0 ? array.length + from : from;
         return array.push.apply(array, rest);
     };
+
     var playerDataExtension = {
+
         initializer: function() {
             var self = this;
             self._firstLoad = true;
@@ -4122,6 +4288,7 @@ KISSY.add('page/mods/player/player-data',['base', 'json', 'io', 'utils/base', '.
             self._soundArr = [];
             // 歌曲ID 数组
             self._tracksObj = {};
+
             // 歌曲对象 维护.
             // self.on("afterIndexChange", function(event) {
             //     S.log('afterIndexChange ' + event.attrName + ': ' + event.prevVal + ' --> ' +
@@ -4455,7 +4622,7 @@ KISSY.add('page/mods/player/player-data',['base', 'json', 'io', 'utils/base', '.
             var self = this;
             var mode = self.get("mode");
             mode += 1;
-            mode = mode % 3;
+            mode = mode % 4;	// van
             self.set("mode", mode);
             return mode;
         },
@@ -4528,9 +4695,11 @@ KISSY.add('page/mods/player/player-data',['base', 'json', 'io', 'utils/base', '.
                 self.playthisRoam();
             } else {
                 var index = self._getNextIndex(Bval);
-                self.set("index", index, {
+                if (index != -1)		// van mode == 3 时列表只播放一遍
+					self.set("index", index, {
                     "force": true
-                });
+					});
+				else return false;
             }
         },
         /**
@@ -4694,7 +4863,7 @@ KISSY.add('page/mods/player/player-data',['base', 'json', 'io', 'utils/base', '.
          * @private
          * @return {Int}       索引值
          */
-        _getNextIndex: function(value) { //1 顺序播放，2 随机播放，0 循环单曲
+        _getNextIndex: function(value) { //1 顺序播放，2 随机播放，0 循环单曲, 3 顺序播放1遍
             var self = this;
             var mode = self.get("mode");
             var index = self.get("index");
@@ -4710,12 +4879,17 @@ KISSY.add('page/mods/player/player-data',['base', 'json', 'io', 'utils/base', '.
             if (mode === 1) {
                 index = S.indexOf(sid, self._soundIdArr);
             }
+			if (mode === 3) {	// van
+                index = S.indexOf(sid, self._soundIdArr);
+            }
             if (mode === 2) {
                 index = S.indexOf(sid, self._randomIdArr);
             }
             index += 1;
             if (index >= self._soundIdArr.length) {
-                index = 0;
+                if (!value && mode === 3) {	// van
+					index = -1;
+                } else index = 0;
             }
             return index;
         },
@@ -4725,7 +4899,7 @@ KISSY.add('page/mods/player/player-data',['base', 'json', 'io', 'utils/base', '.
             var index = self.get("index");
             var sid = self.get("songId");
             S.log(mode + "," + index + "," + sid, "", "_getPrevIndex");
-            if (mode === 1 || mode === 0) {
+            if (mode === 1 || mode === 0 || mode === 3) {	// van
                 index = S.indexOf(sid, self._soundIdArr);
             }
             if (mode === 2) {
@@ -4757,7 +4931,7 @@ KISSY.add('page/mods/player/player-data',['base', 'json', 'io', 'utils/base', '.
             var index = self.get("index");
             var sid = sid.toString();
             S.log([mode, index, self._soundIdArr, sid], "", "_getIndexForId");
-            if (mode == 1 || mode == 0) {
+            if (mode == 1 || mode == 0 || mode == 3) {	// van
                 index = S.indexOf(sid, self._soundIdArr);
             }
             if (mode == 2) {
@@ -5118,7 +5292,7 @@ KISSY.add('page/mods/player/player-data',['base', 'json', 'io', 'utils/base', '.
             result.lyric = obj.lyric;
             result.objectId = Number(obj.object_id);
             result.objectName = obj.object_name;
-            result.tryhq = Number(obj.tryhq);
+            result.tryhq = Number(obj.tryhq) || 0;
             result.artistUrl = obj.artist_url;
             result.rec_note = obj.rec_note;
 
@@ -5264,61 +5438,61 @@ KISSY.add('page/mods/xtpl/itemMenu-xtpl',function (S, require, exports, module) 
             config0.params = params1;
             config0.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-up" style="left:';
+                buffer += '\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-up" style="left:';
                 var id3 = getPropertyUtil(engine, scope, "left", 0, 2);
                 buffer += renderOutputUtil(id3 + (30), true);
                 buffer += 'px; top:';
                 var id4 = getPropertyUtil(engine, scope, "top", 0, 2);
                 buffer += renderOutputUtil(id4 - (16), true);
-                buffer += 'px;">\r\n';
+                buffer += 'px;">\n';
                 return buffer;
             };
             config0.inverse = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-down" style="left:';
+                buffer += '\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-down" style="left:';
                 var id5 = getPropertyUtil(engine, scope, "left", 0, 4);
                 buffer += renderOutputUtil(id5 + (30), true);
                 buffer += 'px; top:';
                 var id6 = getPropertyUtil(engine, scope, "top", 0, 4);
                 buffer += renderOutputUtil(id6 - (166), true);
-                buffer += 'px;">\r\n';
+                buffer += 'px;">\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config0, "if", 1);
-            buffer += '\r\n\t<ul>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.play(';
+            buffer += '\n\t<ul>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.play(';
             var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 7);
             buffer += renderOutputUtil(id7, true);
-            buffer += ')"><i class="icon-playnow"></i>立即播放</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.download(';
+            buffer += ')"><i class="icon-playnow"></i>立即播放</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.download(';
             var id8 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 8);
             buffer += renderOutputUtil(id8, true);
             buffer += ',\'';
             var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "note", 0, 8);
             buffer += renderOutputUtil(id9, true);
-            buffer += '\')"><i class="icon-download"></i>下载</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.collect(';
+            buffer += '\')"><i class="icon-download"></i>下载</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.collect(';
             var id10 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 9);
             buffer += renderOutputUtil(id10, true);
             buffer += ',\'';
             var id11 = getPropertyOrRunCommandUtil(engine, scope, {}, "note", 0, 9);
             buffer += renderOutputUtil(id11, true);
-            buffer += '\')"><i class="icon-collect"></i>添加到精选集</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.recommend(';
+            buffer += '\')"><i class="icon-collect"></i>添加到精选集</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.recommend(';
             var id12 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 10);
             buffer += renderOutputUtil(id12, true);
             buffer += ',32,\'';
             var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "note", 0, 10);
             buffer += renderOutputUtil(id13, true);
-            buffer += '\')"><i class="icon-tshare"></i>分享</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.sendMobile(';
+            buffer += '\')"><i class="icon-tshare"></i>分享</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.sendMobile(';
             var id14 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 11);
             buffer += renderOutputUtil(id14, true);
             buffer += ', \'';
             var id15 = getPropertyOrRunCommandUtil(engine, scope, {}, "note", 0, 11);
             buffer += renderOutputUtil(id15, true);
-            buffer += '\')"><i class="icon-mobile"></i>发送到手机</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeBoboWidget(';
+            buffer += '\')"><i class="icon-mobile"></i>发送到手机</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeBoboWidget(';
             var id16 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 12);
             buffer += renderOutputUtil(id16, true);
             buffer += ',\'';
             var id17 = getPropertyOrRunCommandUtil(engine, scope, {}, "note", 0, 12);
             buffer += renderOutputUtil(id17, true);
-            buffer += '\')"><i class="icon-bobo"></i>生成虾米播播</a></li>\r\n\t</ul>\r\n\t<span class="arrow"></span>\r\n</div>';
+            buffer += '\')"><i class="icon-bobo"></i>生成虾米播播</a></li>\n\t</ul>\n\t<span class="arrow"></span>\n</div>';
             return buffer;
         };
 });
@@ -5346,28 +5520,28 @@ KISSY.add('page/mods/xtpl/otherMenu-xtpl',function (S, require, exports, module)
             config0.params = params1;
             config0.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-up" style="left:';
+                buffer += '\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-up" style="left:';
                 var id3 = getPropertyUtil(engine, scope, "left", 0, 2);
                 buffer += renderOutputUtil(id3 + (30), true);
                 buffer += 'px; top:';
                 var id4 = getPropertyUtil(engine, scope, "top", 0, 2);
                 buffer += renderOutputUtil(id4 - (16), true);
-                buffer += 'px;">\r\n';
+                buffer += 'px;">\n';
                 return buffer;
             };
             config0.inverse = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-down" style="left:';
+                buffer += '\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-down" style="left:';
                 var id5 = getPropertyUtil(engine, scope, "left", 0, 4);
                 buffer += renderOutputUtil(id5 + (30), true);
                 buffer += 'px; top:';
                 var id6 = getPropertyUtil(engine, scope, "top", 0, 4);
                 buffer += renderOutputUtil(id6 - (166), true);
-                buffer += 'px;">\r\n';
+                buffer += 'px;">\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config0, "if", 1);
-            buffer += '\r\n\t';
+            buffer += '\n\t';
             var config7 = {};
             var params8 = [];
             var id9 = getPropertyUtil(engine, scope, "type", 0, 6);
@@ -5375,58 +5549,58 @@ KISSY.add('page/mods/xtpl/otherMenu-xtpl',function (S, require, exports, module)
             config7.params = params8;
             config7.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n\t<ul>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.thenplay(';
+                buffer += '\n\t<ul>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.thenplay(';
                 var id10 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 8);
                 buffer += renderOutputUtil(id10, true);
                 buffer += ',\'collect\', ';
                 var id11 = getPropertyOrRunCommandUtil(engine, scope, {}, "typeid", 0, 8);
                 buffer += renderOutputUtil(id11, true);
-                buffer += ')"><i class="icon-thenplay"></i>接着播放</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.promotion_download(';
+                buffer += ')"><i class="icon-thenplay"></i>接着播放</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.promotion_download(';
                 var id12 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 9);
                 buffer += renderOutputUtil(id12, true);
                 buffer += ', \'1\', ';
                 var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "typeid", 0, 9);
                 buffer += renderOutputUtil(id13, true);
-                buffer += ')"><i class="icon-download"></i>下载</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.collect(';
+                buffer += ')"><i class="icon-download"></i>下载</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.collect(';
                 var id14 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 10);
                 buffer += renderOutputUtil(id14, true);
-                buffer += ')"><i class="icon-collect"></i>添加到精选集</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.recommend(';
+                buffer += ')"><i class="icon-collect"></i>添加到精选集</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.recommend(';
                 var id15 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 11);
                 buffer += renderOutputUtil(id15, true);
-                buffer += ', 32)"><i class="icon-tshare"></i>分享</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.sendMobile(';
+                buffer += ', 32)"><i class="icon-tshare"></i>分享</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.sendMobile(';
                 var id16 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 12);
                 buffer += renderOutputUtil(id16, true);
-                buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeBoboWidget(';
+                buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeBoboWidget(';
                 var id17 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 13);
                 buffer += renderOutputUtil(id17, true);
-                buffer += ')"><i class="icon-bobo"></i>生成虾米播播</a></li>\r\n\t</ul>\r\n\t';
+                buffer += ')"><i class="icon-bobo"></i>生成虾米播播</a></li>\n\t</ul>\n\t';
                 return buffer;
             };
             config7.inverse = function (scope) {
                 var buffer = "";
-                buffer += '\r\n\t<ul>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.thenplay(';
+                buffer += '\n\t<ul>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.thenplay(';
                 var id18 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 17);
                 buffer += renderOutputUtil(id18, true);
-                buffer += ')"><i class="icon-thenplay"></i>接着播放</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.download(';
+                buffer += ')"><i class="icon-thenplay"></i>接着播放</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.download(';
                 var id19 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 18);
                 buffer += renderOutputUtil(id19, true);
-                buffer += ')"><i class="icon-download"></i>下载</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.collect(';
+                buffer += ')"><i class="icon-download"></i>下载</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.collect(';
                 var id20 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 19);
                 buffer += renderOutputUtil(id20, true);
-                buffer += ')"><i class="icon-collect"></i>添加到精选集</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.recommend(';
+                buffer += ')"><i class="icon-collect"></i>添加到精选集</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.recommend(';
                 var id21 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 20);
                 buffer += renderOutputUtil(id21, true);
-                buffer += ', 32)"><i class="icon-tshare"></i>分享</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.sendMobile(';
+                buffer += ', 32)"><i class="icon-tshare"></i>分享</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.sendMobile(';
                 var id22 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 21);
                 buffer += renderOutputUtil(id22, true);
-                buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeBoboWidget(';
+                buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeBoboWidget(';
                 var id23 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 22);
                 buffer += renderOutputUtil(id23, true);
-                buffer += ')"><i class="icon-bobo"></i>生成虾米播播</a></li>\r\n\t</ul>\r\n\t';
+                buffer += ')"><i class="icon-bobo"></i>生成虾米播播</a></li>\n\t</ul>\n\t';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config7, "if", 6);
-            buffer += '\r\n\t<span class="arrow"></span>\r\n</div>';
+            buffer += '\n\t<span class="arrow"></span>\n</div>';
             return buffer;
         };
 });
@@ -5454,10 +5628,10 @@ KISSY.add('page/mods/xtpl/pageItem-xtpl',function (S, require, exports, module) 
             config0.params = params1;
             config0.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div id="J_pageMoreMenu" class="mouse-menu page-more-menu" style="left:';
+                buffer += '\n<div id="J_pageMoreMenu" class="mouse-menu page-more-menu" style="left:';
                 var id3 = getPropertyUtil(engine, scope, "left", 0, 2);
                 buffer += renderOutputUtil(id3 + (86), true);
-                buffer += 'px;">\r\n\t<ul>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.thenplayIds(\'';
+                buffer += 'px;">\n\t<ul>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.thenplayIds(\'';
                 var id4 = getPropertyOrRunCommandUtil(engine, scope, {}, "type", 0, 4);
                 buffer += renderOutputUtil(id4, true);
                 buffer += '\', \'';
@@ -5466,7 +5640,7 @@ KISSY.add('page/mods/xtpl/pageItem-xtpl',function (S, require, exports, module) 
                 buffer += '\', ';
                 var id6 = getPropertyOrRunCommandUtil(engine, scope, {}, "typeid", 0, 4);
                 buffer += renderOutputUtil(id6, true);
-                buffer += ')"><i class="icon-thenplay"></i>接着播放</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.promotion_download(\'';
+                buffer += ')"><i class="icon-thenplay"></i>接着播放</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.promotion_download(\'';
                 var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "type", 0, 5);
                 buffer += renderOutputUtil(id7, true);
                 buffer += '\', \'';
@@ -5475,18 +5649,18 @@ KISSY.add('page/mods/xtpl/pageItem-xtpl',function (S, require, exports, module) 
                 buffer += '\', ';
                 var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "typeid", 0, 5);
                 buffer += renderOutputUtil(id9, true);
-                buffer += ')"><i class="icon-download"></i>下载</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeMultiWidget(\'';
+                buffer += ')"><i class="icon-download"></i>下载</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeMultiWidget(\'';
                 var id10 = getPropertyOrRunCommandUtil(engine, scope, {}, "type", 0, 6);
                 buffer += renderOutputUtil(id10, true);
-                buffer += '\')"><i class="icon-bobo"></i>生成虾米播播</a></li>\r\n\t</ul>\r\n\t<span class="arrow"></span>\r\n</div>\r\n';
+                buffer += '\')"><i class="icon-bobo"></i>生成虾米播播</a></li>\n\t</ul>\n\t<span class="arrow"></span>\n</div>\n';
                 return buffer;
             };
             config0.inverse = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div id="J_pageMoreMenu" class="mouse-menu page-more-menu" style="left:';
+                buffer += '\n<div id="J_pageMoreMenu" class="mouse-menu page-more-menu" style="left:';
                 var id11 = getPropertyUtil(engine, scope, "left", 0, 11);
                 buffer += renderOutputUtil(id11 + (86), true);
-                buffer += 'px;">\r\n\t<ul>\r\n\t\t';
+                buffer += 'px;">\n\t<ul>\n\t\t';
                 var config12 = {};
                 var params13 = [];
                 var id14 = getPropertyUtil(engine, scope, "type", 0, 13);
@@ -5504,17 +5678,17 @@ KISSY.add('page/mods/xtpl/pageItem-xtpl',function (S, require, exports, module) 
                 config12.fn = config12.inverse;
                 config12.inverse = inverse16;
                 buffer += runBlockCommandUtil(engine, scope, config12, "if", 13);
-                buffer += '\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.downloadsongs(\'';
+                buffer += '\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.downloadsongs(\'';
                 var id17 = getPropertyOrRunCommandUtil(engine, scope, {}, "type", 0, 14);
                 buffer += renderOutputUtil(id17, true);
-                buffer += '\')"><i class="icon-download"></i>下载</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeMultiWidget(\'';
+                buffer += '\')"><i class="icon-download"></i>下载</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeMultiWidget(\'';
                 var id18 = getPropertyOrRunCommandUtil(engine, scope, {}, "type", 0, 15);
                 buffer += renderOutputUtil(id18, true);
-                buffer += '\')"><i class="icon-bobo"></i>生成虾米播播</a></li>\r\n\t</ul>\r\n\t<span class="arrow"></span>\r\n</div>\r\n';
+                buffer += '\')"><i class="icon-bobo"></i>生成虾米播播</a></li>\n\t</ul>\n\t<span class="arrow"></span>\n</div>\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config0, "if", 1);
-            buffer += '\r\n';
+            buffer += '\n';
             return buffer;
         };
 });
@@ -5537,16 +5711,16 @@ KISSY.add('page/mods/xtpl/trackMenu-xtpl',function (S, require, exports, module)
             buffer += '<div id="J_trackMoreMenu" class="mouse-menu track-more-menu" style="left:';
             var id0 = getPropertyOrRunCommandUtil(engine, scope, {}, "left", 0, 1);
             buffer += renderOutputUtil(id0, true);
-            buffer += 'px;">\r\n\t<ul>\r\n\t\t<li><a id="J_trackDown" href="javascript:void(0)" onclick="SEIYA.download(';
+            buffer += 'px;">\n\t<ul>\n\t\t<li><a id="J_trackDown" href="javascript:void(0)" onclick="SEIYA.download(';
             var id1 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 3);
             buffer += renderOutputUtil(id1, true);
-            buffer += ')"><i class="icon-download"></i>下载</a></li>\r\n\t\t<li><a id="J_trackCollect" href="javascript:void(0)" onclick="SEIYA.collect(';
+            buffer += ')"><i class="icon-download"></i>下载</a></li>\n\t\t<li><a id="J_trackCollect" href="javascript:void(0)" onclick="SEIYA.collect(';
             var id2 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 4);
             buffer += renderOutputUtil(id2, true);
-            buffer += ')"><i class="icon-collect"></i>添加到精选集</a></li>\r\n\t\t<li><a id="J_trackMobile" href="javascript:void(0)" onclick="SEIYA.sendMobile(';
+            buffer += ')"><i class="icon-collect"></i>添加到精选集</a></li>\n\t\t<li><a id="J_trackMobile" href="javascript:void(0)" onclick="SEIYA.sendMobile(';
             var id3 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 5);
             buffer += renderOutputUtil(id3, true);
-            buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\r\n\t</ul>\r\n\t<span class="arrow"></span>\r\n</div>';
+            buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\n\t</ul>\n\t<span class="arrow"></span>\n</div>';
             return buffer;
         };
 });
@@ -5574,43 +5748,43 @@ KISSY.add('page/mods/xtpl/roamMenu-xtpl',function (S, require, exports, module) 
             config0.params = params1;
             config0.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-up" style="left:';
+                buffer += '\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-up" style="left:';
                 var id3 = getPropertyUtil(engine, scope, "left", 0, 2);
                 buffer += renderOutputUtil(id3 + (30), true);
                 buffer += 'px; top:';
                 var id4 = getPropertyUtil(engine, scope, "top", 0, 2);
                 buffer += renderOutputUtil(id4 - (16), true);
-                buffer += 'px;">\r\n';
+                buffer += 'px;">\n';
                 return buffer;
             };
             config0.inverse = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-down" style="left:';
+                buffer += '\n<div id="J_itemMoreMenu" class="mouse-menu item-more-menu item-more-menu-down" style="left:';
                 var id5 = getPropertyUtil(engine, scope, "left", 0, 4);
                 buffer += renderOutputUtil(id5 + (30), true);
                 buffer += 'px; top:';
                 var id6 = getPropertyUtil(engine, scope, "top", 0, 4);
                 buffer += renderOutputUtil(id6 - (136), true);
-                buffer += 'px;">\r\n';
+                buffer += 'px;">\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config0, "if", 1);
-            buffer += '\r\n\t<ul>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.download(';
+            buffer += '\n\t<ul>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.download(';
             var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 7);
             buffer += renderOutputUtil(id7, true);
-            buffer += ')"><i class="icon-download"></i>下载</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.collect(';
+            buffer += ')"><i class="icon-download"></i>下载</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.collect(';
             var id8 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 8);
             buffer += renderOutputUtil(id8, true);
-            buffer += ')"><i class="icon-collect"></i>添加到精选集</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.recommend(';
+            buffer += ')"><i class="icon-collect"></i>添加到精选集</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.recommend(';
             var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 9);
             buffer += renderOutputUtil(id9, true);
-            buffer += ', 32)"><i class="icon-tshare"></i>分享</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.sendMobile(';
+            buffer += ', 32)"><i class="icon-tshare"></i>分享</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.sendMobile(';
             var id10 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 10);
             buffer += renderOutputUtil(id10, true);
-            buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\r\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeBoboWidget(';
+            buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\n\t\t<li><a href="javascript:void(0)" onclick="SEIYA.makeBoboWidget(';
             var id11 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 11);
             buffer += renderOutputUtil(id11, true);
-            buffer += ')"><i class="icon-bobo"></i>生成虾米播播</a></li>\r\n\t</ul>\r\n\t<span class="arrow"></span>\r\n</div>';
+            buffer += ')"><i class="icon-bobo"></i>生成虾米播播</a></li>\n\t</ul>\n\t<span class="arrow"></span>\n</div>';
             return buffer;
         };
 });
@@ -5620,13 +5794,13 @@ KISSY.add('page/mods/xtpl/roamMenu-xtpl',function (S, require, exports, module) 
  */
 KISSY.add('page/mods/player/player-menu',['node', 'base', 'event', 'xtemplate', '../xtpl/itemMenu-xtpl', '../xtpl/otherMenu-xtpl', '../xtpl/pageItem-xtpl', '../xtpl/trackMenu-xtpl', '../xtpl/roamMenu-xtpl'], function(S, require, exports, module) {
     // @formatter:off
-    var Node = require("node"), 
-        Base = require("base"), 
-        Event = require("event"), 
-        Xtemplate = require("xtemplate"), 
-        ItemMenuTpl = require("../xtpl/itemMenu-xtpl"), 
-        OtherMenuTpl = require("../xtpl/otherMenu-xtpl"), 
-        PageMenuTpl = require("../xtpl/pageItem-xtpl"), 
+    var Node = require("node"),
+        Base = require("base"),
+        Event = require("event"),
+        Xtemplate = require("xtemplate"),
+        ItemMenuTpl = require("../xtpl/itemMenu-xtpl"),
+        OtherMenuTpl = require("../xtpl/otherMenu-xtpl"),
+        PageMenuTpl = require("../xtpl/pageItem-xtpl"),
         TrackMenuTpl = require("../xtpl/trackMenu-xtpl"),
         RoamMenuTpl = require("../xtpl/roamMenu-xtpl");
     // @formatter:on
@@ -5789,26 +5963,26 @@ KISSY.add('page/mods/xtpl/roamList-xtpl',function (S, require, exports, module) 
                 getPropertyUtil = utils.getProperty,
                 runInlineCommandUtil = utils.runInlineCommand,
                 getPropertyOrRunCommandUtil = utils.getPropertyOrRunCommand;
-            buffer += '<div class="ui-roam-body" id="J_roamBody" style="height:0;">\r\n\t<div class="ui-roam-title">\r\n\t\t<span>正在漫游...</span>\r\n\t\t<div class="ui-roam-close"><a data-event="close">关闭漫游</a></div>\r\n\t</div>\r\n\t<div class="ui-roam-main" id="J_roamMain">\r\n\t\t';
+            buffer += '<div class="ui-roam-body" id="J_roamBody" style="height:0;">\n\t<div class="ui-roam-title">\n\t\t<span>正在漫游...</span>\n\t\t<div class="ui-roam-close"><a data-event="close">关闭漫游</a></div>\n\t</div>\n\t<div class="ui-roam-main" id="J_roamMain">\n\t\t';
             var config4 = {};
             config4.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n\t\t<div class="ui-roam-item" ondblclick="SEIYAEVENT.roamDblclick(this, ';
+                buffer += '\n\t\t<div class="ui-roam-item" ondblclick="SEIYAEVENT.roamDblclick(this, ';
                 var id0 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 8);
                 buffer += renderOutputUtil(id0, true);
                 buffer += ')" id="J_roamItem';
                 var id1 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 8);
                 buffer += renderOutputUtil(id1, true);
-                buffer += '">\r\n\t\t\t<div class="ui-roam-sort"><em data-type="roam" data-sid="';
+                buffer += '">\n\t\t\t<div class="ui-roam-sort"><em data-type="roam" data-sid="';
                 var id2 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 9);
                 buffer += renderOutputUtil(id2, true);
-                buffer += '"></em></div>\r\n\t\t\t<div class="ui-roam-item-column c1">';
+                buffer += '"></em></div>\n\t\t\t<div class="ui-roam-item-column c1">';
                 var id3 = getPropertyOrRunCommandUtil(engine, scope, {}, "title", 0, 10);
                 buffer += renderOutputUtil(id3, false);
-                buffer += '</div>\r\n\t\t\t<div class="ui-roam-item-column c2">';
+                buffer += '</div>\n\t\t\t<div class="ui-roam-item-column c2">';
                 var id4 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistfun", 0, 11);
                 buffer += renderOutputUtil(id4, false);
-                buffer += '</div>\r\n\t\t\t<div class="ui-roam-item-column c3"><a href="http://www.xiami.com/album/';
+                buffer += '</div>\n\t\t\t<div class="ui-roam-item-column c3"><a href="http://www.xiami.com/album/';
                 var id5 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 12);
                 buffer += renderOutputUtil(id5, true);
                 buffer += '" target="_blank" title="';
@@ -5817,7 +5991,7 @@ KISSY.add('page/mods/xtpl/roamList-xtpl',function (S, require, exports, module) 
                 buffer += '">';
                 var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 12);
                 buffer += renderOutputUtil(id7, false);
-                buffer += '</a></div>\r\n\t\t\t<div class="ui-roam-control">\r\n\t\t\t\t';
+                buffer += '</a></div>\n\t\t\t<div class="ui-roam-control">\n\t\t\t\t';
                 var config8 = {};
                 var params9 = [];
                 var id10 = getPropertyUtil(engine, scope, "grade", 0, 14);
@@ -5825,29 +5999,29 @@ KISSY.add('page/mods/xtpl/roamList-xtpl',function (S, require, exports, module) 
                 config8.params = params9;
                 config8.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t\t\t<a class="fav-btn icon-roam-fav" data-type="roam" data-sid="';
+                    buffer += '\n\t\t\t\t<a class="fav-btn icon-roam-fav" data-type="roam" data-sid="';
                     var id11 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 15);
                     buffer += renderOutputUtil(id11, true);
-                    buffer += '" data-event="fav" title="收藏"></a>\r\n\t\t\t\t';
+                    buffer += '" data-event="fav" title="收藏"></a>\n\t\t\t\t';
                     return buffer;
                 };
                 config8.inverse = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t\t\t<a class="fav-btn icon-roam-faved" data-type="roam" data-sid="';
+                    buffer += '\n\t\t\t\t<a class="fav-btn icon-roam-faved" data-type="roam" data-sid="';
                     var id12 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 17);
                     buffer += renderOutputUtil(id12, true);
-                    buffer += '" data-event="fav" title="取消收藏"></a>\r\n\t\t\t\t';
+                    buffer += '" data-event="fav" title="取消收藏"></a>\n\t\t\t\t';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config8, "if", 14);
-                buffer += '\r\n\t\t\t\t<a class="more-btn icon-roam-more" data-type="roam" data-sid="';
+                buffer += '\n\t\t\t\t<a class="more-btn icon-roam-more" data-type="roam" data-sid="';
                 var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 19);
                 buffer += renderOutputUtil(id13, true);
-                buffer += '" data-event="more" title="更多"></a>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t';
+                buffer += '" data-event="more" title="更多"></a>\n\t\t\t</div>\n\t\t</div>\n\t\t';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config4, "songs", 7);
-            buffer += '\r\n\t</div>\r\n</div>';
+            buffer += '\n\t</div>\n</div>';
             return buffer;
         };
 });
@@ -5871,19 +6045,19 @@ KISSY.add('page/mods/xtpl/roamItem-xtpl',function (S, require, exports, module) 
             var config3 = {};
             config3.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div class="ui-roam-item" ondblclick="SEIYAEVENT.roamDblclick(this, ';
+                buffer += '\n<div class="ui-roam-item" ondblclick="SEIYAEVENT.roamDblclick(this, ';
                 var id0 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 2);
                 buffer += renderOutputUtil(id0, true);
                 buffer += ')" id="J_roamItem';
                 var id1 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 2);
                 buffer += renderOutputUtil(id1, true);
-                buffer += '">\r\n\t<div class="ui-roam-sort"><em data-type="roam" data-sid="';
+                buffer += '">\n\t<div class="ui-roam-sort"><em data-type="roam" data-sid="';
                 var id2 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 3);
                 buffer += renderOutputUtil(id2, true);
-                buffer += '"></em></div>\r\n\t<div class="ui-roam-item-column c1">';
+                buffer += '"></em></div>\n\t<div class="ui-roam-item-column c1">';
                 var id3 = getPropertyOrRunCommandUtil(engine, scope, {}, "title", 0, 4);
                 buffer += renderOutputUtil(id3, false);
-                buffer += '</div>\r\n\t<div class="ui-roam-item-column c2"><a href="http://www.xiami.com/artist/';
+                buffer += '</div>\n\t<div class="ui-roam-item-column c2"><a href="http://www.xiami.com/artist/';
                 var id4 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 5);
                 buffer += renderOutputUtil(id4, true);
                 buffer += '" target="_blank" title="';
@@ -5892,7 +6066,7 @@ KISSY.add('page/mods/xtpl/roamItem-xtpl',function (S, require, exports, module) 
                 buffer += '">';
                 var id6 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist", 0, 5);
                 buffer += renderOutputUtil(id6, false);
-                buffer += '</a></div>\r\n\t<div class="ui-roam-item-column c3"><a href="http://www.xiami.com/album/';
+                buffer += '</a></div>\n\t<div class="ui-roam-item-column c3"><a href="http://www.xiami.com/album/';
                 var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 6);
                 buffer += renderOutputUtil(id7, true);
                 buffer += '" target="_blank" title="';
@@ -5901,7 +6075,7 @@ KISSY.add('page/mods/xtpl/roamItem-xtpl',function (S, require, exports, module) 
                 buffer += '">';
                 var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 6);
                 buffer += renderOutputUtil(id9, false);
-                buffer += '</a></div>\r\n\t<div class="ui-roam-control">\r\n\t\t';
+                buffer += '</a></div>\n\t<div class="ui-roam-control">\n\t\t';
                 var config10 = {};
                 var params11 = [];
                 var id12 = getPropertyUtil(engine, scope, "grade", 0, 8);
@@ -5909,25 +6083,25 @@ KISSY.add('page/mods/xtpl/roamItem-xtpl',function (S, require, exports, module) 
                 config10.params = params11;
                 config10.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t<a class="fav-btn icon-roam-fav" data-type="roam" data-sid="';
+                    buffer += '\n\t\t<a class="fav-btn icon-roam-fav" data-type="roam" data-sid="';
                     var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 9);
                     buffer += renderOutputUtil(id13, true);
-                    buffer += '" data-event="fav" title="收藏"></a>\r\n\t\t';
+                    buffer += '" data-event="fav" title="收藏"></a>\n\t\t';
                     return buffer;
                 };
                 config10.inverse = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t<a class="fav-btn icon-roam-faved" data-type="roam" data-sid="';
+                    buffer += '\n\t\t<a class="fav-btn icon-roam-faved" data-type="roam" data-sid="';
                     var id14 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 11);
                     buffer += renderOutputUtil(id14, true);
-                    buffer += '" data-event="fav" title="取消收藏"></a>\r\n\t\t';
+                    buffer += '" data-event="fav" title="取消收藏"></a>\n\t\t';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config10, "if", 8);
-                buffer += '\r\n\t\t<a class="more-btn icon-roam-more" data-type="roam" data-sid="';
+                buffer += '\n\t\t<a class="more-btn icon-roam-more" data-type="roam" data-sid="';
                 var id15 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 13);
                 buffer += renderOutputUtil(id15, true);
-                buffer += '" data-event="more" title="更多"></a>\r\n\t</div>\r\n</div>\r\n';
+                buffer += '" data-event="more" title="更多"></a>\n\t</div>\n</div>\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config3, "songs", 1);
@@ -6685,6 +6859,73 @@ KISSY.add('page/mods/player/player-drag',['node', 'event', 'dd', 'dd/plugin/prox
     });
 });
 
+KISSY.add('page/mods/player/player-cover',['io', 'xtemplate', 'event', 'node'], function(S, require) {
+
+    var IO = require("io");
+    var Xtemplate = require('xtemplate');
+    var Event = require('event');
+    var Node = require('node');
+    var $ = Node.all;
+
+    function cover() {
+        var self = this;
+        self.CoverTpl = '{{#if cover}}<a href="{{^if albumId===0}}http://www.xiami.com/album/{{albumId}}{{else}}http://www.xiami.com/artist/{{artistId}}{{/if}}" target="_blank" title="{{album}}-{{artist}}"><img id="J_playerCoverImg" src="{{cover}}" alt="{{album}}-{{artist}}"></a>{{else}}<img src="http://gtms01.alicdn.com/tps/i1/T1THUfFc8jXXaC1Jrl-250-250.png" width="250" height="250" />{{/if}}';
+        self.adCoverTpl = '{{#if cover}}<a href="{{artistUrl}}" target="_blank" title="{{song}}-{{artist}}"><img id="J_playerCoverImg" src="{{cover}}" alt="{{album}}-{{artist}}"></a>{{else}}<img src="http://gtms01.alicdn.com/tps/i1/T1THUfFc8jXXaC1Jrl-250-250.png" width="250" height="250" />{{/if}}'
+        // self.IECoverTpl = '{{#if cover}}<a href="{{^if albumId===0}}http://www.xiami.com/album/{{albumId}}{{else}}http://www.xiami.com/artist/{{artistId}}{{/if}}" target="_blank" title="{{album}}-{{artist}}"><img id="J_playerCoverImg" src="{{cover}}" alt="{{album}}-{{artist}}"></a>{{else}}<img src="http://gtms01.alicdn.com/tps/i1/T1THUfFc8jXXaC1Jrl-250-250.png" width="250" height="250" />{{/if}}';
+        // if (!S.UA.ie) {
+        //     //self.blur = true;
+        //     self.Tpl_cover = new Xtemplate(self.CoverTpl)
+        // } else {
+        //     //self.blur = false;
+        //     self.Tpl_cover = new Xtemplate(self.IECoverTpl)
+        // };
+        self.Tpl_cover = new Xtemplate(self.CoverTpl);
+        self.Tpl_adCover = new Xtemplate(self.adCoverTpl);
+        self.track = null;
+        self.Cover = $("#J_playerCover");
+    };
+    cover.prototype = {
+        render: function(track) {
+
+            var self = this;
+            if (self.track && track.albumId == self.track.albumId) {
+                return true;
+            };
+            self.track = track;
+
+            if(track.lyric === "audioad"){
+                self.Cover.html(self.Tpl_adCover.render(track));
+            }else {
+                self.Cover.html(self.Tpl_cover.render(track));
+            }
+
+
+            // if (self.blur) {
+            //     self._addEvent();
+            // };
+        }
+        //,
+        // _addEvent: function() {
+        //     var self = this;
+        //     var img = self.Cover.one('#J_playerCoverImg');
+        //     Event.on(img, {
+        //         'error': {
+        //             fn: function() {
+        //                 img.attr('src', self.track.cover + '?imgblur' + S.now());
+        //             },
+        //             once: true
+        //         },
+        //         'load':{
+        //             fn: function(){
+        //                 S.log("图片加载成功")
+        //             }
+        //         }
+        //     });
+        // }
+    };
+    return cover;
+});
+
 /**
  * @fileOverview 数据请求管理中心
  * @author noyobo<nongyoubao@alibaba-inc.com>
@@ -6699,6 +6940,7 @@ KISSY.add('page/mods/data/center',['io', 'base'], function(S, require) {
             self.host = self.get('host');
         },
         load: function(url, atPlay) {
+			//alert(url);
             var self = this;
             if (!url || url == '') return false;
             if (!atPlay) {
@@ -6720,7 +6962,51 @@ KISSY.add('page/mods/data/center',['io', 'base'], function(S, require) {
                         self.set('uid', responres.data.uid);
                         self.set('vip', responres.data.vip);
                         self.set('vipRole', responres.data.vip_role);
-                        self.set('trackList', responres.data.trackList);
+                        //alert(url);
+						var list = {};	// van
+						if (document.getElementById('mp3list'))
+							list = JSON.parse(document.getElementById('mp3list').innerHTML);
+						var addsongids = unescape(url.match(/\d{2,}[%2C\d{2,}]*/));
+						addsongids = addsongids.split(',');
+						var templist = [];
+						if (!responres.data.trackList) {
+							for (x in addsongids) {
+								if (list[addsongids[x]]) {
+									list[addsongids[x]]['insert_type'] = '3';
+									list[addsongids[x]]['grade'] = -2;
+									list[addsongids[x]]['artist_url'] = 'http://www.xiami.com/search/find/artist/'+list[addsongids[x]]['artist'];
+									list[addsongids[x]]['lyric'] = 'http://www.xiami.com/radio/lyric/sid/'+list[addsongids[x]]['song_id'];
+									list[addsongids[x]]['location'] = list[addsongids[x]]['location'].replace(/amp\;/g, "");
+									
+									templist.push(list[addsongids[x]]);
+								}
+							}
+							if (templist.length > 0)
+								self.set('trackList', templist);
+							else self.set('trackList', responres.data.trackList);
+						} else {
+							if (responres.data.trackList.length == addsongids.length) {
+								self.set('trackList', responres.data.trackList);
+							} else {
+								templist = responres.data.trackList;
+								var oldIDs = {};
+								for (x in templist) {
+									oldIDs[templist[x].song_id] = 'ok';
+								}
+								for (x in addsongids) {
+									if (!oldIDs[addsongids[x]]) {
+										if (list[addsongids[x]]) {
+											list[addsongids[x]]['insert_type'] = '3';
+											list[addsongids[x]]['grade'] = -2;
+											list[addsongids[x]]['artist_url'] = 'http://www.xiami.com/search/find/artist/'+list[addsongids[x]]['artist'];
+											list[addsongids[x]]['lyric'] = 'http://www.xiami.com/radio/lyric/sid/'+list[addsongids[x]]['song_id'];
+											templist.push(list[addsongids[x]]);
+										}
+									}									
+								}
+								self.set('trackList', templist);
+							}
+						}
                         status = true;
                     }
                 },
@@ -6780,19 +7066,49 @@ KISSY.add('page/mods/xtpl/trackInfo-xtpl',function (S, require, exports, module)
             var config8 = {};
             config8.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<a id="J_trackName" href="http://www.xiami.com/song/';
-                var id0 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 2);
-                buffer += renderOutputUtil(id0, true);
-                buffer += '" title="';
-                var id1 = getPropertyOrRunCommandUtil(engine, scope, {}, "song", 0, 2);
-                buffer += renderOutputUtil(id1, false);
-                buffer += '" target="_blank">';
-                var id2 = getPropertyOrRunCommandUtil(engine, scope, {}, "song", 0, 2);
-                buffer += renderOutputUtil(id2, false);
-                buffer += '</a> - ';
-                var id3 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistfun", 0, 2);
-                buffer += renderOutputUtil(id3, false);
-                buffer += '\r\n';
+                buffer += '\n';
+                var config0 = {};
+                var params1 = [];
+                var id2 = getPropertyUtil(engine, scope, "lyric", 0, 2);
+                params1.push(id2 === ('audioad'));
+                config0.params = params1;
+				
+                config0.fn = function (scope) {
+                    var buffer = "";
+                    buffer += '\n<a id="J_trackName" href="';
+                    var id3 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistUrl", 0, 3);
+                    buffer += renderOutputUtil(id3, true);
+                    buffer += '" title="';
+                    var id4 = getPropertyOrRunCommandUtil(engine, scope, {}, "song", 0, 3);
+                    buffer += renderOutputUtil(id4, false);
+                    buffer += '" target="_blank">';
+                    var id5 = getPropertyOrRunCommandUtil(engine, scope, {}, "song", 0, 3);
+                    buffer += renderOutputUtil(id5, false);
+                    buffer += '</a> - ';
+                    var id6 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistfun", 0, 3);
+                    buffer += renderOutputUtil(id6, false);
+                    buffer += '\n';			
+                    return buffer;
+                };
+                config0.inverse = function (scope) {
+                    var buffer = "";
+                    buffer += '\n<a id="J_trackName" href="http://www.xiami.com/song/';
+                    var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 5);
+                    buffer += renderOutputUtil(id7, true);
+                    buffer += '" title="';
+                    var id8 = getPropertyOrRunCommandUtil(engine, scope, {}, "song", 0, 5);
+                    buffer += renderOutputUtil(id8, false);
+                    buffer += '" target="_blank">';
+                    var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "song", 0, 5);
+                    buffer += renderOutputUtil(id9, false);
+                    buffer += '</a> - ';
+                    var id10 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistfun", 0, 5);
+                    buffer += renderOutputUtil(id10, false);
+                    buffer += '\n';		
+                    return buffer;
+                };
+                buffer += runBlockCommandUtil(engine, scope, config0, "if", 2);
+                buffer += '\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config8, "data", 1);
@@ -6930,18 +7246,18 @@ KISSY.add('page/mods/xtpl/user-xtpl',function (S, require, exports, module) {
             config0.params = params1;
             config0.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div class="user unlogin">\r\n\t<div class="avatar">\r\n\t\t<img src="http://gtms01.alicdn.com/tps/i1/T1UJFKFtlfXXamt9jd-34-34.png" width="30" height="30" />\r\n\t</div>\r\n</div>\r\n<div class="mod-login" id="J_login">\r\n\t<div class="login-content">马上 <a href="#login" id="J_miniLogin">登录</a></div>\r\n</div>\r\n';
+                buffer += '\n<div class="user unlogin">\n\t<div class="avatar">\n\t\t<img src="http://gtms01.alicdn.com/tps/i1/T1UJFKFtlfXXamt9jd-34-34.png" width="30" height="30" />\n\t</div>\n</div>\n<div class="mod-login" id="J_login">\n\t<div class="login-content">马上 <a href="#login" id="J_miniLogin">登录</a></div>\n</div>\n';
                 return buffer;
             };
             config0.inverse = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div class="user">\r\n<div class="avatar">\r\n\t<a href="http://www.xiami.com/u/';
+                buffer += '\n<div class="user">\n<div class="avatar">\n\t<a href="http://www.xiami.com/u/';
                 var id3 = getPropertyOrRunCommandUtil(engine, scope, {}, "uid", 0, 13);
                 buffer += renderOutputUtil(id3, true);
                 buffer += '" target="_blank" title="';
                 var id4 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 13);
                 buffer += renderOutputUtil(id4, false);
-                buffer += '">\r\n\t\t';
+                buffer += '">\n\t\t';
                 var config5 = {};
                 var params6 = [];
                 var id7 = getPropertyUtil(engine, scope, "avatar", 0, 14);
@@ -6949,25 +7265,25 @@ KISSY.add('page/mods/xtpl/user-xtpl',function (S, require, exports, module) {
                 config5.params = params6;
                 config5.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t<img src="http://img.xiami.net/';
+                    buffer += '\n\t\t<img src="http://img.xiami.net/';
                     var id8 = getPropertyOrRunCommandUtil(engine, scope, {}, "avatar", 0, 15);
                     buffer += renderOutputUtil(id8, true);
                     buffer += '" width="30" height="30" alt="';
                     var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 15);
                     buffer += renderOutputUtil(id9, false);
-                    buffer += '" />\r\n\t\t';
+                    buffer += '" />\n\t\t';
                     return buffer;
                 };
                 config5.inverse = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t<img src="http://img.xiami.net//res/img/default/usr50.gif" width="30" height="30" alt="';
+                    buffer += '\n\t\t<img src="http://img.xiami.net//res/img/default/usr50.gif" width="30" height="30" alt="';
                     var id10 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 17);
                     buffer += renderOutputUtil(id10, false);
-                    buffer += '">\r\n\t\t';
+                    buffer += '">\n\t\t';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config5, "if", 14);
-                buffer += '\r\n\t</a>\r\n</div>\r\n<em clas="msg" id="J_userMsg" style="display: none">0</em>\r\n</div>\r\n<div class="friend" id="J_friend"></div>\r\n';
+                buffer += '\n\t</a>\n</div>\n<em clas="msg" id="J_userMsg" style="display: none">0</em>\n</div>\n<div class="friend" id="J_friend"></div>\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config0, "if", 1);
@@ -7103,7 +7419,7 @@ KISSY.add('utils/goldlog/index',function(S) {
  * @author noyobo
  * @mail nongyoubao@alibaba-inc.com
  */
-KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate', './player/player-swfobj', './player/player-lrc', './player/player-sale', './player/player-lister', './player/player-volume', './player/player-panel', './player/player-control', './player/player-tracks', './player/player-blur', './player/player-data', './player/player-menu', './player/player-roam', './player/player-log', './player/player-drag', './data/center', './xtpl/trackInfo-xtpl', 'widget/tool/index', 'utils/tip/index', './user', 'utils/goldlog/index'], function(S, require, exports, module) {
+KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate', './player/player-swfobj', './player/player-lrc', './player/player-sale', './player/player-lister', './player/player-volume', './player/player-panel', './player/player-control', './player/player-tracks', './player/player-blur', './player/player-data', './player/player-menu', './player/player-roam', './player/player-log', './player/player-drag', './player/player-cover', './data/center', './xtpl/trackInfo-xtpl', 'widget/tool/index', 'utils/tip/index', './user', 'utils/goldlog/index'], function(S, require, exports, module) {
     // @formatter:off
     var Node = require("node"),
         Base = require("base"),
@@ -7126,6 +7442,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
         PlayerRoam = require("./player/player-roam"),
         PlayerLog = require('./player/player-log'),
         PlayerDrag = require('./player/player-drag'),
+        PlayerCover = require('./player/player-cover'),
         DataCenter = require('./data/center'),
         Tpl_trackInfo = require("./xtpl/trackInfo-xtpl"),
         UTool = require("widget/tool/index"),
@@ -7134,9 +7451,6 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
         Goldlog = require('utils/goldlog/index');
     // @formatter:on
     var $ = Node.all;
-
-    var CoverTpl = '{{#if cover}}<a href="{{^if albumId===0}}http://www.xiami.com/album/{{albumId}}{{else}}http://www.xiami.com/artist/{{artistId}}{{/if}}" target="_blank" title="{{album}}-{{artist}}"><img crossOrigin="http://www.xiami.com" src="{{cover}}?v=tblur" alt="{{album}}-{{artist}}"></a>{{else}}<img src="http://gtms01.alicdn.com/tps/i1/T1THUfFc8jXXaC1Jrl-250-250.png" width="250" height="250" />{{/if}}';
-    var Tpl_cover = new Xtemplate(CoverTpl);
 
     function player() {
         // @formatter:off
@@ -7163,12 +7477,12 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
             self.Share_btn = $("#J_trackShare");
 
             self.Track_info = $("#J_trackInfo");
-            self.Cover = $("#J_playerCover");
+
             self.Sale = $('#J_albumSale');
             self.LrcWrap = $('#J_lyricScrollWrap');
 
             self.PlayerWrap = $("#J_playerWrap");
-
+            self.TrackControls = self.PlayerWrap.one(".track-controls");
             self.BODY = $("#middle");
 
             self.High_Timer = null;
@@ -7197,6 +7511,9 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
             })
             self.PlayerSale = new PlayerSale();
             self.USER = new User();
+
+            self.PlayerCover = new PlayerCover();
+
             self._playerListen();
             self._playerMenu();
             self._playerRoam();
@@ -7256,11 +7573,55 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                     for (var i = 0, max = arr.length; i < max; i++) {
                         result.push('<a href="http://www.xiami.com/search/find/artist/' + arr[i] + '" target="_blank" title="' + arr[i] + '">' + arr[i] + '</a>');
                     }
-                    return result.join(" ; ");
+                    return result.join(" / ");	// dumbbirdedit
                 }
             };
-            var html = self.tpl_trackInfo.render(data);
+			
+            var html = self.tpl_trackInfo.render(data);	
+			// dumbbirdedit
+			function xhr(u, m, a, d, c) {
+				var xmlhttp,
+				S_Result;
+				var url = u || '';
+				var method = m || 'get';
+				var async = a || 0;
+				var postdata = d || '';
+				xmlhttp = new XMLHttpRequest;
+				xmlhttp.onreadystatechange = callback;
+				xmlhttp.open(method, url, async);
+				xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				xmlhttp.send(postdata);
+				function callback() {
+					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+						S_Result = xmlhttp.responseText;
+						if (c) {
+							c.call(this, S_Result);
+						} //异步方式使用回调函数处理
+					}
+				}
+				return S_Result; //同步方式可以取得返回值
+			}
+			
+			// var sid = track.songId;
+			// alert(sid);
+			// var doc = document.createElement("div");
+			// doc.id = 'songwriters';
+			// doc.style = 'display:none';
+			// doc.innerHTML = xhr('http://www.xiami.com/song/'+sid,'get',0);
+			// document.getElementsByTagName('head')[0].appendChild(doc);
+			//操作
+			//var songwriters = document.getElementById('albums_info').childNodes[1].childNodes;
+			//alert(songwriters.length);
+			// for (var i=2; i<songwriters.length; i++)
+				// if(songwriters[i*2].childNodes[1].innerHTML == "作词：")
+					// alert("词人找到");
+			//移除
+			// doc = document.getElementById("songwriters");
+			// doc.parentNode.removeChild(doc);
+			// alert(html);			
             self.Track_info.html(html);
+			
+			
             if (passtime > 0) {
                 self.XIAMIPLAYER.passtime = passtime;
                 self.XIAMIPLAYER.passtimeTip = $('<span id="J_passtimeTip" style="color:#aaa; font-size:12px;">(同步进度中,若长时间无声音请刷新)</span>')
@@ -7272,37 +7633,59 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
             if (track.cover.indexOf("demo100.png") > -1) {
                 track.cover = "http://img.xiami.net/res/img/default/demo185.png";
             }
-            self.Cover.html(Tpl_cover.render(track));
-            // 获取专辑 促销详情
-            self.PlayerSale.load({
-                'albumid': track.albumId,
-                'itemsid': track.songId,
-                'userid': self.USER.get('uid')
-            }, function(html) {
-                self.Sale.html(html);
-                self.Sale.show();
-                Goldlog.record('/xiamipc.1.13', '', 'cache=_' + S.now() + '&albumid=' + track.albumId + '&itemsid=' + track.songId + '&userid=' + self.USER.get('uid'), 'H46807197')
-                self.LrcWrap.css('top', '257px');
-                self.PlayerLrc.sync();
-            }, function() {
-                self.Sale.html('');
-                self.Sale.hide();
-                self.LrcWrap.css('top', '215px');
-                self.PlayerLrc.sync();
-            });
-
+            //self.Cover.html(Tpl_cover.render(track));
+            self.PlayerCover.render(track);
             self.PlayerPanel.reset(passtime);
             self.PlayerBlur.render(track.cover);
-            self.Fav_btn.attr("data-sid", track.songId);
-            self.More_btn.attr("data-sid", track.songId);
-            self.Share_btn.attr("data-sid", track.songId);
-            if (track.grade > -1) {
-                self.Fav_btn.attr("class", "icon-faved");
-                self.Fav_btn.attr("title", "取消收藏");
-            } else {
-                self.Fav_btn.attr("class", "icon-fav");
-                self.Fav_btn.attr("title", "收藏");
+
+            if(track.lyric === "audioad"){
+                self.Sale.html('');
+                self.Sale.hide();
+                self.LrcWrap.css('top', '225px');
+                self.TrackControls.hide();
+                self.PlayerAd.renderSideBarAd(self.PlayerAd.get('adArr'));
+                Goldlog.record('/xiamipc.1.13', '', 'cache=_' + S.now() + '&artistid=' + track.artistId + '&audioid=' + track.artistId + '&userid=' + self.USER.get('uid'), 'H46807197');
+
+            }else {
+                // 获取专辑 促销详情
+                self.PlayerSale.load({
+                    'albumid': track.albumId,
+                    'itemsid': track.songId,
+                    'userid': self.USER.get('uid')
+                }, function(html) {
+                    self.Sale.html(html);
+                    self.Sale.show();
+                    Goldlog.record('/xiamipc.1.13', '', 'cache=_' + S.now() + '&albumid=' + track.albumId + '&itemsid=' + track.songId + '&userid=' + self.USER.get('uid'), 'H46807197');
+                    self.LrcWrap.css('top', '257px');
+                    self.PlayerLrc.sync();
+                }, function() {
+                    self.Sale.html('');
+                    self.Sale.hide();
+                    self.LrcWrap.css('top', '215px');
+                    self.PlayerLrc.sync();
+                });
+                self.TrackControls.show();
+                self.Fav_btn.attr("data-sid", track.songId);
+                self.More_btn.attr("data-sid", track.songId);
+                self.Share_btn.attr("data-sid", track.songId);
             }
+
+            if (track.grade != -2) {		// van
+				self.Fav_btn.attr("data-sid", track.songId);
+				if (track.grade > -1) {
+					self.Fav_btn.attr("class", "icon-faved");
+					self.Fav_btn.attr("title", "取消收藏");
+				} else {
+					self.Fav_btn.attr("class", "icon-fav");
+					self.Fav_btn.attr("title", "收藏");
+				}
+			} else {
+				self.Fav_btn.attr("data-sid", "");
+				self.Fav_btn.attr("class", "icon-wormhole");
+				self.Fav_btn.attr("href", "/collect/552436");
+				self.Fav_btn.attr("target", "_blank");
+				self.Fav_btn.attr("title", "穿越中");
+			}
             var status = self.PlayerData.get('status');
             if ("room" != self.PlayerData.get("status")) {
                 //var index = self.PlayerData.checkIndex();
@@ -7325,6 +7708,10 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 case 2:
                     self.Mode_btn.attr("class", "mode-random");
                     self.Mode_btn.attr("title", "随机播放");
+                    break;
+				case 3:
+                    self.Mode_btn.attr("class", "mode-once");	// van
+                    self.Mode_btn.attr("title", "顺序一遍");
                     break;
                 case 0:
                     self.Mode_btn.attr("class", "mode-only");
@@ -7402,6 +7789,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 //UTool.changeFavicon("http://res.xiami.net/pause.ico");
                 //document.title = document.title.substr(1);
             }
+
             if (status == "play") {
                 self.pause();
                 //UTool.changeFavicon("http://res.xiami.net/pause.ico");
@@ -7578,6 +7966,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                         break;
                 }
                 if (op !== 0) {
+
                     var track = self.PlayerData.get("track"),
                         trackVo = Json.parse(track);
                     if (trackVo.rec_note != '') {
@@ -7621,9 +8010,11 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
         },
         _playerLrc: function() {
             var self = this;
+
             self.PlayerLrc = new PlayerLrc({
                 wrap: "#J_playerLrc"
             });
+
         },
         _playerControl: function() {
             var self = this;
@@ -7634,6 +8025,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 // 更改列表
             });
         },
+
         _playerListen: function() {
             var self = this;
             self.XIAMIPLAYER = window.__XIAMIPLAYER__ = new PlayerLister({
@@ -7642,6 +8034,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 positionTime: "#J_positionTime",
                 durationTime: "#J_durationTime"
             });
+
             self.XIAMIPLAYER.on("ready", function(event) {
                 var j = Json.parse(event.data);
                 // if(!j.conect && !window.__TEST__){
@@ -7663,6 +8056,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                     });
                 }, 100);
             });
+
             self.XIAMIPLAYER.on("addSongs", function(event) {
                 self.DataCenter.load(event.data.url, event.data.atPlay);
             });
@@ -7672,11 +8066,13 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 window.XiamiPlayer.player_song_end && window.XiamiPlayer.player_song_end();
             });
             self.XIAMIPLAYER.on("soundOpen", function(event) {
+
                 var a = self.PlayerData.get("track");
                 var b = self.PlayerData.getDataArrLimit();
                 window.XiamiPlayer.player_song_start && window.XiamiPlayer.player_song_start(a, b);
             });
             self.XIAMIPLAYER.on("playerRuning", function(event) {
+
                 S.log("playerRuning");
                 var a = self.PlayerData.get("track");
                 var b = self.PlayerData.getDataArrLimit();
@@ -7687,9 +8083,12 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 self.PlayerLrc.syncTime(obj.position);
             });
             self.XIAMIPLAYER.on("lyricComplete", function(event) {
+
                 var a = self.PlayerData.get("track");
                 var track = Json.parse(a);
+
                 self.PlayerLrc.render(track.songId, event.status, event.data);
+
             });
             self.XIAMIPLAYER.on("soundError", function(event) {
                 S.log(["sounderror", event.data]);
@@ -7740,7 +8139,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 var index = self.PlayerData.getCurrentIndex();
                 // 避免前面所在歌曲被删除, 需重新定位
                 var roamSongId = self.PlayerData.get("roamSongId");
-                S.log(['渲染歌曲列表', data, index])
+                S.log(['渲染歌曲列表', data, index]);
                 self.PlayerTracks.addTracks(data, index);
                 // 渲染歌曲列表
             });
@@ -7768,6 +8167,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
             // });
             self.PlayerData.on("afterTrackChange", function(event) {
                 S.log("afterTrackChange");
+
                 var track = Json.parse(event.newVal);
                 var passtime = self.PlayerData.get('passtime');
                 if (passtime > track.length) passtime = 0;
@@ -7807,6 +8207,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 //self.PlayerLrc.empty();
             });
         },
+
         _playerTracks: function() {
             var self = this;
             self.PlayerTracks = new PlayerTracks();
@@ -7828,8 +8229,8 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
             self.DataCenter.load(self.dataUrl);
             self.DataCenter.on('complete', function(event) {
                 if (event.status) {
-                    var DATA = event.target.getAttrVals();
-                    self._dataCenterCompleteHandler(DATA);
+                    var data = event.target.getAttrVals();
+                    self._dataCenterCompleteHandler(data);
                 }
             })
         },
@@ -7886,7 +8287,6 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
     module.exports = player;
 });
 // 2013-12-30 12:52:28
-
 /** Compiled By kissy-xtemplate */
 KISSY.add('page/mods/xtpl/collectItem-xtpl',function (S, require, exports, module) {
         /*jshint quotmark:false, loopfunc:true, indent:false, asi:true, unused:false, boss:true*/
@@ -7903,7 +8303,7 @@ KISSY.add('page/mods/xtpl/collectItem-xtpl',function (S, require, exports, modul
                 getPropertyUtil = utils.getProperty,
                 runInlineCommandUtil = utils.runInlineCommand,
                 getPropertyOrRunCommandUtil = utils.getPropertyOrRunCommand;
-            buffer += '<div class="collect-item collect-item-edit" data-id="0">\r\n\t<div class="collect-item-con">\r\n\t\t<img src="http://gtms01.alicdn.com/tps/i1/T1c7F7FqXeXXcCXlfb-25-25.png" width="25" height="25">\r\n\t\t<input type="hidden" class="item-old" value="">\r\n\t\t<span class="item-name"></span>\r\n\t\t<input type="text" value="" class="item-input" maxlength="400" title="回车确认" placeholder="回车确认" />\r\n\t\t<a class="edit icon-editCollect"></a>\r\n\t\t<a class="delete icon-deleteCollect"></a>\r\n\t</div>\r\n</div>';
+            buffer += '<div class="collect-item collect-item-edit" data-id="0">\n\t<div class="collect-item-con">\n\t\t<img src="http://gtms01.alicdn.com/tps/i1/T1c7F7FqXeXXcCXlfb-25-25.png" width="25" height="25">\n\t\t<input type="hidden" class="item-old" value="">\n\t\t<span class="item-name"></span>\n\t\t<input type="text" value="" class="item-input" maxlength="400" title="回车确认" placeholder="回车确认" />\n\t\t<a class="edit icon-editCollect"></a>\n\t\t<a class="delete icon-deleteCollect"></a>\n\t</div>\n</div>';
             return buffer;
         };
 });
@@ -7931,11 +8331,11 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
             config0.params = params1;
             config0.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n';
+                buffer += '\n';
                 var config1 = {};
                 config1.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n';
+                    buffer += '\n';
                     var config3 = {};
                     var params4 = [];
                     var id5 = getPropertyUtil(engine, scope, "shield", 0, 3);
@@ -7943,31 +8343,31 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                     config3.params = params4;
                     config3.fn = function (scope) {
                         var buffer = "";
-                        buffer += '\r\n<div class="ui-row-item ui-track-item ui-track-disabled" data-sid="';
+                        buffer += '\n<div class="ui-row-item ui-track-item ui-track-disabled" data-sid="';
                         var id6 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 4);
                         buffer += renderOutputUtil(id6, true);
                         buffer += '" data-type="fav" id="J_favList';
                         var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 4);
                         buffer += renderOutputUtil(id7, true);
-                        buffer += '">\r\n<div class="ui-track-main">\r\n\t<div class="ui-track-checkbox">\r\n\t\t<input type="checkbox" disabled="disabled" class="ui-track-item-id" name="fav" id="J_track';
+                        buffer += '">\n<div class="ui-track-main">\n\t<div class="ui-track-checkbox">\n\t\t<input type="checkbox" disabled="disabled" class="ui-track-item-id" name="fav" id="J_track';
                         var id8 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 7);
                         buffer += renderOutputUtil(id8, true);
                         buffer += '" value="';
                         var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 7);
                         buffer += renderOutputUtil(id9, true);
-                        buffer += '" disabled="disabled" />\r\n\t</div>\r\n\t<div class="ui-track-sort"><i>';
+                        buffer += '" disabled="disabled" />\n\t</div>\n\t<div class="ui-track-sort"><i>';
                         var id10 = getPropertyUtil(engine, scope, "xindex", 0, 9);
                         buffer += renderOutputUtil(id10 + (1), true);
-                        buffer += '</i></div>\r\n\t<div class="ui-row-item-body">\r\n\t\t<div class="ui-row-item-column c1" data-id="';
+                        buffer += '</i></div>\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1" data-id="';
                         var id11 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 11);
                         buffer += renderOutputUtil(id11, true);
                         buffer += '">';
                         var id12 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_name", 0, 11);
                         buffer += renderOutputUtil(id12, false);
-                        buffer += '&nbsp;&nbsp;<img src="http://gtms03.alicdn.com/tps/i3/T1iS08FvdcXXblKhDf-39-18.png" width="39" height="18" /></div>\r\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
+                        buffer += '&nbsp;&nbsp;<img src="http://gtms03.alicdn.com/tps/i3/T1iS08FvdcXXblKhDf-39-18.png" width="39" height="18" /></div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
                         var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 12);
                         buffer += renderOutputUtil(id13, true);
-                        buffer += '">\r\n\t\t';
+                        buffer += '">\n\t\t';
                         var config14 = {};
                         var params15 = [];
                         var id16 = getPropertyUtil(engine, scope, "singers", 0, 13);
@@ -7975,7 +8375,7 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                         config14.params = params15;
                         config14.fn = function (scope) {
                             var buffer = "";
-                            buffer += '\r\n\t\t';
+                            buffer += '\n\t\t';
                             var config17 = {};
                             var params18 = [];
                             var id19 = getPropertyUtil(engine, scope, "xindex", 0, 14);
@@ -7996,11 +8396,11 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                             buffer += '">';
                             var id22 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 14);
                             buffer += renderOutputUtil(id22, false);
-                            buffer += '</a>\r\n\t\t';
+                            buffer += '</a>\n\t\t';
                             return buffer;
                         };
                         buffer += runBlockCommandUtil(engine, scope, config14, "each", 13);
-                        buffer += '\r\n\t\t</div>\r\n\t\t<div class="ui-row-item-column c3" data-album-id="';
+                        buffer += '\n\t\t</div>\n\t\t<div class="ui-row-item-column c3" data-album-id="';
                         var id23 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 17);
                         buffer += renderOutputUtil(id23, true);
                         buffer += '"><a href="http://www.xiami.com/album/';
@@ -8012,7 +8412,7 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                         buffer += '">';
                         var id26 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 17);
                         buffer += renderOutputUtil(id26, false);
-                        buffer += '</a></div>\r\n\t</div>\r\n\t<div class="ui-track-control">\r\n\t\t';
+                        buffer += '</a></div>\n\t</div>\n\t<div class="ui-track-control">\n\t\t';
                         var config27 = {};
                         var params28 = [];
                         var id29 = getPropertyUtil(engine, scope, "grade", 0, 20);
@@ -8020,45 +8420,45 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                         config27.params = params28;
                         config27.fn = function (scope) {
                             var buffer = "";
-                            buffer += '\r\n\t\t<a class="fav-btn icon-track-fav" data-type="myfav" data-event="fav" title="收藏"></a>\r\n\t\t';
+                            buffer += '\n\t\t<a class="fav-btn icon-track-fav" data-type="myfav" data-event="fav" title="收藏"></a>\n\t\t';
                             return buffer;
                         };
                         config27.inverse = function (scope) {
                             var buffer = "";
-                            buffer += '\r\n\t\t<a class="fav-btn icon-track-faved" data-type="myfav" data-event="fav" title="取消收藏"></a>\r\n\t\t';
+                            buffer += '\n\t\t<a class="fav-btn icon-track-faved" data-type="myfav" data-event="fav" title="取消收藏"></a>\n\t\t';
                             return buffer;
                         };
                         buffer += runBlockCommandUtil(engine, scope, config27, "if", 20);
-                        buffer += '\r\n\t</div>\r\n</div>\r\n</div>\r\n';
+                        buffer += '\n\t</div>\n</div>\n</div>\n';
                         return buffer;
                     };
                     config3.inverse = function (scope) {
                         var buffer = "";
-                        buffer += '\r\n<div class="ui-row-item ui-track-item" data-sid="';
+                        buffer += '\n<div class="ui-row-item ui-track-item" data-sid="';
                         var id30 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 29);
                         buffer += renderOutputUtil(id30, true);
                         buffer += '" data-type="fav" id="J_favList';
                         var id31 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 29);
                         buffer += renderOutputUtil(id31, true);
-                        buffer += '">\r\n<div class="ui-track-main">\r\n\t<div class="ui-track-checkbox">\r\n\t\t<input type="checkbox" class="ui-track-item-id" name="fav" id="J_track';
+                        buffer += '">\n<div class="ui-track-main">\n\t<div class="ui-track-checkbox">\n\t\t<input type="checkbox" class="ui-track-item-id" name="fav" id="J_track';
                         var id32 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 32);
                         buffer += renderOutputUtil(id32, true);
                         buffer += '" value="';
                         var id33 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 32);
                         buffer += renderOutputUtil(id33, true);
-                        buffer += '" />\r\n\t</div>\r\n\t<div class="ui-track-sort"><em>';
+                        buffer += '" />\n\t</div>\n\t<div class="ui-track-sort"><em>';
                         var id34 = getPropertyUtil(engine, scope, "xindex", 0, 34);
                         buffer += renderOutputUtil(id34 + (1), true);
-                        buffer += '</em></div>\r\n\t<div class="ui-row-item-body">\r\n\t\t<div class="ui-row-item-column c1" data-id="';
+                        buffer += '</em></div>\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1" data-id="';
                         var id35 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 36);
                         buffer += renderOutputUtil(id35, true);
                         buffer += '">';
                         var id36 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_name", 0, 36);
                         buffer += renderOutputUtil(id36, false);
-                        buffer += '</div>\r\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
+                        buffer += '</div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
                         var id37 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 37);
                         buffer += renderOutputUtil(id37, true);
-                        buffer += '">\r\n\t\t';
+                        buffer += '">\n\t\t';
                         var config38 = {};
                         var params39 = [];
                         var id40 = getPropertyUtil(engine, scope, "singers", 0, 38);
@@ -8066,7 +8466,7 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                         config38.params = params39;
                         config38.fn = function (scope) {
                             var buffer = "";
-                            buffer += '\r\n\t\t';
+                            buffer += '\n\t\t';
                             var config41 = {};
                             var params42 = [];
                             var id43 = getPropertyUtil(engine, scope, "xindex", 0, 39);
@@ -8087,11 +8487,11 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                             buffer += '">';
                             var id46 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 39);
                             buffer += renderOutputUtil(id46, false);
-                            buffer += '</a>\r\n\t\t';
+                            buffer += '</a>\n\t\t';
                             return buffer;
                         };
                         buffer += runBlockCommandUtil(engine, scope, config38, "each", 38);
-                        buffer += '\r\n\t\t</div>\r\n\t\t<div class="ui-row-item-column c3" data-album-id="';
+                        buffer += '\n\t\t</div>\n\t\t<div class="ui-row-item-column c3" data-album-id="';
                         var id47 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 42);
                         buffer += renderOutputUtil(id47, true);
                         buffer += '"><a href="http://www.xiami.com/album/';
@@ -8103,7 +8503,7 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                         buffer += '">';
                         var id50 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 42);
                         buffer += renderOutputUtil(id50, false);
-                        buffer += '</a></div>\r\n\t</div>\r\n\t<div class="ui-track-control">\r\n\t\t';
+                        buffer += '</a></div>\n\t</div>\n\t<div class="ui-track-control">\n\t\t';
                         var config51 = {};
                         var params52 = [];
                         var id53 = getPropertyUtil(engine, scope, "grade", 0, 45);
@@ -8111,33 +8511,33 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                         config51.params = params52;
                         config51.fn = function (scope) {
                             var buffer = "";
-                            buffer += '\r\n\t\t<a class="fav-btn icon-track-fav" data-type="myfav" data-event="fav" title="收藏"></a>\r\n\t\t';
+                            buffer += '\n\t\t<a class="fav-btn icon-track-fav" data-type="myfav" data-event="fav" title="收藏"></a>\n\t\t';
                             return buffer;
                         };
                         config51.inverse = function (scope) {
                             var buffer = "";
-                            buffer += '\r\n\t\t<a class="fav-btn icon-track-faved" data-type="myfav" data-event="fav" title="取消收藏"></a>\r\n\t\t';
+                            buffer += '\n\t\t<a class="fav-btn icon-track-faved" data-type="myfav" data-event="fav" title="取消收藏"></a>\n\t\t';
                             return buffer;
                         };
                         buffer += runBlockCommandUtil(engine, scope, config51, "if", 45);
-                        buffer += '\r\n\t\t<a class="more-btn icon-track-more" data-type="myfav" data-event="more" title="更多"></a>\r\n\t</div>\r\n</div>\r\n</div>\r\n';
+                        buffer += '\n\t\t<a class="more-btn icon-track-more" data-type="myfav" data-event="more" title="更多"></a>\n\t</div>\n</div>\n</div>\n';
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config3, "if", 3);
-                    buffer += '\r\n';
+                    buffer += '\n';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config1, "data", 2);
-                buffer += '\r\n';
+                buffer += '\n';
                 return buffer;
             };
             config0.inverse = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div class="fav-detail-none"></div>\r\n';
+                buffer += '\n<div class="fav-detail-none"></div>\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config0, "if", 1);
-            buffer += '\r\n';
+            buffer += '\n';
             return buffer;
         };
 });
@@ -8252,7 +8652,7 @@ KISSY.add('page/mods/xtpl/collectListItem-xtpl',function (S, require, exports, m
             config0.params = params1;
             config0.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n';
+                buffer += '\n';
                 var config3 = {};
                 var params4 = [];
                 var id5 = getPropertyUtil(engine, scope, "data", 0, 2);
@@ -8260,10 +8660,10 @@ KISSY.add('page/mods/xtpl/collectListItem-xtpl',function (S, require, exports, m
                 config3.params = params4;
                 config3.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n<div class="collect-item"  data-id="';
+                    buffer += '\n<div class="collect-item"  data-id="';
                     var id6 = getPropertyOrRunCommandUtil(engine, scope, {}, "list_id", 0, 3);
                     buffer += renderOutputUtil(id6, true);
-                    buffer += '">\r\n\t<div class="collect-item-con">\r\n\t\t';
+                    buffer += '">\n\t<div class="collect-item-con">\n\t\t';
                     var config7 = {};
                     var params8 = [];
                     var id9 = getPropertyUtil(engine, scope, "logo", 0, 5);
@@ -8271,41 +8671,41 @@ KISSY.add('page/mods/xtpl/collectListItem-xtpl',function (S, require, exports, m
                     config7.params = params8;
                     config7.fn = function (scope) {
                         var buffer = "";
-                        buffer += '\r\n\t\t<img src="http://img.xiami.net/';
+                        buffer += '\n\t\t<img src="http://img.xiami.net/';
                         var id10 = getPropertyOrRunCommandUtil(engine, scope, {}, "logo", 0, 6);
                         buffer += renderOutputUtil(id10, true);
-                        buffer += '" width="25" height="25" alt="">\r\n\t\t';
+                        buffer += '" width="25" height="25" alt="">\n\t\t';
                         return buffer;
                     };
                     config7.inverse = function (scope) {
                         var buffer = "";
-                        buffer += '\r\n\t\t<img src="http://gtms01.alicdn.com/tps/i1/T1c7F7FqXeXXcCXlfb-25-25.png" width="25" height="25" alt="">\r\n\t\t';
+                        buffer += '\n\t\t<img src="http://gtms01.alicdn.com/tps/i1/T1c7F7FqXeXXcCXlfb-25-25.png" width="25" height="25" alt="">\n\t\t';
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config7, "if", 5);
-                    buffer += '\r\n\t\t<input type="hidden" class="item-old" value="';
+                    buffer += '\n\t\t<input type="hidden" class="item-old" value="';
                     var id11 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 10);
                     buffer += renderOutputUtil(id11, false);
-                    buffer += '">\r\n\t\t<span class="item-name">';
+                    buffer += '">\n\t\t<span class="item-name">';
                     var id12 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 11);
                     buffer += renderOutputUtil(id12, false);
-                    buffer += '</span>\r\n\t\t<input type="text" value="';
+                    buffer += '</span>\n\t\t<input type="text" value="';
                     var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 12);
                     buffer += renderOutputUtil(id13, false);
-                    buffer += '" class="item-input" maxlength="400">\r\n\t\t<a class="edit icon-editCollect"></a>\r\n\t\t<a class="delete icon-deleteCollect"></a>\r\n\t</div>\r\n</div>\r\n';
+                    buffer += '" class="item-input" maxlength="400">\n\t\t<a class="edit icon-editCollect"></a>\n\t\t<a class="delete icon-deleteCollect"></a>\n\t</div>\n</div>\n';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config3, "each", 2);
-                buffer += '\r\n';
+                buffer += '\n';
                 return buffer;
             };
             config0.inverse = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div class="collect-none"></div>\r\n';
+                buffer += '\n<div class="collect-none"></div>\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config0, "if", 1);
-            buffer += '\r\n';
+            buffer += '\n';
             return buffer;
         };
 });
@@ -8325,13 +8725,13 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                 getPropertyUtil = utils.getProperty,
                 runInlineCommandUtil = utils.runInlineCommand,
                 getPropertyOrRunCommandUtil = utils.getPropertyOrRunCommand;
-            buffer += '<div class="ui-collect-title">\r\n\t<div class="ui-collect-title-con">\r\n\t\t<a class="icon-playAllBtn"  title="播放全部" onclick="SEIYA.playcollect(\'';
+            buffer += '<div class="ui-collect-title">\n\t<div class="ui-collect-title-con">\n\t\t<a class="icon-playAllBtn"  title="播放全部" onclick="SEIYA.playcollect(\'';
             var id0 = getPropertyOrRunCommandUtil(engine, scope, {}, "list_id", 0, 3);
             buffer += renderOutputUtil(id0, true);
-            buffer += '\')"></a>\r\n\t\t<h2>';
+            buffer += '\')"></a>\n\t\t<h2>';
             var id1 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 4);
             buffer += renderOutputUtil(id1, false);
-            buffer += '</h2>\r\n\t\t<p><span>歌曲数:';
+            buffer += '</h2>\n\t\t<p><span>歌曲数:';
             var id2 = getPropertyOrRunCommandUtil(engine, scope, {}, "songs_count", 0, 5);
             buffer += renderOutputUtil(id2, true);
             buffer += '首</span><span>更新时间:';
@@ -8340,7 +8740,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
             buffer += '</span><a href="http://www.xiami.com/song/showcollect/id/';
             var id4 = getPropertyOrRunCommandUtil(engine, scope, {}, "list_id", 0, 5);
             buffer += renderOutputUtil(id4, true);
-            buffer += '" target="_blank">查看详情</a></p>\r\n\t</div>\r\n</div>\r\n<div class="ui-collect-header ui-row-item">\r\n\t<div class="ui-row-item-body">\r\n\t\t<div class="ui-row-item-column c1">\r\n\t\t\t歌曲\r\n\t\t</div>\r\n\t\t<div class="ui-row-item-column c2">\r\n\t\t\t演唱者\r\n\t\t</div>\r\n\t\t<div class="ui-row-item-column c3">\r\n\t\t\t专辑\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n';
+            buffer += '" target="_blank">查看详情</a></p>\n\t</div>\n</div>\n<div class="ui-collect-header ui-row-item">\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1">\n\t\t\t歌曲\n\t\t</div>\n\t\t<div class="ui-row-item-column c2">\n\t\t\t演唱者\n\t\t</div>\n\t\t<div class="ui-row-item-column c3">\n\t\t\t专辑\n\t\t</div>\n\t</div>\n</div>\n';
             var config5 = {};
             var params6 = [];
             var id7 = getPropertyUtil(engine, scope, "song", 0, 21);
@@ -8348,11 +8748,11 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
             config5.params = params6;
             config5.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div class="ui-collect-body">\r\n\t<div id="J_pageCollectScrollView" class="ks-scroll-view">\r\n\t\t<!-- 歌曲列表 -->\r\n\t\t<div class="ks-scroll-view-content">\r\n\t\t\t<!-- 列表 begin -->\r\n\t\t\t<div class="ui-tracks-wrap" id="J_collectTracksList">\r\n\t\t\t';
+                buffer += '\n<div class="ui-collect-body">\n\t<div id="J_pageCollectScrollView" class="ks-scroll-view">\n\t\t<!-- 歌曲列表 -->\n\t\t<div class="ks-scroll-view-content">\n\t\t\t<!-- 列表 begin -->\n\t\t\t<div class="ui-tracks-wrap" id="J_collectTracksList">\n\t\t\t';
                 var config0 = {};
                 config0.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t\t\t<div class="ui-row-item ui-track-item';
+                    buffer += '\n\t\t\t\t<div class="ui-row-item ui-track-item';
                     var config8 = {};
                     var params9 = [];
                     var id10 = getPropertyUtil(engine, scope, "shield", 0, 29);
@@ -8373,7 +8773,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     buffer += '" data-type="collect" id="J_collectList';
                     var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 29);
                     buffer += renderOutputUtil(id13, true);
-                    buffer += '">\r\n\t\t\t\t<div class="ui-track-main">\r\n\t\t\t\t\t<div class="ui-track-checkbox">\r\n\t\t\t\t\t\t<input type="checkbox" class="ui-track-item-id" name="collect" id="J_collectTrack';
+                    buffer += '">\n\t\t\t\t<div class="ui-track-main">\n\t\t\t\t\t<div class="ui-track-checkbox">\n\t\t\t\t\t\t<input type="checkbox" class="ui-track-item-id" name="collect" id="J_collectTrack';
                     var id14 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 32);
                     buffer += renderOutputUtil(id14, true);
                     buffer += '" value="';
@@ -8391,7 +8791,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config16, "if", 32);
-                    buffer += ' />\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class="ui-track-sort">';
+                    buffer += ' />\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class="ui-track-sort">';
                     var config19 = {};
                     var params20 = [];
                     var id21 = getPropertyUtil(engine, scope, "shield", 0, 34);
@@ -8414,7 +8814,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config19, "if", 34);
-                    buffer += '</div>\r\n\t\t\t\t\t<div class="ui-row-item-body">\r\n\t\t\t\t\t\t<div class="ui-row-item-column c1" data-id="';
+                    buffer += '</div>\n\t\t\t\t\t<div class="ui-row-item-body">\n\t\t\t\t\t\t<div class="ui-row-item-column c1" data-id="';
                     var id24 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 36);
                     buffer += renderOutputUtil(id24, true);
                     buffer += '">';
@@ -8432,10 +8832,10 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config26, "if", 36);
-                    buffer += '</div>\r\n\t\t\t\t\t\t<div class="ui-row-item-column c2" data-artist-id="';
+                    buffer += '</div>\n\t\t\t\t\t\t<div class="ui-row-item-column c2" data-artist-id="';
                     var id29 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 37);
                     buffer += renderOutputUtil(id29, true);
-                    buffer += '">\r\n\t\t\t\t\t\t';
+                    buffer += '">\n\t\t\t\t\t\t';
                     var config30 = {};
                     var params31 = [];
                     var id32 = getPropertyUtil(engine, scope, "singers", 0, 38);
@@ -8443,7 +8843,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     config30.params = params31;
                     config30.fn = function (scope) {
                         var buffer = "";
-                        buffer += '\r\n\t\t\t\t\t\t';
+                        buffer += '\n\t\t\t\t\t\t';
                         var config33 = {};
                         var params34 = [];
                         var id35 = getPropertyUtil(engine, scope, "xindex", 0, 39);
@@ -8464,11 +8864,11 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                         buffer += '">';
                         var id38 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 39);
                         buffer += renderOutputUtil(id38, false);
-                        buffer += '</a>\r\n\t\t\t\t\t\t';
+                        buffer += '</a>\n\t\t\t\t\t\t';
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config30, "each", 38);
-                    buffer += '\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class="ui-row-item-column c3" data-album-id="';
+                    buffer += '\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class="ui-row-item-column c3" data-album-id="';
                     var id39 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 42);
                     buffer += renderOutputUtil(id39, true);
                     buffer += '"><a href="http://www.xiami.com/album/';
@@ -8480,7 +8880,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     buffer += '">';
                     var id42 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 42);
                     buffer += renderOutputUtil(id42, false);
-                    buffer += '</a></div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class="ui-track-control">\r\n\t\t\t\t\t\t';
+                    buffer += '</a></div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class="ui-track-control">\n\t\t\t\t\t\t';
                     var config43 = {};
                     var params44 = [];
                     var id45 = getPropertyUtil(engine, scope, "grade", 0, 45);
@@ -8488,16 +8888,16 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     config43.params = params44;
                     config43.fn = function (scope) {
                         var buffer = "";
-                        buffer += '\r\n\t\t\t\t\t\t<a class="fav-btn icon-track-fav" data-type="collect" data-event="fav" title="收藏"></a>\r\n\t\t\t\t\t\t';
+                        buffer += '\n\t\t\t\t\t\t<a class="fav-btn icon-track-fav" data-type="collect" data-event="fav" title="收藏"></a>\n\t\t\t\t\t\t';
                         return buffer;
                     };
                     config43.inverse = function (scope) {
                         var buffer = "";
-                        buffer += '\r\n\t\t\t\t\t\t<a class="fav-btn icon-track-faved" data-type="collect" data-event="fav" title="取消收藏"></a>\r\n\t\t\t\t\t\t';
+                        buffer += '\n\t\t\t\t\t\t<a class="fav-btn icon-track-faved" data-type="collect" data-event="fav" title="取消收藏"></a>\n\t\t\t\t\t\t';
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config43, "if", 45);
-                    buffer += '\r\n\t\t\t\t\t\t';
+                    buffer += '\n\t\t\t\t\t\t';
                     var config46 = {};
                     var params47 = [];
                     var id48 = getPropertyUtil(engine, scope, "shield", 0, 50);
@@ -8515,26 +8915,26 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     config46.fn = config46.inverse;
                     config46.inverse = inverse50;
                     buffer += runBlockCommandUtil(engine, scope, config46, "if", 50);
-                    buffer += '\r\n\t\t\t\t\t\t<a class="delete-btn icon-track-delete" data-type="collect" data-event="delete" title="删除"></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t';
+                    buffer += '\n\t\t\t\t\t\t<a class="delete-btn icon-track-delete" data-type="collect" data-event="delete" title="删除"></a>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config0, "song", 28);
-                buffer += '\r\n\t\t\t</div>\r\n\t\t\t<!-- 列表 end -->\r\n\t\t</div>\r\n\t\t<!-- 歌曲列表 end -->\r\n\t</div>\r\n</div>\r\n';
+                buffer += '\n\t\t\t</div>\n\t\t\t<!-- 列表 end -->\n\t\t</div>\n\t\t<!-- 歌曲列表 end -->\n\t</div>\n</div>\n';
                 return buffer;
             };
             config5.inverse = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div class="ui-collect-body" style="background: none">\r\n\t<div id="J_pageCollectScrollView" class="ks-scroll-view">\r\n\t\t<!-- 歌曲列表 -->\r\n\t\t<div class="ks-scroll-view-content">\r\n\t\t\t<!-- 列表 begin -->\r\n\t\t\t<div class="ui-tracks-wrap" id="J_collectTracksList">\r\n\t\t\t<div class="collect-detail-none"></div>\r\n\t\t\t</div>\r\n\t\t\t<!-- 列表 end -->\r\n\t\t</div>\r\n\t\t<!-- 歌曲列表 end -->\r\n\t</div>\r\n</div>\r\n';
+                buffer += '\n<div class="ui-collect-body" style="background: none">\n\t<div id="J_pageCollectScrollView" class="ks-scroll-view">\n\t\t<!-- 歌曲列表 -->\n\t\t<div class="ks-scroll-view-content">\n\t\t\t<!-- 列表 begin -->\n\t\t\t<div class="ui-tracks-wrap" id="J_collectTracksList">\n\t\t\t<div class="collect-detail-none"></div>\n\t\t\t</div>\n\t\t\t<!-- 列表 end -->\n\t\t</div>\n\t\t<!-- 歌曲列表 end -->\n\t</div>\n</div>\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config5, "if", 21);
-            buffer += '\r\n\r\n<div class="ui-collect-footer">\r\n\t<div class="ui-track-all">\r\n\t\t<div class="ui-all-checkbox">\r\n\t\t\t<input id="J_checkAll_collect" type="checkbox" onclick="SEIYA.syncCheck(this,\'collect\')" />\r\n\t\t</div>\r\n\t\t<div class="ui-all-item">\r\n\t\t\t<a class="icon-tracks-play" onclick="SEIYA.playAllSongs(\'collect\', \'collect\', ';
+            buffer += '\n\n<div class="ui-collect-footer">\n\t<div class="ui-track-all">\n\t\t<div class="ui-all-checkbox">\n\t\t\t<input id="J_checkAll_collect" type="checkbox" onclick="SEIYA.syncCheck(this,\'collect\')" />\n\t\t</div>\n\t\t<div class="ui-all-item">\n\t\t\t<a class="icon-tracks-play" onclick="SEIYA.playAllSongs(\'collect\', \'collect\', ';
             var id51 = getPropertyOrRunCommandUtil(engine, scope, {}, "list_id", 0, 84);
             buffer += renderOutputUtil(id51, true);
-            buffer += ')">播放</a>\r\n\t\t</div>\r\n\t\t<div class="ui-all-item">\r\n\t\t\t<a class="icon-tracks-add" onclick="SEIYA.collects(\'collect\')">添加到精选集</a>\r\n\t\t</div>\r\n\t\t<div class="ui-all-item">\r\n\t\t\t<a class="icon-tracks-more" data-type="collect" data-typeid="';
+            buffer += ')">播放</a>\n\t\t</div>\n\t\t<div class="ui-all-item">\n\t\t\t<a class="icon-tracks-add" onclick="SEIYA.collects(\'collect\')">添加到精选集</a>\n\t\t</div>\n\t\t<div class="ui-all-item">\n\t\t\t<a class="icon-tracks-more" data-type="collect" data-typeid="';
             var id52 = getPropertyOrRunCommandUtil(engine, scope, {}, "list_id", 0, 90);
             buffer += renderOutputUtil(id52, true);
-            buffer += '" data-event="more">更多</a>\r\n\t\t</div>\r\n\t</div>\r\n</div>';
+            buffer += '" data-event="more">更多</a>\n\t\t</div>\n\t</div>\n</div>';
             return buffer;
         };
 });
@@ -8958,11 +9358,11 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
             config0.params = params1;
             config0.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n';
+                buffer += '\n';
                 var config2 = {};
                 config2.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n';
+                    buffer += '\n';
                     var config3 = {};
                     var params4 = [];
                     var id5 = getPropertyUtil(engine, scope, "shield", 0, 3);
@@ -8970,7 +9370,7 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                     config3.params = params4;
                     config3.fn = function (scope) {
                         var buffer = "";
-                        buffer += '\r\n<div class="ui-row-item ui-track-item ui-track-disabled" data-sid="';
+                        buffer += '\n<div class="ui-row-item ui-track-item ui-track-item" data-sid="';
                         var id6 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 4);
                         buffer += renderOutputUtil(id6, true);
                         buffer += '" data-gmt="';
@@ -8979,25 +9379,25 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                         buffer += '" data-type="history" id="J_historyList';
                         var id8 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 4);
                         buffer += renderOutputUtil(id8, true);
-                        buffer += '">\r\n<div class="ui-track-main">\r\n\t<div class="ui-track-checkbox">\r\n\t\t<input type="checkbox" class="ui-track-item-id" name="history" id="J_track';
+                        buffer += '">\n<div class="ui-track-main">\n\t<div class="ui-track-checkbox">\n\t\t<input type="checkbox" class="ui-track-item-id" name="history" id="J_track';
                         var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 7);
                         buffer += renderOutputUtil(id9, true);
                         buffer += '" value="';
                         var id10 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 7);
                         buffer += renderOutputUtil(id10, true);
-                        buffer += '" disabled="disabled" />\r\n\t</div>\r\n\t<div class="ui-track-sort"><i>';
+                        buffer += '" />\n\t</div>\n\t<div class="ui-track-sort"><i><em>';
                         var id11 = getPropertyUtil(engine, scope, "xindex", 0, 9);
                         buffer += renderOutputUtil(id11 + (1), true);
-                        buffer += '</i></div>\r\n\t<div class="ui-row-item-body">\r\n\t\t<div class="ui-row-item-column c1" data-id="';
+                        buffer += '</em></i></div>\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1" data-id="';
                         var id12 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 11);
                         buffer += renderOutputUtil(id12, true);
                         buffer += '">';
                         var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_name", 0, 11);
                         buffer += renderOutputUtil(id13, false);
-                        buffer += '&nbsp;&nbsp;<img src="http://gtms03.alicdn.com/tps/i3/T1iS08FvdcXXblKhDf-39-18.png" width="39" height="18" /></div>\r\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
+                        buffer += '&nbsp;&nbsp;<img src="http://gtms03.alicdn.com/tps/i3/T1iS08FvdcXXblKhDf-39-18.png" width="39" height="18" /></div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
                         var id14 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 12);
                         buffer += renderOutputUtil(id14, true);
-                        buffer += '">\r\n\t\t';
+                        buffer += '">\n\t\t';
                         var config15 = {};
                         var params16 = [];
                         var id17 = getPropertyUtil(engine, scope, "singers", 0, 13);
@@ -9005,7 +9405,7 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                         config15.params = params16;
                         config15.fn = function (scope) {
                             var buffer = "";
-                            buffer += '\r\n\t\t';
+                            buffer += '\n\t\t';
                             var config18 = {};
                             var params19 = [];
                             var id20 = getPropertyUtil(engine, scope, "xindex", 0, 14);
@@ -9026,36 +9426,40 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                             buffer += '">';
                             var id23 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 14);
                             buffer += renderOutputUtil(id23, false);
-                            buffer += '</a>\r\n\t\t';
+                            buffer += '</a>\n\t\t';
                             return buffer;
                         };
                         buffer += runBlockCommandUtil(engine, scope, config15, "each", 13);
-                        buffer += '\r\n\t\t</div>\r\n\t\t<div class="ui-row-item-column c3"><span class="time">';
+                        buffer += '\n\t\t</div>\n\t\t<div class="ui-row-item-column c3"><span class="time">';
                         var id24 = getPropertyOrRunCommandUtil(engine, scope, {}, "gmt_play", 0, 17);
                         buffer += renderOutputUtil(id24, true);
-                        buffer += '</span></div>\r\n\t</div>\r\n\t<div class="ui-track-control">\r\n\t\t';
+                        buffer += '</span></div>\n\t</div>\n\t<div class="ui-track-control">\n\t\t';
                         var config25 = {};
                         var params26 = [];
                         var id27 = getPropertyUtil(engine, scope, "grade", 0, 20);
-                        params26.push(id27 === (-1));
-                        config25.params = params26;
-                        config25.fn = function (scope) {
-                            var buffer = "";
-                            buffer += '\r\n\t\t<a class="fav-btn icon-track-fav" data-type="history" data-event="fav" title="收藏"></a>\r\n\t\t';
-                            return buffer;
-                        };
-                        config25.inverse = function (scope) {
-                            var buffer = "";
-                            buffer += '\r\n\t\t<a class="fav-btn icon-track-faved" data-type="history" data-event="fav" title="取消收藏"></a>\r\n\t\t';
-                            return buffer;
-                        };
-                        buffer += runBlockCommandUtil(engine, scope, config25, "if", 20);
-                        buffer += '\r\n\t\t<a class="delete-btn icon-track-delete" data-type="history" data-event="delete" title="删除"></a>\r\n\t</div>\r\n</div>\r\n</div>\r\n';
+						if (true) {
+							buffer += '\n\t\t<a class="icon-wormhole" title="穿越中" href="/collect/552436" target="_blank"></a>\n\t\t';
+						} else {
+							params26.push(id27 === (-1));
+							config25.params = params26;
+							config25.fn = function (scope) {
+								var buffer = "";
+								buffer += '\n\t\t<a class="fav-btn icon-track-fav" data-type="history" data-event="fav" title="收藏"></a>\n\t\t';
+								return buffer;
+							};
+							config25.inverse = function (scope) {
+								var buffer = "";
+								buffer += '\n\t\t<a class="fav-btn icon-track-faved" data-type="history" data-event="fav" title="取消收藏"></a>\n\t\t';
+								return buffer;
+							};
+							buffer += runBlockCommandUtil(engine, scope, config25, "if", 20);
+						}
+                        buffer += '\n\t\t<a class="delete-btn icon-track-delete" data-type="history" data-event="delete" title="删除"></a>\n\t</div>\n</div>\n</div>\n';
                         return buffer;
                     };
                     config3.inverse = function (scope) {
                         var buffer = "";
-                        buffer += '\r\n<div class="ui-row-item ui-track-item" data-sid="';
+                        buffer += '\n<div class="ui-row-item ui-track-item" data-sid="';
                         var id28 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 30);
                         buffer += renderOutputUtil(id28, true);
                         buffer += '" data-gmt="';
@@ -9064,25 +9468,25 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                         buffer += '" data-type="history" id="J_historyList';
                         var id30 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 30);
                         buffer += renderOutputUtil(id30, true);
-                        buffer += '">\r\n<div class="ui-track-main">\r\n\t<div class="ui-track-checkbox">\r\n\t\t<input type="checkbox" class="ui-track-item-id" name="history" id="J_track';
+                        buffer += '">\n<div class="ui-track-main">\n\t<div class="ui-track-checkbox">\n\t\t<input type="checkbox" class="ui-track-item-id" name="history" id="J_track';
                         var id31 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 33);
                         buffer += renderOutputUtil(id31, true);
                         buffer += '" value="';
                         var id32 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 33);
                         buffer += renderOutputUtil(id32, true);
-                        buffer += '" />\r\n\t</div>\r\n\t<div class="ui-track-sort"><em>';
+                        buffer += '" />\n\t</div>\n\t<div class="ui-track-sort"><em>';
                         var id33 = getPropertyUtil(engine, scope, "xindex", 0, 35);
                         buffer += renderOutputUtil(id33 + (1), true);
-                        buffer += '</em></div>\r\n\t<div class="ui-row-item-body">\r\n\t\t<div class="ui-row-item-column c1" data-id="';
+                        buffer += '</em></div>\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1" data-id="';
                         var id34 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 37);
                         buffer += renderOutputUtil(id34, true);
                         buffer += '">';
                         var id35 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_name", 0, 37);
                         buffer += renderOutputUtil(id35, false);
-                        buffer += '</div>\r\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
+                        buffer += '</div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
                         var id36 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 38);
                         buffer += renderOutputUtil(id36, true);
-                        buffer += '">\r\n\t\t';
+                        buffer += '">\n\t\t';
                         var config37 = {};
                         var params38 = [];
                         var id39 = getPropertyUtil(engine, scope, "singers", 0, 39);
@@ -9090,7 +9494,7 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                         config37.params = params38;
                         config37.fn = function (scope) {
                             var buffer = "";
-                            buffer += '\r\n\t\t';
+                            buffer += '\n\t\t';
                             var config40 = {};
                             var params41 = [];
                             var id42 = getPropertyUtil(engine, scope, "xindex", 0, 40);
@@ -9111,48 +9515,52 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                             buffer += '">';
                             var id45 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 40);
                             buffer += renderOutputUtil(id45, false);
-                            buffer += '</a>\r\n\t\t';
+                            buffer += '</a>\n\t\t';
                             return buffer;
                         };
                         buffer += runBlockCommandUtil(engine, scope, config37, "each", 39);
-                        buffer += '\r\n\t\t</div>\r\n\t\t<div class="ui-row-item-column c3"><span class="time">';
+                        buffer += '\n\t\t</div>\n\t\t<div class="ui-row-item-column c3"><span class="time">';
                         var id46 = getPropertyOrRunCommandUtil(engine, scope, {}, "gmt_play", 0, 43);
                         buffer += renderOutputUtil(id46, true);
-                        buffer += '</span></div>\r\n\t</div>\r\n\t<div class="ui-track-control">\r\n\t\t';
+                        buffer += '</span></div>\n\t</div>\n\t<div class="ui-track-control">\n\t\t';
                         var config47 = {};
                         var params48 = [];
                         var id49 = getPropertyUtil(engine, scope, "grade", 0, 46);
-                        params48.push(id49 === (-1));
-                        config47.params = params48;
-                        config47.fn = function (scope) {
-                            var buffer = "";
-                            buffer += '\r\n\t\t<a class="fav-btn icon-track-fav" data-type="history" data-event="fav" title="收藏"></a>\r\n\t\t';
-                            return buffer;
-                        };
-                        config47.inverse = function (scope) {
-                            var buffer = "";
-                            buffer += '\r\n\t\t<a class="fav-btn icon-track-faved" data-type="history" data-event="fav" title="取消收藏"></a>\r\n\t\t';
-                            return buffer;
-                        };
-                        buffer += runBlockCommandUtil(engine, scope, config47, "if", 46);
-                        buffer += '\r\n\t\t<a class="more-btn icon-track-more" data-type="history" data-event="more" title="更多"></a>\r\n\t\t<a class="delete-btn icon-track-delete" data-type="history" data-event="delete" title="删除"></a>\r\n\t</div>\r\n</div>\r\n</div>\r\n';
+						if (false) {
+							buffer += '\n\t\t<a class="icon-wormhole" title="穿越中" href="/collect/552436" target="_blank"></a>\n\t\t';
+						} else {
+							params48.push(id49 === (-1));
+							config47.params = params48;
+							config47.fn = function (scope) {
+								var buffer = "";
+								buffer += '\n\t\t<a class="fav-btn icon-track-fav" data-type="history" data-event="fav" title="收藏"></a>\n\t\t';
+								return buffer;
+							};
+							config47.inverse = function (scope) {
+								var buffer = "";
+								buffer += '\n\t\t<a class="fav-btn icon-track-faved" data-type="history" data-event="fav" title="取消收藏"></a>\n\t\t';
+								return buffer;
+							};
+							buffer += runBlockCommandUtil(engine, scope, config47, "if", 46);
+						}
+                        buffer += '\n\t\t<a class="more-btn icon-track-more" data-type="history" data-event="more" title="更多"></a>\n\t\t<a class="delete-btn icon-track-delete" data-type="history" data-event="delete" title="删除"></a>\n\t</div>\n</div>\n</div>\n';
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config3, "if", 3);
-                    buffer += '\r\n';
+                    buffer += '\n';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config2, "data", 2);
-                buffer += '\r\n';
+                buffer += '\n';
                 return buffer;
             };
             config0.inverse = function (scope) {
                 var buffer = "";
-                buffer += '\r\n<div class="history-detail-none"></div>\r\n';
+                buffer += '\n<div class="history-detail-none"></div>\n';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config0, "if", 1);
-            buffer += '\r\n';
+            buffer += '\n';
             return buffer;
         };
 });
@@ -9485,6 +9893,7 @@ KISSY.add('page/mods/page',['node', 'event', './player/player-event'], function(
          * @param  {Number} typeid 双击对象对应的类型 ID
          */
         _dblclickRoute: function(sid, type, typeid) {
+
             var self = this;
             S.log([sid, type], "", "_dblclickRoute");
             if ("room" == GLOBAL.PLAYER.PlayerData.get("status")) {
@@ -9629,7 +10038,7 @@ KISSY.add('page/mods/xtpl/search-xtpl',function (S, require, exports, module) {
                 getPropertyUtil = utils.getProperty,
                 runInlineCommandUtil = utils.runInlineCommand,
                 getPropertyOrRunCommandUtil = utils.getPropertyOrRunCommand;
-            buffer += '<dl>\r\n\t';
+            buffer += '<dl>\n\t';
             var config0 = {};
             var params1 = [];
             var id2 = getPropertyUtil(engine, scope, "songs", 0, 2);
@@ -9637,11 +10046,11 @@ KISSY.add('page/mods/xtpl/search-xtpl',function (S, require, exports, module) {
             config0.params = params1;
             config0.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n\t<dt>歌曲</dt>\r\n\t<dd class="song-list">\r\n\t\t<ul>\r\n\t\t\t';
+                buffer += '\n\t<dt>歌曲</dt>\n\t<dd class="song-list">\n\t\t<ul>\n\t\t\t';
                 var config5 = {};
                 config5.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t\t<li><a href="http://www.xiami.com/song/';
+                    buffer += '\n\t\t\t<li><a href="http://www.xiami.com/song/';
                     var id3 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 7);
                     buffer += renderOutputUtil(id3, true);
                     buffer += '" target="_blank" title="';
@@ -9673,15 +10082,15 @@ KISSY.add('page/mods/xtpl/search-xtpl',function (S, require, exports, module) {
                     buffer += '</a> <a onclick="SEIYA.addAndPlay(';
                     var id16 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 7);
                     buffer += renderOutputUtil(id16, true);
-                    buffer += ')" class="play-btn"></a></li>\r\n\t\t\t';
+                    buffer += ')" class="play-btn"></a></li>\n\t\t\t';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config5, "songs", 6);
-                buffer += '\r\n\t\t</ul>\r\n\t</dd>\r\n\t';
+                buffer += '\n\t\t</ul>\n\t</dd>\n\t';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config0, "if", 2);
-            buffer += '\r\n\t';
+            buffer += '\n\t';
             var config17 = {};
             var params18 = [];
             var id19 = getPropertyUtil(engine, scope, "albums", 0, 12);
@@ -9689,11 +10098,11 @@ KISSY.add('page/mods/xtpl/search-xtpl',function (S, require, exports, module) {
             config17.params = params18;
             config17.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n\t<dt>专辑</dt>\r\n\t<dd class="album-list">\r\n\t\t<ul>\r\n\t\t\t';
+                buffer += '\n\t<dt>专辑</dt>\n\t<dd class="album-list">\n\t\t<ul>\n\t\t\t';
                 var config6 = {};
                 config6.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t\t<li>\r\n\t\t\t\t<div class="album">\r\n\t\t\t\t\t<div class="img">\r\n\t\t\t\t\t\t<a href="http://www.xiami.com/album/';
+                    buffer += '\n\t\t\t<li>\n\t\t\t\t<div class="album">\n\t\t\t\t\t<div class="img">\n\t\t\t\t\t\t<a href="http://www.xiami.com/album/';
                     var id20 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 20);
                     buffer += renderOutputUtil(id20, true);
                     buffer += '" target="_blank" title="';
@@ -9705,7 +10114,7 @@ KISSY.add('page/mods/xtpl/search-xtpl',function (S, require, exports, module) {
                     buffer += '" width="30" height="30" alt="';
                     var id23 = getPropertyOrRunCommandUtil(engine, scope, {}, "title", 0, 20);
                     buffer += renderOutputUtil(id23, false);
-                    buffer += '"  /></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class="name">\r\n\t\t\t\t\t\t<p><a href="http://www.xiami.com/album/';
+                    buffer += '"  /></a>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class="name">\n\t\t\t\t\t\t<p><a href="http://www.xiami.com/album/';
                     var id24 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 23);
                     buffer += renderOutputUtil(id24, true);
                     buffer += '" target="_blank" title="';
@@ -9721,7 +10130,7 @@ KISSY.add('page/mods/xtpl/search-xtpl',function (S, require, exports, module) {
                     config27.params = params28;
                     var id26 = runInlineCommandUtil(engine, scope, config27, "higtKey", 23);
                     buffer += renderOutputUtil(id26, false);
-                    buffer += '</a></p>\r\n\t\t\t\t\t\t<p><a href="http://www.xiami.com/album/';
+                    buffer += '</a></p>\n\t\t\t\t\t\t<p><a href="http://www.xiami.com/album/';
                     var id31 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 24);
                     buffer += renderOutputUtil(id31, true);
                     buffer += '" target="_blank" title="';
@@ -9737,18 +10146,18 @@ KISSY.add('page/mods/xtpl/search-xtpl',function (S, require, exports, module) {
                     config34.params = params35;
                     var id33 = runInlineCommandUtil(engine, scope, config34, "higtKey", 24);
                     buffer += renderOutputUtil(id33, false);
-                    buffer += '</a></p>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<a onclick="SEIYA.addPlayalbum(';
+                    buffer += '</a></p>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<a onclick="SEIYA.addPlayalbum(';
                     var id38 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 27);
                     buffer += renderOutputUtil(id38, true);
-                    buffer += ')" class="play-btn"></a>\r\n\t\t\t</li>\r\n\t\t\t';
+                    buffer += ')" class="play-btn"></a>\n\t\t\t</li>\n\t\t\t';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config6, "albums", 16);
-                buffer += '\r\n\t\t</ul>\r\n\t</dd>\r\n\t';
+                buffer += '\n\t\t</ul>\n\t</dd>\n\t';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config17, "if", 12);
-            buffer += '\r\n\t';
+            buffer += '\n\t';
             var config39 = {};
             var params40 = [];
             var id41 = getPropertyUtil(engine, scope, "artists", 0, 33);
@@ -9756,23 +10165,23 @@ KISSY.add('page/mods/xtpl/search-xtpl',function (S, require, exports, module) {
             config39.params = params40;
             config39.fn = function (scope) {
                 var buffer = "";
-                buffer += '\r\n\t<dt>艺人</dt>\r\n\t<dd class="artist-list">\r\n\t\t<ul>\r\n\t\t\t';
+                buffer += '\n\t<dt>艺人</dt>\n\t<dd class="artist-list">\n\t\t<ul>\n\t\t\t';
                 var config7 = {};
                 config7.fn = function (scope) {
                     var buffer = "";
-                    buffer += '\r\n\t\t\t<li>\r\n\t\t\t\t<div class="artist">\r\n\t\t\t\t\t<div class="img">\r\n\t\t\t\t\t\t<a href="http://www.xiami.com/artist/';
+                    buffer += '\n\t\t\t<li>\n\t\t\t\t<div class="artist">\n\t\t\t\t\t<div class="img">\n\t\t\t\t\t\t<a href="http://www.xiami.com/artist/';
                     var id42 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 41);
                     buffer += renderOutputUtil(id42, true);
                     buffer += '" target="_blank" title="';
                     var id43 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 41);
                     buffer += renderOutputUtil(id43, false);
-                    buffer += '">\r\n\t\t\t\t\t\t<img src="http://img.xiami.net/';
+                    buffer += '">\n\t\t\t\t\t\t<img src="http://img.xiami.net/';
                     var id44 = getPropertyOrRunCommandUtil(engine, scope, {}, "logo", 0, 42);
                     buffer += renderOutputUtil(id44, false);
                     buffer += '" width="30" height="30" alt="';
                     var id45 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 42);
                     buffer += renderOutputUtil(id45, false);
-                    buffer += '" /></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class="name">\r\n\t\t\t\t\t\t<a href="http://www.xiami.com/artist/';
+                    buffer += '" /></a>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class="name">\n\t\t\t\t\t\t<a href="http://www.xiami.com/artist/';
                     var id46 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 45);
                     buffer += renderOutputUtil(id46, true);
                     buffer += '" target="_blank" title="';
@@ -9788,18 +10197,18 @@ KISSY.add('page/mods/xtpl/search-xtpl',function (S, require, exports, module) {
                     config49.params = params50;
                     var id48 = runInlineCommandUtil(engine, scope, config49, "higtKey", 45);
                     buffer += renderOutputUtil(id48, false);
-                    buffer += '</a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</li>\r\n\t\t\t';
+                    buffer += '</a>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</li>\n\t\t\t';
                     return buffer;
                 };
                 buffer += runBlockCommandUtil(engine, scope, config7, "artists", 37);
-                buffer += '\r\n\t\t</ul>\r\n\t</dd>\r\n\t';
+                buffer += '\n\t\t</ul>\n\t</dd>\n\t';
                 return buffer;
             };
             buffer += runBlockCommandUtil(engine, scope, config39, "if", 33);
-            buffer += '\r\n</dl>\r\n<div class="result-more">\r\n\t<a href="http://www.xiami.com/search?key=';
+            buffer += '\n</dl>\n<div class="result-more">\n\t<a href="http://www.xiami.com/search?key=';
             var id53 = getPropertyOrRunCommandUtil(engine, scope, {}, "key", 0, 55);
             buffer += renderOutputUtil(id53, true);
-            buffer += '" target="_blank">更多结果</a>\r\n</div>';
+            buffer += '" target="_blank">更多结果</a>\n</div>';
             return buffer;
         };
 });
@@ -10127,7 +10536,7 @@ KISSY.add('page/mods/main',['node', 'io', 'event', 'xtemplate', 'utils/index/glo
 
         S.log(roomUid, "", "roomUid");
 
-        var swfurl = location.href.indexOf("gitlabswf") !== -1 ? "http://gitlabswf.xiami.com/music/xiamiplayer/1.4/player.swf" : "http://img.xiami.com/static/swf/seiya/1.4/player.swf";
+        var swfurl = location.href.indexOf("gitlabswf") !== -1 ? "http://gitlabswf.xiami.com/music/xiamiplayer/1.5/player.swf" : "http://img.xiami.com/static/swf/seiya/1.5/player.swf";
 
         self.PLAYER = window.__PLAYER__ = new Player();
 

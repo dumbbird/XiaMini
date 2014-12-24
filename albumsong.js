@@ -10,7 +10,7 @@ var loadTracklist = function () {
 		var ReUrl = arr[1].match(/\d+/);
 		var AlbumUrl = $("#albumCover").attr("href");
 		var xmlhttp;
-		var MaxShow = 16; // 初始最多显示数量+1
+		var MaxShow = 6; // 初始最多显示数量+1
 
 		function AlbumRequest() {
 			xmlhttp = new XMLHttpRequest;
@@ -26,7 +26,7 @@ var loadTracklist = function () {
 				$(AllSongs).find("a.show_zhcn").remove(); // 去除歌曲注释信息
 				var AllSongsDo = $(AlbumHtml).find(".song_do");
 				$(AllSongsDo).find(".song_menu").remove(); // 去除more按钮
-				var SongsNum = (AllSongs.length > MaxShow) ? MaxShow : AllSongs.length; // 列表初始最多显示15首
+				var SongsNum = (AllSongs.length > MaxShow) ? MaxShow : AllSongs.length; // 列表初始最多显示MaxShow-1首
 				var SongID;
 				var AlbumSongs = '<div id="album_song" class="block mgt20" >' +
 					'<h3><a class="playRank fr" style="margin:-3px 20px 0 0;" href="javascript:void(0)" title="全部播放" onclick="playall(\'ids2\');">全部播放</a>这张专辑还有    ';

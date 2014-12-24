@@ -32,57 +32,57 @@ function addGlobalStyle(css) {
 
 
 // 定义CSS样式
-addGlobalStyle('.player-info .track-info .track-controls #J_winopenPlay {' + // 弹窗图标CSS
-'  top: 0px; right: -33px; position: absolute; cursor: pointer;' +
-'}' +
-'.icon-winopenPlay {' +
-'  background-image: url("http://bbsdata.gztwkadokawa.com/album/201405/28/225839pgklmuagcg25gcrr.png"); background-repeat: no-repeat;' +
-'}' +
-'.icon-winopenPlay {' +
-'  background-position: 0px -277px; width: 18px; height: 18px;' +
-'}' +
-'.icon-winopenPlay:hover {' +
-'  background-position: -28px -277px;' +
-'}' +
-'.track-play-menu {' + // 设置DIV+CSS
-'  padding: 10px; border-radius: 4px; left: 300px; width: 140px; height: 60px; bottom: 26px; position: fixed; z-index: 1999; background-color: rgb(51, 51, 51);' +
-'}' +
-'.track-play-menu ul li {' +
-'  height: 30px; line-height: 30px;' +
-'}' +
-'.track-play-menu ul li a {' +
-'  border-radius: 4px; color: rgb(170, 170, 170); line-height: 30px; padding-left: 38px; text-decoration: none; display: block; position: relative;' +
-'}' +
-'.track-play-menu ul li a:hover {' +
-'  background-color: rgb(68, 68, 68);' +
-'}' +
-'.track-play-menu ul li i {' +
-'  left: 8px; top: 6px; width: 18px; height: 18px; position: absolute;' +
-'}' +
-'.track-play-menu .arrow {' +
-'  left: -9px; width: 9px; height: 18px; bottom: 16px; position: absolute; background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAASCAYAAACJgPRIAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACLSURBVChThc4BDoIwDAVQONK6HUhRuQ4xRrksqP+PDsjWwU+arO3L0uYkrfd+0LeZVkSeQD/ti6yghgheCVioADnike8csHQff/hYgJXAaC1TNWeARdTj8c0X+4oHAT7QVGFEDOAdAxMqWYLBDVVAXW8JIXRYzIeIyaGOyzjnrrhzOkRMgtrWIyKXPykjhfjqVAPDAAAAAElFTkSuQmCC");' +
-'}' +
-'.ks-ie7 .track-play-menu .arrow {' +
-'  background-image: url("http://gtms03.alicdn.com/tps/i3/T1ZNuzFrtaXXbeUgbb-9-18.png");' +
-'}' +
-'.icon-OldPlay {' + // 旧版播放器弹窗图标CSS
-'  background-image: url("http://bbsdata.gztwkadokawa.com/album/201405/28/225839pgklmuagcg25gcrr.png"); background-repeat: no-repeat;' +
-'}' +
-'.icon-OldPlay {' +
-'  background-position: 0px -527px;' +
-'}' +
-'.icon-NewPlay {' + //新版播放器弹窗图标CSS
-'  background-image: url("http://bbsdata.gztwkadokawa.com/album/201405/28/225839pgklmuagcg25gcrr.png"); background-repeat: no-repeat;' +
-'}' +
-'.icon-NewPlay {' +
-'  background-position: 0px -545px;' +
-'}' +
-'.icon-ListeningPlay {' + //直播间弹窗图标CSS
-'  background-image: url("http://bbsdata.gztwkadokawa.com/album/201405/28/225839pgklmuagcg25gcrr.png"); background-repeat: no-repeat;' +
-'}' +
-'.icon-ListeningPlay {' +
-'  background-position: 0px -581px;' +
-'}');
+// addGlobalStyle('.player-info .track-info .track-controls #J_winopenPlay {' + // 弹窗图标CSS
+// '  top: 0px; right: -33px; position: absolute; cursor: pointer;' +
+// '}' +
+// '.icon-winopenPlay {' +
+// '  background-image: url("icon_openplay.png"); background-repeat: no-repeat;' +
+// '}' +
+// '.icon-winopenPlay {' +
+// '  background-position: 0px -277px; width: 18px; height: 18px;' +
+// '}' +
+// '.icon-winopenPlay:hover {' +
+// '  background-position: -28px -277px;' +
+// '}' +
+// '.track-play-menu {' + // 设置DIV+CSS
+// '  padding: 10px; border-radius: 4px; left: 300px; width: 140px; height: 60px; bottom: 26px; position: fixed; z-index: 1999; background-color: rgb(51, 51, 51);' +
+// '}' +
+// '.track-play-menu ul li {' +
+// '  height: 30px; line-height: 30px;' +
+// '}' +
+// '.track-play-menu ul li a {' +
+// '  border-radius: 4px; color: rgb(170, 170, 170); line-height: 30px; padding-left: 38px; text-decoration: none; display: block; position: relative;' +
+// '}' +
+// '.track-play-menu ul li a:hover {' +
+// '  background-color: rgb(68, 68, 68);' +
+// '}' +
+// '.track-play-menu ul li i {' +
+// '  left: 8px; top: 6px; width: 18px; height: 18px; position: absolute;' +
+// '}' +
+// '.track-play-menu .arrow {' +
+// '  left: -9px; width: 9px; height: 18px; bottom: 16px; position: absolute; background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAASCAYAAACJgPRIAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACLSURBVChThc4BDoIwDAVQONK6HUhRuQ4xRrksqP+PDsjWwU+arO3L0uYkrfd+0LeZVkSeQD/ti6yghgheCVioADnike8csHQff/hYgJXAaC1TNWeARdTj8c0X+4oHAT7QVGFEDOAdAxMqWYLBDVVAXW8JIXRYzIeIyaGOyzjnrrhzOkRMgtrWIyKXPykjhfjqVAPDAAAAAElFTkSuQmCC");' +
+// '}' +
+// '.ks-ie7 .track-play-menu .arrow {' +
+// '  background-image: url("http://gtms03.alicdn.com/tps/i3/T1ZNuzFrtaXXbeUgbb-9-18.png");' +
+// '}' +
+// '.icon-OldPlay {' + // 旧版播放器弹窗图标CSS
+// '  background-image: url("icon_openplay.png"); background-repeat: no-repeat;' +
+// '}' +
+// '.icon-OldPlay {' +
+// '  background-position: 0px -527px;' +
+// '}' +
+// '.icon-NewPlay {' + //新版播放器弹窗图标CSS
+// '  background-image: url("icon_openplay.png"); background-repeat: no-repeat;' +
+// '}' +
+// '.icon-NewPlay {' +
+// '  background-position: 0px -545px;' +
+// '}' +
+// '.icon-ListeningPlay {' + //直播间弹窗图标CSS
+// '  background-image: url("icon_openplay.png"); background-repeat: no-repeat;' +
+// '}' +
+// '.icon-ListeningPlay {' +
+// '  background-position: 0px -581px;' +
+// '}');
 
 
 // 将按钮元素添加到"更多"后面

@@ -1,4 +1,4 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name        XiaMi Paging
 // @author      Ai
 // @namespace   http://www.xiami.com/u/8154435?spm=0.0.0.0.j2pUVV
@@ -10,7 +10,7 @@
 
 /* 
 本脚本由虾米用户@哀个人制作，仅供娱乐，不可用于商业用途。
-目前只支持音乐库的"收藏的歌曲"和"收藏的专辑"；小组讨论区和话题（不支持小组主页）；艺人专辑；新碟上架；专辑页面。
+目前支持个人主页的音乐库的"收藏的歌曲"、"收藏的专辑"和"收藏的艺人"，精选集，贡献专辑；小组讨论区和话题（不支持小组主页）；艺人专辑；新碟上架；专辑页面。
 如有意见或建议的请通过"使用说明"里的方式反馈或提出。
 */
 
@@ -21,71 +21,88 @@ function Paging() {
 
 	// 判断当前网页是否需要本功能
 	var str = window.location.href;
-	var strRE = new RegExp("/space/lib-song|/space/lib-album|.com/group|/artist/album|/music/newalbum|/album/list|/album/\\d+");
+	var strRE = new RegExp("/space/lib-song|/space/lib-album|/space/lib-artist|/space/post-album|/space/collect|/space/stuff-photo|/space/stuff-artist|/space/stuff-album|/space/collect-fav|/space/comments|.com/group|/artist/album|/music/newalbum|/album/list|/album/\\d+");
 	var truststr = strRE.exec(str);
-	var pagenumber;
-	var spantext = $(".all_page span").text();
-	var number = spantext.match(/\d+/g)[1]; // 获取网页内所有条目数
-	var num;
-	var page;
-	var going;
-	switch (true) { // 设置不同页面不同的总页数
-	case truststr == "/space/lib-song": { // 音乐库的"收藏的歌曲"
-			num = 25;
-			page = number / num;
-			pagenumber = Math.ceil(page);
-			break;
-		}
-	case truststr == "/space/lib-album": { // 音乐库的"收藏的专辑"
-			num = 15;
-			page = number / num;
-			pagenumber = Math.ceil(page);
-			break;
-		}
-	case truststr == ".com/group": { // 小组讨论区和话题（不支持小组主页）
-			num = 20;
-			page = number / num;
-			if (!/\/group\/thread-detail\//.exec(str)) {
-				pagenumber = Math.ceil(page);
-			} else {
-				var pageparseInt = parseInt(page);
-				if (page > pageparseInt + 0.05) {
-					var pagenumber = pageparseInt + 1;
-				} else {
-					var pagenumber = pageparseInt;
-				}
-			}
-			break;
-		}
-	case truststr == "/artist/album": { // 艺人专辑
-			num = 9;
-			page = number / num;
-			pagenumber = Math.ceil(page);
-			break;
-		}
-	case truststr == "/music/newalbum": // 新碟上架
-	case truststr == "/album/list": {
-			num = 14;
-			page = number / num;
-			pagenumber = Math.ceil(page);
-			break;
-		}
-	}
-	if (/\/album\/\d+/.exec(truststr)) { // 专辑页面
-		num = 10;
-		page = number / num;
-		pagenumber = Math.ceil(page);
-		$(".all_page").bind("click", function () {
-			if ($("#custompage").length == 0) {
-				setTimeout(function () {
-					Paging();
-				}, 1500);
-			}
-		});
-	}
-
 	// 判断当前网页是否需要本功能
 	if (truststr) {
+		var pagenumber;
+		var spantext = $(".all_page span").text();
+		var number = (spantext)?spantext.match(/\d+/g)[1]:0; // 获取网页内所有条目数
+		var num;
+		var page;
+		var going;
+		switch (true) { // 设置不同页面不同的总页数
+			case truststr == "/space/lib-song": { // 音乐库的"收藏的歌曲"
+					num = 25;
+					page = number / num;
+					pagenumber = Math.ceil(page);
+					break;
+				}
+			case truststr == "/space/lib-album": // 音乐库的"收藏的专辑"
+			case truststr == "/space/lib-artist": // 音乐库的"收藏的艺人"
+			case truststr == "/space/post-album": { // 贡献专辑
+					num = 15;
+					page = number / num;
+					pagenumber = Math.ceil(page);
+					break;
+				}
+			case truststr == "/space/collect": 
+			case truststr == "/space/stuff-photo": 
+			case truststr == "/space/stuff-artist": 
+			case truststr == "/space/stuff-album": 
+			case truststr == "/space/collect-fav": { // 精选集
+					num = 12;
+					page = number / num;
+					pagenumber = Math.ceil(page);
+					break;
+				}
+			case truststr == "/space/comments": { // 留言
+					num = 10;
+					page = number / num;
+					pagenumber = Math.ceil(page);
+					break;
+				}
+			case truststr == ".com/group": { // 小组讨论区和话题（不支持小组主页）
+					num = 20;
+					page = number / num;
+					if (!/\/group\/thread-detail\//.exec(str)) {
+						pagenumber = Math.ceil(page);
+					} else {
+						var pageparseInt = parseInt(page);
+						if (page > pageparseInt + 0.05) {
+							var pagenumber = pageparseInt + 1;
+						} else {
+							var pagenumber = pageparseInt;
+						}
+					}
+					break;
+				}
+			case truststr == "/artist/album": { // 艺人专辑
+					num = 9;
+					page = number / num;
+					pagenumber = Math.ceil(page);
+					break;
+				}
+			case truststr == "/music/newalbum": // 新碟上架
+			case truststr == "/album/list": {
+					num = 14;
+					page = number / num;
+					pagenumber = Math.ceil(page);
+					break;
+				}
+		}
+		if (/\/album\/\d+/.exec(truststr)) { // 专辑页面
+			num = 10;
+			page = number / num;
+			pagenumber = Math.ceil(page);
+			$(".all_page").bind("click", function () {
+				if ($("#custompage").length == 0) {
+					setTimeout(function () {
+						Paging();
+					}, 1500);
+				}
+			});
+		}
 
 		function addpxcss(css) { // 调用函数把CSS样式添加到<head>段的 <style>元素中
 			var head,
@@ -144,22 +161,26 @@ function Paging() {
 				var valuenumber = $("#custompage").attr("value");
 				var gopage;
 				if (!/\/page\//.exec(str)) {
-					if (/space\/lib-song$|space\/lib-album$/.exec(str)) {
+					if (/space\/lib-song$|space\/lib-album$|space\/lib-artist$|space\/post-album$|space\/collect$|space\/collect-fav$|space\/comments$/.exec(str)) {
 						gopage = str.replace(/$/, "/page/" + valuenumber)
-					} else if (/space\/lib-song\/u$|space\/lib-album\/u$/.exec(str)) {
-						uid = $(".buddy.personal_iconX.personalDropDown").attr("href").match(/\d+/);
-						gopage = str.replace(/$/, "/" + uid + "/page/" + valuenumber)
-					} else if (/\/music\/newalbum$/.exec(str)) {
-						gopage = str.replace(/$/, "/type/all/page/" + valuenumber);
-					} else if (/\/album\/list/.exec(str)) {
-						str = str.replace(/\?/g, "/");
-						str = str.replace(/=/g, "/");
-						str = str.replace(/\&/g, "/");
-						gopage = str + "/page/" + valuenumber;
-					} else if (!/\?spm/.exec(str)) {
-						gopage = str.replace(/(\d+$)/, "$1/page/" + valuenumber)
 					} else {
-						gopage = str.replace(/\?spm/, "/page/" + valuenumber + "?spm")
+						if (/space\/lib-song\/u$|space\/lib-album\/u$|space\/lib-artist\/u$|space\/post-album\/u$|space\/collect\/u$|space\/collect-fav\/u$|space\/comments\/u$/.exec(str)) {
+							uid = $(".buddy.personal_iconX.personalDropDown").attr("href").match(/\d+/);
+							gopage = str.replace(/$/, "/" + uid + "/page/" + valuenumber)
+						} else {
+							if (/\/music\/newalbum$/.exec(str)) {
+								gopage = str.replace(/$/, "/page/" + valuenumber)
+							} else if (/\/album\/list/.exec(str)) {
+								str = str.replace(/\?/g, "/");
+								str = str.replace(/=/g, "/");
+								str = str.replace(/\&/g, "/");
+								gopage = str + "/page/" + valuenumber;
+							} else if (!/\?spm/.exec(str)) {
+								gopage = str.replace(/(\d+$)/, "$1/page/" + valuenumber)
+							} else {
+								gopage = str.replace(/\?spm/, "/page/" + valuenumber + "?spm")
+							}
+						}
 					}
 				} else {
 					gopage = str.replace(/\/page\/\d+/, "/page/" + valuenumber)
@@ -173,12 +194,15 @@ function Paging() {
 				if (/space\/lib-song$|space\/lib-album$/.exec(str)) {
 					going = str.replace(/$/, "/page/" + pagenumber)
 				} else {
-					if (/space\/lib-song\/u$|space\/lib-album\/u$/.exec(str)) {
+					if (/space\/lib-song\/u$|space\/lib-album\/u$|space\/stuff-album\/u$/.exec(str)) {
 						uid = $(".buddy.personal_iconX.personalDropDown").attr("href").match(/\d+/);
 						going = str.replace(/$/, "/" + uid + "/page/" + pagenumber)
 					} else {
-						if (/\/music\/newalbum$|\/album\/list$/.exec(str)) {
-							going = str.replace(/$/, "/page/" + pagenumber)
+						if (/\/music\/newalbum$|\/album\/list/.exec(str)) {
+							str = str.replace(/\?/g, "/");
+							str = str.replace(/=/g, "/");
+							str = str.replace(/\&/g, "/");
+							going = str.replace(/$/, "/page/" + pagenumber);
 						} else {
 							if (!/\?spm/.exec(str)) {
 								going = str.replace(/(\d+$)/, "$1/page/" + pagenumber)

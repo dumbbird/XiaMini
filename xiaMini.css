@@ -1,3 +1,15 @@
+/* fonts */
+
+@font-face {   
+font-family: 'iconRegular';   
+src: url("icon.eot") ;    
+src: url("icon.eot#iefix")  format('embedded-opentype'),         
+url("icon.svg")  format('svg'),         
+url("icon.woff")  format('woff'),         
+url("icon.ttf")  format('truetype');	
+src: url("icon.eot") \9;    
+font-weight: normal;    
+font-style: normal;}
 
 /* main page */
 /*#slider,*/
@@ -10,7 +22,8 @@
 #hsy,
 #hot_room,
 #sidebutton,
-#report,
+.primary #report,
+#charts .extra,
 .athena-main-panel,
 .athena-playlist-panel,
 .athena-chat-panel,
@@ -34,13 +47,14 @@
 /*.primary .account a sup {background-color:#3399FF !important; border-color:white !important;}*/
 
 
-/* album and single page */
+/* //////////////////////// album and single page ////////////////// */
 #nav,
 .adm_block.mgt20,
 #song_fans_block,
 #song_tags_block,
 #hot_events_show,
-#artist_fangroup_block
+#artist_fangroup_block,
+#artist_recommend
 {display:none  !important;}
 li.do_share a span {display:block !important}
 li.do_share span {display:none}
@@ -48,7 +62,7 @@ li.do_share span {display:none}
 #main_wrapper {margin-left: 30px !important;}
 #wrapper div#title {padding: 20px 0 10px 30px !important;}
 
-/* album page */
+/* ///////////////////////// album page ////////////////////// */
 #album_info {min-height: 250px !important;}
 #album_rank {float: left !important;}
 #album_info table {float:right !important; width: 250px; padding: 5px !important }
@@ -78,6 +92,13 @@ width: 300px !important;
 margin-right: -320px !important;
 margin-top: 60px !important}
 
+.sb_xiamini
+{float: right !important;
+position: absolute !important;
+width: 300px !important;
+top: 370px !important;
+right: 10px !important}
+
 #relate_song,
 #album_song,
 #trans_list
@@ -85,7 +106,7 @@ margin-top: 60px !important}
 #album_song table.track_list td {padding: 7px 0}
 
 
-/* player */
+/* ////////////////////////// player /////////////////// */
 #J_mainWrap {padding-left: 220px; padding-right: 350px}
 .ui-album-cover {position:fixed; top: 250px; left: -22px}
 .ui-album-sale {position:fixed !important; bottom: 130px !important; left: 10px !important}
@@ -124,15 +145,138 @@ transition-duration: .1s !important;
 -ms-transition-timing-function: ease-in !important;
 transition-timing-function: ease-in !important;}
 
+.icon-wormhole {
+background-image: url(icon_wormhole.png);
+width:18px;height:18px;right:86px;
+}
+
 #lyrics_control {
-margin: 20px 0px;
+margin: 10px 0px;
 text-align:center;
 width: 350px;
 position: relative;
 }
-#lrc_edit, #lrc_fullscreen, #lrc_report {color:#f60; cursor: pointer; margin: 10px; text-decoration: none}
+#lrc_edit, #lrc_fullscreen, #lrc_report {
+font-family: "iconRegular" !important;
+display: inline-block;
+-webkit-font-smoothing: antialiased;
+font-size: 15px;
+color:black; cursor: pointer; margin: 10px; text-decoration: none}
 
-/* Lyrics Edit Page*/
-#ln_xiamini {top: 20px; right: 20px; position: absolute !important}
+#lrc_trans {
+font-family: "iconRegular" !important;
+display: inline-block;
+-webkit-font-smoothing: antialiased;
+font-size: 15px;
+color:#f60; cursor: pointer; margin: 10px; text-decoration: none}
+/*
+#lrc_trans:hover  {
+font-family: "iconRegular" !important;
+display: inline-block;
+-webkit-font-smoothing: antialiased;
+color:green; cursor: pointer; margin: 10px; text-decoration: none}
+*/
+#lrc_edit:hover, #lrc_fullscreen:hover, #lrc_report:hover {
+font-family: "iconRegular" !important;
+display: inline-block;
+-webkit-font-smoothing: antialiased;
+color:#f60; cursor: pointer; margin: 10px; text-decoration: none}
+
+.player-info .track-info .track-controls #J_winopenPlay {
+	top: 0px; right: -33px; position: absolute; cursor: pointer;}
+.icon-winopenPlay { 
+	background-image: url("icon_openplay.png"); 
+	background-repeat: no-repeat;}
+	
+.icon-winopenPlay {
+background-position: 0px -277px; width: 18px; height: 18px;}
+
+.icon-winopenPlay:hover {
+background-position: -28px -277px;}
+
+.track-play-menu {
+ padding: 10px; border-radius: 4px; 
+ left: 300px; width: 140px; height: 60px; 
+ bottom: 26px; position: fixed; z-index: 1999; 
+ background-color: rgb(51, 51, 51);
+}
+
+.track-play-menu ul li {
+  height: 30px; line-height: 30px;
+}
+.track-play-menu ul li a {
+  border-radius: 4px; color: rgb(170, 170, 170); line-height: 30px; padding-left: 38px; 
+  text-decoration: none; display: block; position: relative;
+}
+.track-play-menu ul li a:hover {
+  background-color: rgb(68, 68, 68);
+}
+
+'.track-play-menu ul li i {
+  left: 8px; top: 6px; width: 18px; height: 18px; position: absolute;
+}
+.track-play-menu .arrow {
+  left: -9px; width: 9px; height: 18px; bottom: 16px; position: absolute; 
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAASCAYAAACJgPRIAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACLSURBVChThc4BDoIwDAVQONK6HUhRuQ4xRrksqP+PDsjWwU+arO3L0uYkrfd+0LeZVkSeQD/ti6yghgheCVioADnike8csHQff/hYgJXAaC1TNWeARdTj8c0X+4oHAT7QVGFEDOAdAxMqWYLBDVVAXW8JIXRYzIeIyaGOyzjnrrhzOkRMgtrWIyKXPykjhfjqVAPDAAAAAElFTkSuQmCC");
+}
+.ks-ie7 .track-play-menu .arrow {
+  background-image: url("http://gtms03.alicdn.com/tps/i3/T1ZNuzFrtaXXbeUgbb-9-18.png");
+}
+.icon-OldPlay { 
+  background-image: url("icon_openplay.png"); background-repeat: no-repeat;
+}
+.icon-OldPlay {
+  background-position: 0px -527px;
+}
+.icon-NewPlay { 
+  background-image: url("icon_openplay.png"); background-repeat: no-repeat;
+}
+.icon-NewPlay {
+  background-position: 0px -545px;
+}
+.icon-ListeningPlay { 
+  background-image: url("icon_openplay.png"); background-repeat: no-repeat;
+}
+.icon-ListeningPlay {
+  background-position: 0px -581px;
+}
+
+/* ///////////////////////////////Lyrics Edit Page//////////////////////////////// */
 textarea#editLrcText,
-textarea#editLyricText {font-family: "Courier New";}
+textarea#editLyricText,
+#lrc_input {font-family: "Courier New"; font-size:12px !important}
+
+input#songwriters, input#composer, input#arrangement{width:560px !important}
+
+/* User Page */
+.profile_title .usr_info .member_medal {
+display: inline-block;
+width: 24px;
+height: 24px;
+line-height: 24px;
+vertical-align: text-top;
+background:url(http://www.xiami.com/images/group_photo/1/13001/2/1416542609_qeV6.png) no-repeat; }
+.profile_title .usr_info .medal_lyricmember1{background-position: -200px 0;}
+.profile_title .usr_info .medal_lyricmember2{background-position: -200px -25px;}
+
+/* ///////////////////////////////Artist Page//////////////////////////////// */
+#artist_work .acts a.more {
+padding: 10px 20px;
+line-height: 30px;
+color: #8CA6D7;
+background: url("http://img.xiami.net/res/img/default/page_icon.gif") no-repeat 25px 8px;
+}
+.mv_item_side {
+font-size: 12px;
+position: relative;
+padding:10px;
+/*min-height: 90px;*/
+_height: 90px;
+border-bottom: 1px #f0f0f0 solid;
+}
+
+.mv_item_side .name {
+overflow:hidden; 
+white-space:nowrap; 
+text-overflow: ellipsis; 
+}

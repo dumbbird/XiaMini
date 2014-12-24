@@ -1,93 +1,75 @@
 ﻿// 从320K专门店获取音质信息，并展示在专辑页面右侧。
-// 版本号：1.10.0.2
+// 版本号：1.10.3.1
 
+// title rearrange
+function Re_title4(ti){ 
+	ti = ti.replace(/\&/g,"&amp;");   //&
+	return ti;   
+}
+function Re_title3(ti){ //中断类
+	ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`|;|:|,]/g,"+");
+	ti = ti.replace(/\s+/g,"+");
+	ti = ti.toLowerCase();
+	return ti;
+}
+	
+// load 320K information
 var loadQualitynotes = function() {
 	if (document.getElementById("quality_notes")) return;
-
-	function Re_title(ti){ // 歌名处理，可增加
-			ti = ti.replace(/[\(|（|\[].*[\)|）|\]]/g,"");   //去括号内容
-			ti = ti.replace(/\-.*\-/g,""); // 去- -内容
-			ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`]/g," "); //去引号
-			ti = ti.replace(/\s+/g,"");  // 去空格
-			ti = ti.toLowerCase(); // 小写
-			return ti;   
-		}
-	function Re_title2(ti){ //隔离类
-			ti = ti.replace(/[\(|（|\[].*[\)|）|\]]/g,"");
-			ti = ti.replace(/\-.*\-/g,"");
-			ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`]/g," ");
-			return ti;   
-		}
-	function Re_title3(ti){ //中断类
-			ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`|;|:|,]/g,"+");
-			ti = ti.replace(/\s+/g,"");
-			ti = ti.toLowerCase();
-			return ti;
-		}
-		
-	var CurrentUrl = window.location.href;
-	if (CurrentUrl.indexOf("xiami.com/album/") != -1) {
-		var str = document.cookie.split("; ");
-		//var token = str.match(/_xiamitoken=\w+/);
-		//alert (token);
-		var token;
-		for (var i = 0; i < str.length; i++) {
-			if (str[i].indexOf("_xiamitoken") != -1) {
-				token = str[i];
-			}
-		}
-		var arr = CurrentUrl.split("//");
-		
-		var ReUrl = arr[1].substring(arr[1].indexOf("/"));
-		var albumID = ReUrl.replace(/\/album\//, "");
-		albumID = albumID.replace(/\?spm=.+/, "");
-		//var keywords;		keywords = $("meta[name='keywords']").attr("content").split(", ");
-		var albumTitle = $('#title h1').contents().filter(function() {
-				return this.nodeType == 3;
-			}).text();
-		var albumArtist = $('#album_info table tbody').children().first().children().last().text();
-		//keywords[1].replace(albumTitle, "");
-		//alert(albumTitle); alert(albumArtist);
-		var SearchUrl = "/space/lib-album?" + token + "&u=4275776&key=" + Re_title3(albumTitle) + "+" + albumArtist;
-		//alert (SearchUrl);
-		var xmlhttp;
+	var str = document.cookie.split("; ");
+	var albumID = CurrentUrl.split("album/")[1];
 	
-		function AlbumRequest() {
-			xmlhttp = new XMLHttpRequest;
-			xmlhttp.onreadystatechange = callback;
-			xmlhttp.open("GET", SearchUrl, true);
-			xmlhttp.send(null);
-		}
+	//alert(albumID);
+	//var keywords;		keywords = $("meta[name='keywords']").attr("content").split(", ");
+	
+	var albumTitle = $('#title h1').contents().filter(function() {
+			return this.nodeType == 3;
+		}).text();
+	var albumArtist = $('#album_info table tbody').children().first().children().last().text();
+	
+	//keywords[1].replace(albumTitle, "");
+	//alert(albumTitle); alert(albumArtist);
+	
+	var SearchUrl = "/space/lib-album/u/4275776/page/1?mode=list&key="+ Re_title3(albumTitle) + "+" + albumArtist;
+	//var SearchUrl = "/space/lib-album?" + token + "&u=4275776?mode=list&key=" + Re_title3(albumTitle) + "+" + albumArtist;
+	//alert (SearchUrl);
+	
+	var xmlhttp;
 
-		function callback() {
-			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-				
-				var ResultsHtml = xmlhttp.responseText; // 抓取
-				var searchingID = "#album_" + albumID;
-				var AllResults = $(ResultsHtml).find(searchingID);
-				var ResultsNum = AllResults.length;
-				if (ResultsNum == 1) {
-					//alert (ResultsNum);
-					var tag;
-					var notes = '<div id="quality_notes" class="block sec_Rlt mgt20" style="align:center"><h3>本专辑的音质是</h3>' 
-						+ '<div class="content clearfix">';
-					tag = $(AllResults).eq(0).find(".tag_block").html();
-					notes += tag;
-					notes += '<div id="quality_note" class="blank10"><p>Powered by <a href="/u/4275776">320K专门店</a> & <a href="/g/hquality">一切为了高品质小组</a></p></div>';				
-					notes += '</div>';					
-					notes += '<div class="acts"><a class="more" href="/group/thread-detail/tid/430005" target="_blank">报告错误</a></div>';
-					notes += '</div>';
-					//alert(notes);
-					if ($("#other_albums").length > 0)
-						$("#other_albums").before(notes);
-					else
-						$("#album_tags_block").before(notes);
-				}
-			}
-		}
-		AlbumRequest();
+	function AlbumRequest() {
+		xmlhttp = new XMLHttpRequest;
+		xmlhttp.onreadystatechange = callback;
+		xmlhttp.open("GET", SearchUrl, true);
+		xmlhttp.send(null);
 	}
-	
+
+	function callback() {
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			
+			var ResultsHtml = xmlhttp.responseText; // 抓取
+			var searchingID = "#album_" + albumID;
+			var AllResults = $(ResultsHtml).find(searchingID);
+			var ResultsNum = AllResults.length;
+			if (ResultsNum == 1) {
+				//alert (ResultsNum);
+				var tag;
+				var notes = '<div id="quality_notes" class="block sec_Rlt mgt20" style="align:center"><h3>本专辑的音质是</h3>' 
+					+ '<div class="content clearfix">';
+				tag = $(AllResults).eq(0).find(".tag_block").html();
+				notes += tag;
+				notes += '<div id="quality_note" class="blank10"><p>Powered by <a href="/u/4275776">320K专门店</a> & <a href="/g/hquality">一切为了高品质小组</a></p></div>';				
+				notes += '</div>';					
+				notes += '<div class="acts"><a class="more" href="/group/thread-detail/tid/430005" target="_blank">报告错误</a></div>';
+				notes += '</div>';
+				//alert(notes);
+				if ($("#other_albums").length > 0)
+					$("#other_albums").before(notes);
+				else
+					$("#album_tags_block").before(notes);
+			}
+		}
+	}
+	AlbumRequest();	
 };
 
 var removeQualitynotes = function() {
@@ -98,5 +80,8 @@ var removeQualitynotes = function() {
 }
 
 removeQualitynotes();
-loadQualitynotes();
-
+var CurrentUrl = window.location.href;
+CurrentUrl = CurrentUrl.split("?")[0].split("#")[0];
+if (CurrentUrl.indexOf("xiami.com/album/") != -1) {
+	loadQualitynotes();		
+}
