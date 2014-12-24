@@ -2,3 +2,4 @@
 2. 翻译隐藏模式下的歌词位置移动bug - considered fixed
 3. 不支持单行多时间标签，[XX:XX.XX][YY:YY.YY]。 - considered fixed
 4. 首次载入播放器时如果选择隐藏翻译，那么如果在之后打开翻译，就会因歌词行数的双倍增加而导致歌词滚动不正常。- considered fixed with minor bugs
+5. 首次打开播放器时有时候切换开关不正常工作 - not fixed
