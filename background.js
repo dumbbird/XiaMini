@@ -9,15 +9,7 @@ var updateTab = function(tab) {
 	}, function() {});
 	
 	chrome.storage.sync.get(null, function (data) {		
-		if (data.Mode != "false") {	
-		// Xiamini ON					
-			// render JS in player page
-			// if (/play?/.test(tab.url)) {
-				// chrome.tabs.executeScript(tab.id, {
-					// file : "Collections.js",
-					// runAt: "document_start"
-				// }, function() {});	
-			// }			
+		if (data.Mode != "false") {				
 		} else {	
 		// Xiamini OFF
 			// remove JS in player page
@@ -34,6 +26,13 @@ var updateAfterComplete = function(tab) {
 	chrome.storage.sync.get(null, function (data) {
 		if (data.Mode != "false") {
 		// Xiamini ON
+			// render JS in player page
+			if (/play?/.test(tab.url)) {
+				chrome.tabs.executeScript(tab.id, {
+					file : "lyricscontrol.js",
+					runAt: "document_end"
+				}, function() {});	
+			}
 			// render JS in group page
 			if (/group\/thread\-detail/.test(tab.url)) 
 				chrome.tabs.executeScript(tab.id, {
@@ -107,7 +106,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 	function (details) {
 		
 		if ((details.url.indexOf('music.126.net') != -1)) {
-			//alert(details.url);
+			alert(details.url);
 			for (var i = 0; i < details.requestHeaders.length; ++i) {
 				if (details.requestHeaders[i].name === 'Referer') {
 					details.requestHeaders[i].value = '';
@@ -116,7 +115,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 			}
 		}
 		else if ((details.url.indexOf('tyst.migu.cn') != -1)) {
-			//alert(details.url);
+			alert(details.url);
 		}
 		else if ((details.url.indexOf('imusicapp.cn') != -1)) {
 			for (var i = 0; i < details.requestHeaders.length; ++i) {
@@ -161,42 +160,3 @@ chrome.tabs.onUpdated.addListener(function(id, data, tab) {
 	if (data.status == "complete") 
 		updateAfterComplete(tab);	
 });
-
-function XiaminiNoti(type){
-	var title = 'title';
-	var message = 'message';
-	switch (type) {
-		// case "alert-cuson":
-			// title = '激动人心！您开启了自定义功能！';
-			// message = '可以在主菜单里选择自定义风格了哦！';
-			// break;
-		// case "alert-cusoff":
-			// title = '好桑心！您关闭了自定义功能！';
-			// message = '主菜单里不能选择自定义风格了哦！';
-			// break;
-		// case "alert-mvon":
-			// title = '激动人心！您开启了显示MV功能！';
-			// message = '在单曲页如果存在这首歌的MV，就会在标题上显示MV链接哦！';
-			// break;
-		// case "alert-mvoff":
-			// title = '好桑心！您关闭了显示MV功能！';
-			// message = '在单曲页上不会显示MV链接了哦！';
-			// break;
-		case "alert-wormhole":
-			title = 'A message from Xiamini';
-			message = '您已到达虫洞穿越的入口，点击确定并刷新本页之后，您会发现包括本页面在内的许多虾米的网页会出现一些变化，虫洞会在某些角落中出现……预祝您在四次元(或五次元)世界里旅行愉快！';
-			break;
-	}
-	function getNotificationId() {
-      var id = Math.floor(Math.random() * 9007199254740992) + 1;
-      //chrome.storage.local.set({'id': id});
-      return id.toString();
-    }
-	
-	chrome.notifications.create(getNotificationId(), {
-		title: title,
-		iconUrl: 'xiami.png',
-		type: 'basic',
-		message: message
-    }, function(){});
-  }

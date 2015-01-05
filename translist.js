@@ -1,38 +1,27 @@
 ﻿// 从歌词组帖子中获取翻译贴，并展示在单曲页面右侧。
 // 显示ISRC号
-// 版本号：1.10.2.3
+// 版本号：1.10.4
 
 var loadTranslist = function () {
-
-	function Re_title(ti) { // 歌名处理，可增加
-		ti = ti.replace(/[\(|（|\[].*[\)|）|\]]/g, ""); 		//去括号内容
-		ti = ti.replace(/\-.*\-/g, ""); 						// 去- -内容
-		ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`]/g, " "); 	//去引号
-		ti = ti.replace(/\s+/g, ""); 							// 去空格
-		ti = ti.toLowerCase(); 									// 小写
-		return ti;
-	}
-	function Re_title2(ti) { //隔离类
-		ti = ti.replace(/[\(|（|\[].*[\)|）|\]]/g, "");	// 去括号内容
-		ti = ti.replace(/ \-.*\-/g, "");				// 去- -内容
-		ti = ti.replace(/\'|‘|＇|｀|’|`/g, "'");		// 统一单撇
-		ti = ti.replace(/"|“|”|＂|〃/g, "\"");		// 统一双撇
-		ti = ti.replace(/~|～/g, "~");				// 统一波浪
-		ti = ti.replace(/[ \t]+$/, ""); 				// 去掉行首行末空格
-		ti = ti.replace(/^[ \t]+/, ""); 				// 去掉行首行末空格
-		return ti;
-	}
-	function Re_title3(ti) { //中断类
-		ti = ti.replace(/['|"|“|”|‘|＇|＂|｀|〃|’|`]/g, " ");
-		ti = ti.replace(/\s+/g, "");
-		ti = ti.toLowerCase();
+	
+	function Re_title(ti) { 
+		// 调整曲目名称与帖子标题的格式
+		ti = ti.replace(/\'|‘|＇|｀|’|`/g, "'");				// 统一单撇
+		ti = ti.replace(/"|“|”|＂|〃/g, "\"");					// 统一双撇
+		ti = ti.replace(/~|～/g, "~");							// 统一波浪
 		return ti;
 	}
 
-	if (document.getElementById("trans_list"))
-		return;
-	if (/纯音乐|\[Instrumental\]|无词歌/.test($('#lrc').html()))
-		return;
+	function Re_title2(ti) { 
+		// 调整曲目名称与帖子标题的格式
+		ti = ti.replace(/[ \t]+$/, ""); 						// 去掉行首行末空格
+		ti = ti.replace(/^[ \t]+/, ""); 						// 去掉行首行末空格
+		ti = ti.replace(/[\(|（|\[|\-].*[\)|）|\]|\-]$/g, "");	// 去括号/- -内容
+		return ti;
+	}
+
+	if (document.getElementById("trans_list"))		return;
+	if (/纯音乐|\[Instrumental\]|无词歌/.test($('#lrc').html()))		return;
 	var str = document.cookie.split("; ");
 	var token;
 	for (var i = 0; i < str.length; i++) {
@@ -40,19 +29,21 @@ var loadTranslist = function () {
 			token = str[i];
 		}
 	}
-	var arr = CurrentUrl.split("//");
-	var ReUrl = arr[1].match(/\/song\/\d+/);
-	var lyricsKey;
-	var keyLength = 3;
-	if ($('#lrc').find('.lrc_main').length != 0) {
-		lyricsKey = $('.lrc_main').text().split(/\s+/, keyLength);
-		for (i = 0; i < keyLength; i++)
-			lyricsKey[i] = Re_title2(lyricsKey[i]);
-		//alert(lyricsKey);
-	}	
-	var SearchKey = Re_title2(Songtitle);
-	SearchKey = SearchKey.replace("'", "%27");
+	// var arr = CurrentUrl.split("//");
+	// var ReUrl = arr[1].match(/\/song\/\d+/);
+	// var lyricsKey;
+	// var keyLength = 3;
+	// if ($('#lrc').find('.lrc_main').length != 0) {
+		// lyricsKey = $('.lrc_main').text().split(/\s+/, keyLength);
+		// for (i = 0; i < keyLength; i++)
+			// lyricsKey[i] = Re_title2(lyricsKey[i]);
+		// //alert(lyricsKey);
+	// }
+	
+	var realSongtitle = Re_title2(Re_title(Songtitle));			// 获取真正的曲目标题，去掉标题中的括号等信息
+	var SearchKey = realSongtitle.replace("'", "%27");	// 根据真正曲目标题来设定搜索关键词
 	//alert(Songtitle+"...."+SearchKey);
+	
 	var SearchUrl = "/group/searchingroup/id/13001?" + token + "&key=" + SearchKey + "&submit=搜+索";
 	var SearchUrl_baidu = "//www.baidu.com/s?wd=翻译%20赏析%20" + SearchKey + "%20site%3Awww.xiami.com"
 		 + "&ie=utf-8&tn=baiduhome_pg&f=8&rsv_bp=1&rsv_spt=1&rsv_enter=1&rsv_sug3=56&rsv_sug4=4530&rsv_sug2=0&inputT=2104&rsv_n=2&rsv_sug1=2";
@@ -93,48 +84,43 @@ var loadTranslist = function () {
 			postTitle = $(AllResults).eq(i).text();
 			authorUrl = $(AllResults).eq(i).next().find("a").attr('href');
 			authorName = $(AllResults).eq(i).next().text();
-			//alert(Re_title(postTitle)+'....'+Re_title(Songtitle));
 
-			var realSongtitle = Re_title2(Songtitle).toLowerCase(); // 获取真正的曲目标题，去掉标题中的括号等信息
-			if (postTitle.indexOf('翻译') == -1 && postTitle.indexOf('虾翻') == -1 
-				&& postTitle.indexOf('赏析') == -1 && postTitle.indexOf('| t-LRC') == -1
-				 /*|| Re_title3(postTitle).indexOf(Re_title(Songtitle)) == -1*/)
-				continue;
+			// 根据帖子标题筛选翻译赏析贴
+			if (/【翻译|【赏析|虾翻|\| t\-LRC/.test(postTitle)) {
 
-			// 获取真正的帖子标题，去掉帖子【翻译】等前缀以及括号、中文标题等后缀
-			var realPosttitle = postTitle.split("】")[1];				
-			realPosttitle = Re_title2(realPosttitle);
-			if (realPosttitle == "")
-				continue;
-
-			if (realPosttitle.indexOf(" | ") != -1) {
-				realPosttitle = realPosttitle.split(" | ")[0].toLowerCase();
-			}
-			else if (realPosttitle.indexOf(" \/ ") != -1) {
-				realPosttitle = realPosttitle.split(" \/ ")[0].toLowerCase();				
-			}
-			else {
-				var lastIndex = realPosttitle.lastIndexOf(" ");
-				realPosttitle = realPosttitle.substring(0,lastIndex).toLowerCase();
-			}			
-			//alert(realSongtitle+'....'+postTitle+'....'+realPosttitle);
-			
-			if (realPosttitle != realSongtitle)
-				continue;
-
-			if (TransArr.indexOf(postUrl) == -1) {
-				// 检查地址是否重复
-				//alert(postUrl);
+				// 获取真正的帖子标题，去掉帖子【翻译】等前缀以及括号、中文标题等后缀
+				var realPosttitle = postTitle.split("】")[1];
 				
-				// if (检查歌词内容(xhr(postUrl, 'get', 0)) == 0) 跳过;
+				// 根据翻译赏析贴的格式确定该贴对应的原曲目标题
+				if (realPosttitle.indexOf(" | ") != -1) {
+					realPosttitle = realPosttitle.split(" | ")[0];
+				}
+				else if (realPosttitle.indexOf(" \/ ") != -1) {
+					realPosttitle = realPosttitle.split(" \/ ")[0];				
+				}
+				else {
+					if (postTitle.indexOf('【赏析') != -1)
+						;
+					else {
+						var lastIndex = realPosttitle.lastIndexOf(" ");
+						realPosttitle = realPosttitle.substring(0,lastIndex);
+					}
+				}		
+				realPosttitle = Re_title(realPosttitle);
+				//alert(realSongtitle+'....'+postTitle+'....'+realPosttitle);
+			
+				// 判断帖子对应的曲目标题与真实曲目标题是否match + 判断是否帖子重复
+				if (realPosttitle.toLowerCase() == realSongtitle.toLowerCase() && TransArr.indexOf(postUrl) == -1) {
+					//alert(postUrl);
+					// if (检查歌词内容(xhr(postUrl, 'get', 0)) == 0) 跳过;
 
-				TransArr.push(postUrl); //加入地址数组
-				transList += '<tr class="clearfix">';
-				transList += '<td class="tit""><div style="width:220px; overflow:hidden; white-space:nowrap; text-overflow: ellipsis; word-break:keep-all;">';
-				transList += '<a href="' + postUrl + '" target="_blank" title="' + postTitle + '">' + postTitle + '</a> </div></td>';
-				transList += '<td class="author"><a href="' + authorUrl + '" author>' + authorName + '</a></td>';
-				transList += '</tr>';
-
+					TransArr.push(postUrl); //加入地址数组
+					transList += '<tr class="clearfix">';
+					transList += '<td class="tit""><div style="width:220px; overflow:hidden; white-space:nowrap; text-overflow: ellipsis; word-break:keep-all;">';
+					transList += '<a href="' + postUrl + '" target="_blank" title="' + postTitle + '">' + postTitle + '</a> </div></td>';
+					transList += '<td class="author"><a href="' + authorUrl + '" author>' + authorName + '</a></td>';
+					transList += '</tr>';
+				}
 			}
 		}
 	}	
@@ -145,42 +131,6 @@ var loadTranslist = function () {
 		else return 0;		
 	}
 	*/
-	
-	function Search_baidu(result) {
-		var ResultsHtml = result;
-		var AllResults = $(ResultsHtml).find('.t');
-		var ResultsNum = AllResults.length;
-		//alert (SearchUrl_baidu);	//alert (ResultsNum);
-
-		var postUrl,
-		postTitle,
-		authorUrl,
-		authorName;
-		for (var i = 0; i < ResultsNum; i++) {
-			postUrl = $(AllResults).eq(i).find("a").attr('href');
-			if (blacklist_post.indexOf(postUrl) != -1)
-				continue;
-
-			postTitle = $(AllResults).eq(i).text();
-			authorUrl = "/g/lyrics";
-			authorName = "虾米歌词组";
-			//alert(Re_title(postTitle)+'....'+Re_title(Songtitle));
-
-			if (postTitle.indexOf('翻译') == -1 && postTitle.indexOf('虾翻') == -1 && postTitle.indexOf('赏析') == -1)
-				continue;
-			if (postTitle.indexOf('百度翻译') != -1)
-				continue;
-
-			if (Re_title3(postTitle).indexOf(Re_title(Songtitle)) != -1) {
-				transList += '<tr class="clearfix">';
-				transList += '<td class="tit""><div style="width:220px; overflow:hidden; white-space:nowrap; text-overflow: ellipsis; word-break:keep-all;">';
-				transList += '<a href="' + postUrl + '" target="_blank" title>' + postTitle + '</a> </div></td>';
-				transList += '<td class="author"><a href="' + authorUrl + '" author>' + authorName + '</a></td>';
-				transList += '</tr>';
-			}
-		}
-
-	}
 
 };
 

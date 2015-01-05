@@ -1802,8 +1802,9 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 				});					
 			}
 			resetlrc = function (){
-				if (status) {
+				if (status) {					
 					self.lyricLoadComplete(text);
+					//alert(text);
 					//document.getElementsByTagName("ui-lrc-line ui-lrc-current")[0].removeClass("ui-lrc-current");
 				} else {
 					self.noLyric();
@@ -7478,7 +7479,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
 
             self.Track_info = $("#J_trackInfo");
 
-            self.Sale = $('#J_albumSale');
+            self.Sale = $('#lyrics_control');	// dumbbirdedit
             self.LrcWrap = $('#J_lyricScrollWrap');
 
             self.PlayerWrap = $("#J_playerWrap");
@@ -7577,50 +7578,8 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 }
             };
 			
-            var html = self.tpl_trackInfo.render(data);	
-			// dumbbirdedit
-			function xhr(u, m, a, d, c) {
-				var xmlhttp,
-				S_Result;
-				var url = u || '';
-				var method = m || 'get';
-				var async = a || 0;
-				var postdata = d || '';
-				xmlhttp = new XMLHttpRequest;
-				xmlhttp.onreadystatechange = callback;
-				xmlhttp.open(method, url, async);
-				xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-				xmlhttp.send(postdata);
-				function callback() {
-					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-						S_Result = xmlhttp.responseText;
-						if (c) {
-							c.call(this, S_Result);
-						} //异步方式使用回调函数处理
-					}
-				}
-				return S_Result; //同步方式可以取得返回值
-			}
-			
-			// var sid = track.songId;
-			// alert(sid);
-			// var doc = document.createElement("div");
-			// doc.id = 'songwriters';
-			// doc.style = 'display:none';
-			// doc.innerHTML = xhr('http://www.xiami.com/song/'+sid,'get',0);
-			// document.getElementsByTagName('head')[0].appendChild(doc);
-			//操作
-			//var songwriters = document.getElementById('albums_info').childNodes[1].childNodes;
-			//alert(songwriters.length);
-			// for (var i=2; i<songwriters.length; i++)
-				// if(songwriters[i*2].childNodes[1].innerHTML == "作词：")
-					// alert("词人找到");
-			//移除
-			// doc = document.getElementById("songwriters");
-			// doc.parentNode.removeChild(doc);
-			// alert(html);			
+            var html = self.tpl_trackInfo.render(data);			
             self.Track_info.html(html);
-			
 			
             if (passtime > 0) {
                 self.XIAMIPLAYER.passtime = passtime;
@@ -7653,15 +7612,15 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                     'itemsid': track.songId,
                     'userid': self.USER.get('uid')
                 }, function(html) {
-                    self.Sale.html(html);
-                    self.Sale.show();
+                    //self.Sale.html(html);
+                    //self.Sale.show();
                     Goldlog.record('/xiamipc.1.13', '', 'cache=_' + S.now() + '&albumid=' + track.albumId + '&itemsid=' + track.songId + '&userid=' + self.USER.get('uid'), 'H46807197');
-                    self.LrcWrap.css('top', '257px');
+                    //self.LrcWrap.css('top', '257px');
                     self.PlayerLrc.sync();
                 }, function() {
-                    self.Sale.html('');
-                    self.Sale.hide();
-                    self.LrcWrap.css('top', '215px');
+                    //self.Sale.html('<a id="lrc_fullscreen" title="歌词全屏显示开关">f</a><a id="lrc_report" title="歌词报错" href="http://www.xiami.com/group/thread-detail/tid/193387" target="_blank">r</a><a id="lrc_trans" title="文本歌词" status="txt" style="color:lightgray">s</a>');
+                    //self.Sale.show();
+                    //self.LrcWrap.css('top', '215px');
                     self.PlayerLrc.sync();
                 });
                 self.TrackControls.show();
@@ -7669,7 +7628,18 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 self.More_btn.attr("data-sid", track.songId);
                 self.Share_btn.attr("data-sid", track.songId);
             }
-
+			
+			// Lyrics & Wormhole Control - van & dumbbirdedit
+			
+			html = '<div id="lyrics_control">';
+			html += '<a id="lrc_fullscreen" title="歌词全屏显示开关">f</a>';
+			html += '<a id="lrc_report" title="歌词报错" href="http://www.xiami.com/group/thread-detail/tid/193387" target="_blank">r</a>';
+			html += '<a id="lrc_trans" title="文本歌词" status="txt" style="color:lightgray">s</a>';
+			html += '</div>';
+			if ($('#lyrics_control').length == 0)
+				$('#J_lrcWrap').append(html);
+			/*alert("player");*/
+			
             if (track.grade != -2) {		// van
 				self.Fav_btn.attr("data-sid", track.songId);
 				if (track.grade > -1) {
@@ -7686,6 +7656,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
 				self.Fav_btn.attr("target", "_blank");
 				self.Fav_btn.attr("title", "穿越中");
 			}
+			
             var status = self.PlayerData.get('status');
             if ("room" != self.PlayerData.get("status")) {
                 //var index = self.PlayerData.checkIndex();
@@ -7697,8 +7668,8 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
             } catch (e) {
                 throw new Error("#J_trackMoreMenu Not in the Body");
             }
-        },
-        setModeView: function(value) {
+        },		
+		setModeView: function(value) {
             var self = this;
             switch (value) {
                 case 1:

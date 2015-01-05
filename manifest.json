@@ -2,9 +2,9 @@
 "update_url": "https://clients2.google.com/service/update2/crx",
 
   "manifest_version": 2,
-  "name": "Xiamini (Wormhole Special Ed.) 虾米你 (虫洞穿越版)",
+  "name": "Xiamini 2015 虾米你 (虫洞穿越版)",
   "description": "虾米网首页优化 / 播放器新旧版切换 / 虾米歌词优化 / 320K专门店音质检测结果显示 / 古典音乐资料优化显示 / 虫洞穿越观光团",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "icons": { "16": "xiami.png",
            "48": "xiami.png",
           "128": "xiami.png" },

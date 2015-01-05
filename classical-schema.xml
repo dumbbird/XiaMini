@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<musician id="97714" aka="贝多芬">
+	<work op="1" year="1795" title="钢琴三重奏">
+		<subwork op="1/1" title="降E大调钢琴三重奏1号"></subwork>
+		<subwork op="1/2" title="G大调钢琴三重奏2号"></subwork>
+		<subwork op="1/3" title="c小调钢琴三重奏3号"></subwork>
+	</work>
+	<work op="2" year="1796" title="钢琴奏鸣曲">
+		<subwork op="2/1" title="f小调钢琴奏鸣曲1号"></subwork>
+		<subwork op="2/2" title="A大调钢琴奏鸣曲2号"></subwork>
+		<subwork op="2/3" title="c小调钢琴奏鸣曲3号"></subwork>
+	</work>
+	<work op="3" year="1794" title="降E大调弦乐三重奏1号"></work>
+	<work op="4" year="1795" title="降E大调弦乐五重奏"></work>
+	<work op="5" year="1796" title="奏鸣曲 钢琴和大提琴">
+		<subwork op="5/1" title="奏鸣曲 钢琴和大提琴1号"></subwork>
+		<subwork op="5/2" title="奏鸣曲 钢琴和大提琴2号"></subwork>
+	</work>
+	<work op="6" year="1797" title="四手联弹钢琴奏鸣曲"></work>
+	<work op="7" year="1797" title="E大调钢琴奏鸣曲4号"></work>
+	<work op="8" year="1797" title="D大调弦乐三重奏1号 (小夜曲)"></work>
+	<work op="9" year="1798" title="弦乐三重奏">
+
+	</work>
+	<work op="10" year="1798" title="钢琴奏鸣曲">
+		<subwork op="10/1" title="c小调钢琴奏鸣曲5号"></subwork>
+		<subwork op="10/2" title="F大调钢琴奏鸣曲6号"></subwork>
+		<subwork op="10/3" title="D大调钢琴奏鸣曲7号"></subwork>
+	</work>
+	<work op="11" year="1798" title="钢琴三重奏">
+
+	</work>
+	<work op="12" year="1798" title="钢琴三重奏">
+
+	</work>
+	<work op="13" year="1799" title="c小调钢琴奏鸣曲8号" subtitle="悲怆">
+
+	</work>
+	<work op="14" year="1799" title="钢琴三重奏">
+		<subwork op="14/1" title="E大调钢琴奏鸣曲9号"></subwork>
+		<subwork op="14/2" title="G大调钢琴奏鸣曲10号"></subwork>
+	</work>
+	<work op="15" year="1795" title="钢琴三重奏">
+
+	</work>
+	<work op="16" year="1796" title="钢琴三重奏"></work>
+	
+	<work op="22" year="1796" title="降B大调钢琴奏鸣曲11号"></work>
+	<work op="26" year="1796" title="降A大调钢琴奏鸣曲12号"></work>
+	<work op="27" year="1796" title="钢琴奏鸣曲">
+		<subwork op="27/1" title="降E大调钢琴奏鸣曲13号"></subwork>
+		<subwork op="27/2" title="升c小调钢琴奏鸣曲14号" subtitle="月光"></subwork>
+	</work>
+	<work op="28" year="1796" title="D大调钢琴奏鸣曲15号" subtitle="田园"></work>
+	<work op="31" year="1796" title="钢琴奏鸣曲">
+		<subwork op="31/1" title="G大调钢琴奏鸣曲16号"></subwork>
+		<subwork op="31/2" title="d小调钢琴奏鸣曲17号" subtitle="暴风雨"></subwork>
+		<subwork op="31/3" title="降E大调钢琴奏鸣曲18号"></subwork>
+	</work>
+	<work op="49" year="1796" title="钢琴奏鸣曲">
+		<subwork op="49/1" title="G大调钢琴奏鸣曲19号"></subwork>
+		<subwork op="49/2" title="G大调钢琴奏鸣曲20号"></subwork>	
+	</work>
+	<work op="16" year="1796" title="钢琴奏鸣曲"></work>
+	<work op="16" year="1796" title="钢琴奏鸣曲"></work>
+	<work op="16" year="1796" title="钢琴奏鸣曲"></work>
+	<work op="16" year="1796" title="钢琴奏鸣曲"></work>
+	<work op="16" year="1796" title="钢琴奏鸣曲"></work>
+</musician>
+

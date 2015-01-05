@@ -35,7 +35,7 @@ chrome.storage.sync.get(null, function (data) {
 			load_Taobao();		// load music.taobao.com ad
 		else if (/\/group/.test(CurrentUrl))
 			rm_postTitle();		// remove postTitle length
-		else if (/\/artist/.test(CurrentUrl) && !document.getElementById("artist_mv_block"))
+		else if (/\/artist/.test(CurrentUrl) && !document.getElementById("artist_mv_block")) 
 			load_MV();
 	}
 });
@@ -63,7 +63,7 @@ function loadGroup() {
 
 function semicolConvert() {
 	var el = $("#albums_info tbody").find("tr").eq(1);
-	if (el) {
+	if (el.length > 0) {
 		var txt = el.html();
 		if (txt.indexOf(";") != -1) {		
 			//alert(txt);

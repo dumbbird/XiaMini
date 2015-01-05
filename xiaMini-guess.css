@@ -15,6 +15,7 @@ font-style: normal;}
 #slider,
 #albums, 
 #collects,
+#pr_ad,
 #task,
 #pyramid,
 #friend,
@@ -92,6 +93,13 @@ position: relative !important;
 width: 300px !important;
 margin-right: -320px !important;
 margin-top: 60px !important}
+
+.sb_xiamini
+{float: right !important;
+position: absolute !important;
+width: 300px !important;
+top: 370px !important;
+right: 10px !important}
 
 #relate_song,
 #album_song,
@@ -239,6 +247,8 @@ background-position: -28px -277px;}
 textarea#editLrcText,
 textarea#editLyricText,
 #lrc_input {font-family: "Courier New"; font-size:12px !important}
+
+input#songwriters, input#composer, input#arrangement{width:560px !important}
 
 /* User Page */
 .profile_title .usr_info .member_medal {
