@@ -1,5 +1,7 @@
 Chrome版更新Log (all updated by @dumbbird except where noted)：
 
+2.2.1	调整部分CSS，修复歌词翻译索引的一处bug
+2.2.0	优化播放器切换功能，重新调整虫洞穿越相关设计
 2.1.9	修复古典显示小bug
 2.1.8	虫洞穿越测试 (by @dumbbird and @van)，修复网页播放器一些小bug，增加只播一遍模式
 2.1.7	增加播放器文本、LRC、t-LRC三相切换功能，增加艺人页面MV列表，修复一些小bug
