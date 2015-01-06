@@ -118,6 +118,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 			alert(details.url);
 		}
 		else if ((details.url.indexOf('imusicapp.cn') != -1)) {
+			alert(details.url);
 			for (var i = 0; i < details.requestHeaders.length; ++i) {
 				if (details.requestHeaders[i].name === 'Referer') {
 					details.requestHeaders[i].value = 'http://music.163.com/';
