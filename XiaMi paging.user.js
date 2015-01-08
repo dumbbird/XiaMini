@@ -4,7 +4,7 @@
 // @namespace   http://www.xiami.com/u/8154435?spm=0.0.0.0.j2pUVV
 // @description This is a simple paging for XiaMi.com（单纯的跳页功能）
 // @include     http://www.xiami.com/*
-// @version     1.1.0
+// @version     1.2.0
 // @grant       none
 // ==/UserScript==
 
@@ -20,8 +20,15 @@ $(Paging())
 function Paging() {
 
 	// 判断当前网页是否需要本功能
-	var str = window.location.href;
-	var strRE = new RegExp("/space/lib-song|/space/lib-album|/space/lib-artist|/space/post-album|/space/collect|/space/stuff-photo|/space/stuff-artist|/space/stuff-album|/space/collect-fav|/space/comments|.com/group|/artist/album|/music/newalbum|/album/list|/album/\\d+");
+	var str = window.location.href.split("?spm=")[0];
+	var spm = window.location.href.split("?spm=")[1];
+	if (spm) {
+		var index = spm.indexOf("&");
+		if (index != -1)
+			str += "?" + spm.substring(index+1);
+	}
+	//alert(str+"...."+spm);
+	var strRE = new RegExp("/space/lib-song|/space/lib-album|/space/lib-artist|/space/post-album|/space/collect|/space/stuff-photo|/space/stuff-artist|/space/stuff-album|/space/collect-fav|/space/comments|.com/group|.com/g|/artist/album|/music/newalbum|/album/list|/album/\\d+");
 	var truststr = strRE.exec(str);
 	// 判断当前网页是否需要本功能
 	if (truststr) {
@@ -62,10 +69,11 @@ function Paging() {
 					pagenumber = Math.ceil(page);
 					break;
 				}
+			case truststr == ".com/g":
 			case truststr == ".com/group": { // 小组讨论区和话题（不支持小组主页）
 					num = 20;
 					page = number / num;
-					if (!/\/group\/thread-detail\//.exec(str)) {
+					if (!/\/thread\-/.exec(str)) {
 						pagenumber = Math.ceil(page);
 					} else {
 						var pageparseInt = parseInt(page);
@@ -160,61 +168,70 @@ function Paging() {
 			if (event.which == 13) {
 				var valuenumber = $("#custompage").attr("value");
 				var gopage;
-				if (!/\/page\//.exec(str)) {
+				if (!/page/.exec(str)) {
 					if (/space\/lib-song$|space\/lib-album$|space\/lib-artist$|space\/post-album$|space\/collect$|space\/collect-fav$|space\/comments$/.exec(str)) {
 						gopage = str.replace(/$/, "/page/" + valuenumber)
-					} else {
-						if (/space\/lib-song\/u$|space\/lib-album\/u$|space\/lib-artist\/u$|space\/post-album\/u$|space\/collect\/u$|space\/collect-fav\/u$|space\/comments\/u$/.exec(str)) {
-							uid = $(".buddy.personal_iconX.personalDropDown").attr("href").match(/\d+/);
-							gopage = str.replace(/$/, "/" + uid + "/page/" + valuenumber)
-						} else {
-							if (/\/music\/newalbum$/.exec(str)) {
-								gopage = str.replace(/$/, "/page/" + valuenumber)
-							} else if (/\/album\/list/.exec(str)) {
-								str = str.replace(/\?/g, "/");
-								str = str.replace(/=/g, "/");
-								str = str.replace(/\&/g, "/");
-								gopage = str + "/page/" + valuenumber;
-							} else if (!/\?spm/.exec(str)) {
-								gopage = str.replace(/(\d+$)/, "$1/page/" + valuenumber)
-							} else {
-								gopage = str.replace(/\?spm/, "/page/" + valuenumber + "?spm")
-							}
-						}
-					}
-				} else {
-					gopage = str.replace(/\/page\/\d+/, "/page/" + valuenumber)
-				}
+					} else if (/space\/lib-song\/u$|space\/lib-album\/u$|space\/lib-artist\/u$|space\/post-album\/u$|space\/collect\/u$|space\/collect-fav\/u$|space\/comments\/u$/.exec(str)) {
+						uid = $(".buddy.personal_iconX.personalDropDown").attr("href").match(/\d+/);
+						gopage = str.replace(/$/, "/" + uid + "/page/" + valuenumber)
+					} else if (/\/music\/newalbum$/.exec(str)) {
+						gopage = str.replace(/$/, "/page/" + valuenumber);
+					} else if (/\/album\/list/.exec(str)) {
+						str = str.replace(/\?/g, "/");
+						str = str.replace(/=/g, "/");
+						str = str.replace(/\&/g, "/");
+						gopage = str + "/page/" + valuenumber;
+					} else if (/\/thread\-/.exec(str)) {
+						gopage = str.replace(/$/, "?page=" + valuenumber);
+					} else 
+						gopage = str.replace(/(\d+$)/, "$1/page/" + valuenumber);
+				} 
+				else if (/\?page\=/.exec(str)) 
+					gopage = str.replace(/\?page\=\d+/, "?page=" + valuenumber);
+				else 
+					gopage = str.replace(/\/page\/\d+/, "/page/" + valuenumber);
+				
+				// if (spm != "") {
+					// if (/\?/.exec(gopage))
+						// gopage = gopage + "&spm=" + spm;
+					// else
+						// gopage = gopage + "?spm=" + spm;
+				// }
+					
 				window.location = gopage;
 				doane(event);
 			}
-		})
+		});
+		
 		$("#pagenumbernum").click(function () {
-			if (!/\/page\//.exec(str)) {
+			if (!/page/.exec(str)) {
 				if (/space\/lib-song$|space\/lib-album$/.exec(str)) {
 					going = str.replace(/$/, "/page/" + pagenumber)
-				} else {
-					if (/space\/lib-song\/u$|space\/lib-album\/u$|space\/stuff-album\/u$/.exec(str)) {
-						uid = $(".buddy.personal_iconX.personalDropDown").attr("href").match(/\d+/);
-						going = str.replace(/$/, "/" + uid + "/page/" + pagenumber)
-					} else {
-						if (/\/music\/newalbum$|\/album\/list/.exec(str)) {
-							str = str.replace(/\?/g, "/");
-							str = str.replace(/=/g, "/");
-							str = str.replace(/\&/g, "/");
-							going = str.replace(/$/, "/page/" + pagenumber);
-						} else {
-							if (!/\?spm/.exec(str)) {
-								going = str.replace(/(\d+$)/, "$1/page/" + pagenumber)
-							} else {
-								going = str.replace(/\?spm/, "/page/" + pagenumber + "?spm")
-							}
-						}
-					}
-				}
-			} else {
-				going = str.replace(/\/page\/\d+/, "/page/" + pagenumber)
-			}
+				} else if (/space\/lib-song\/u$|space\/lib-album\/u$|space\/stuff-album\/u$/.exec(str)) {
+					uid = $(".buddy.personal_iconX.personalDropDown").attr("href").match(/\d+/);
+					going = str.replace(/$/, "/" + uid + "/page/" + pagenumber)
+				} else if (/\/music\/newalbum$|\/album\/list/.exec(str)) {
+					str = str.replace(/\?/g, "/");
+					str = str.replace(/=/g, "/");
+					str = str.replace(/\&/g, "/");
+					going = str.replace(/$/, "/page/" + pagenumber);
+				} else if (/\/thread\-/.exec(str)) {
+					going = str.replace(/$/, "?page=" + pagenumber);
+				} else 
+					going = str.replace(/(\d+$)/, "$1/page/" + pagenumber);
+			} 
+			else if (/\?page\=/.exec(str)) 
+				going = str.replace(/\?page\=\d+/, "?page=" + pagenumber);
+			else 
+				going = str.replace(/\/page\/\d+/, "/page/" + pagenumber);
+			
+			// if (spm != "") {
+				// if (/\?/.exec(going))
+					// going = going + "&spm=" + spm;
+				// else
+					// going = going + "?spm=" + spm;
+			// }
+			
 			window.location = going;
 		});
 		if (/\/music\/newalbum|\/album\/list/.exec(str)) { // 根据页面不同设置跳页功能不同位置

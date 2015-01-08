@@ -2,7 +2,7 @@
 	// 隐藏数量较多的回复贴
 		
 	var CurrentUrl = window.location.href;
-	if (CurrentUrl.indexOf("/group/thread-detail/") != -1) {
+	if (CurrentUrl.indexOf("/thread-") != -1) {
 		var MaxReply = 5; // 最多显示数量
 		var ReplyArr = new Array(); //记录加了隐藏开关的楼号
 		var total_topic = $('div.parent_post'); //有回复的楼数

@@ -34,7 +34,7 @@ var updateAfterComplete = function(tab) {
 				}, function() {});	
 			}
 			// render JS in group page
-			if (/group\/thread\-detail/.test(tab.url)) 
+			if (/thread\-/.test(tab.url)) 
 				chrome.tabs.executeScript(tab.id, {
 					file : "hidereply.js",
 					runAt: "document_end"
