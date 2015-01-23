@@ -1,6 +1,6 @@
 ﻿// 从歌词组帖子中获取翻译贴，并展示在单曲页面右侧。
 // 显示ISRC号
-// 版本号：1.10.4
+// 版本号：1.10.5
 
 var loadTranslist = function () {
 	
@@ -17,6 +17,8 @@ var loadTranslist = function () {
 		ti = ti.replace(/[ \t]+$/, ""); 						// 去掉行首行末空格
 		ti = ti.replace(/^[ \t]+/, ""); 						// 去掉行首行末空格
 		ti = ti.replace(/[\(|（|\[|\-].*[\)|）|\]|\-]$/g, "");	// 去括号/- -内容
+		ti = ti.replace(/[ \t]+$/, ""); 						// 去掉行首行末空格
+		ti = ti.replace(/^[ \t]+/, ""); 						// 去掉行首行末空格
 		return ti;
 	}
 

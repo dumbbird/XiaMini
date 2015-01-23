@@ -62,6 +62,9 @@ a.wormhole {
 	background: url(.png) 0 0 no-repeat;
 }*/
 
+/* xiami musician album page */
+#album_plan{background-position: left !important}
+
 /* classical album page */
 
 .track_list tr.same_group td.chkbox {
