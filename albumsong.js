@@ -93,19 +93,19 @@ var loadTracklist = function () {
 					var tmid = this.id.split("_")[1];
 					$("marquee#Tmarquee_" + tmid).attr('scrollamount', '2');
 				});
-				$("marquee[id^=Tmarquee_]").mouseout(function (event) {
+				$("marquee[id^=Tmarquee_]").mouseleave(function (event) {
 					var tmid = this.id.split("_")[1];
-					var x = event.clientX;
-					var y = event.clientY;
-					var x1 = this.offsetLeft + this.getBoundingClientRect().left;
-					var y1 = this.offsetTop - 7 + this.getBoundingClientRect().top;
-					var x2 = x1 + this.offsetWidth;
-					var y2 = y1 + this.offsetHeight -1;
+					//var x = event.clientX;
+					//var y = event.clientY;
+					//var x1 = this.offsetLeft + this.getBoundingClientRect().left;
+					//var y1 = this.offsetTop - 7 + this.getBoundingClientRect().top;
+					//var x2 = x1 + this.offsetWidth;
+					//var y2 = y1 + this.offsetHeight -1;
 					//alert(x+'_'+y+'_'+x1+'_'+x2+'_'+y1+'_'+y2);
-					if( x < x1 || x > x2 || y < y1 || y > y2) {	// 碰到元素内子元素也会触发mouseout事件，追加验证是否还在元素内
-						$("marquee#Tmarquee_" + tmid).attr('scrollamount', '0');
-						$("marquee#Tmarquee_" + tmid).attr('scrollLeft', $("marquee#Tmarquee_" + tmid).attr('width'));
-					}
+					//if( x < x1 || x > x2 || y < y1 || y > y2) {	// 碰到元素内子元素也会触发mouseout事件，追加验证是否还在元素内
+					$("marquee#Tmarquee_" + tmid).attr('scrollamount', '0');
+					$("marquee#Tmarquee_" + tmid).attr('scrollLeft', $("marquee#Tmarquee_" + tmid).attr('width'));
+					//}
 				});
 				
 				function Isoverflow(str) {  //添加一个容器，通过丢入字符串后的元素相对高度判断是否换行即超长

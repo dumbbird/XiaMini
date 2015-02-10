@@ -1,5 +1,5 @@
 ﻿// Project Wormhole，呵呵你懂的。
-// 版本号：1.0
+// 版本号：1.4
 
 // title rearrange
 function Re_title4(ti){ 
@@ -14,8 +14,13 @@ function Re_title3(ti){ //中断类
 }
 
 var cd2play = function() {
+	var id_name;
+	if (CurrentUrl.indexOf("album/") != -1) 
+		id_name = "recommendids";
+	else if (CurrentUrl.indexOf("collect/") != -1) 
+		id_name = "ids";
 	var wormhole_cd = '<a title="立即开始虫洞穿越" href="javascript:void(0)" onclick="';
-	wormhole_cd += 'selectAll(\'recommendids\');playsongs(\'recommendids\');">开始虫洞穿越</a>';
+	wormhole_cd += 'selectAll(\'' + id_name +'\');playsongs(\'' +id_name + '\');">开始虫洞穿越</a>';
 	$('div.cd2play').html(wormhole_cd);
 }
 var cd2play_entrance = function() {
@@ -48,33 +53,10 @@ var loadControl = function() {
 }
 
 var wormhole = function() {
-	var str = document.cookie.split("; ");
-	var albumID = CurrentUrl.split("album/")[1];
-	
 	$.getJSON("https://raw.githubusercontent.com/dumbbird/xiaMini/master/wormhole.json", function(json){
 		var songid = 0, wormhole_html = "";
 		var flag = 0;
-		if (CurrentUrl.indexOf("xiami.com/album/") != -1) {
-			$(".song_name").each(function(){
-				if ($(this).find("a").length > 0)
-					songid = $(this).find("a").eq(0).attr("href").split("song/")[1];
-				//alert (json[songid]);
-				if (json[songid] && $(this).parent().find(".song_play").length == 0) {
-					//alert("wormhole enabled");
-					flag = 1;
-					$(this).parent().find('input[type=checkbox]').attr({'disabled':false, 'checked':true});
-					wormhole_html = '<a class="song_play wormhole" href="javascript:void(0)" title="试听" onclick="play(';
-					wormhole_html += "'" + songid + "');";
-					wormhole_html += '"><span>试听</span></a>';
-					//alert(wormhole_html);
-					$(this).parent().find(".song_do").append(wormhole_html);
-					if ($(".chapter_ctrl").length == 0)
-						loadControl();
-				}
-			});
-			if (flag)
-				cd2play();
-		} else if (CurrentUrl.indexOf("xiami.com/song/") != -1) {
+		if (CurrentUrl.indexOf("xiami.com/song/") != -1) {
 			songid = CurrentUrl.split("song/")[1];
 			if (json[songid]) {				
 				wormhole_html = '<div class="song_info"><div class="player">'; 
@@ -85,17 +67,45 @@ var wormhole = function() {
 				$('#song_acts').before(wormhole_html);
 			}
 		}
+		else {
+			$(".chkbox, .chk").each(function(){
+				if ($(this).find("input").length > 0)
+					songid = $(this).find("input").eq(0).attr("value");
+				//alert (songid);
+				if (json[songid] && $(this).parent().find(".song_play").length == 0) {
+					//alert("wormhole enabled");
+					flag = 1;
+					$(this).parent().find('input[type=checkbox]').attr({'disabled':false, 'checked':true});
+					
+					if (CurrentUrl.indexOf("album/") != -1) {
+						wormhole_html = '<a class="song_play wormhole" href="javascript:void(0)" title="试听" onclick="play(';
+						wormhole_html += "'" + songid + "');";
+						wormhole_html += '"><span>试听</span></a>';
+						//alert(wormhole_html);
+						$(this).parent().find(".song_do").append(wormhole_html);
+						if ($(".chapter_ctrl").length == 0)
+							loadControl();
+					}
+					else if (CurrentUrl.indexOf("collect/") != -1) {
+						var item = $(this).parent();
+						
+						var songname_html = $(item).find('.song_name').html().split(" -- ");
+						var buffer = '<a href="/song/' + songid +'" title>' + songname_html[0] + '</a>' + ' -- ' + songname_html[1];
+						//alert(buffer);
+						$(item).find('.song_name').html(buffer);
+		
+						wormhole_html = '<p> <a class="song_play" href="javascript:void(0)" title="穿越虫洞，到高维空间试听这首歌" onclick="play(\'' + songid + '\',\'collect\',\'552436\');">试听</a>';
+						wormhole_html += '<a class="song_digg" href="javascript:void(0)" title="分享" onclick="recommend(' + songid + ',\'32\');">分享</a>';
+						wormhole_html += '<a class="song_toclt" href="javascript:void(0)" onclick="collect(\'' + songid + '\');" title="添加这首高次元歌曲到精选集">添加到精选集</a></p>';
+		
+						$(item).append(wormhole_html);
+					}
+				}
+			});
+			if (flag)
+				cd2play();
+		}
 	});
-
-	var albumTitle = $('#title h1').contents().filter(function() {
-			return this.nodeType == 3;
-		}).text();
-	var albumArtist = $('#album_info table tbody').children().first().children().last().text();
-	
-	//keywords[1].replace(albumTitle, "");
-	//alert(albumTitle); 
-	//alert(albumArtist);
-
 };
 
 var wormhole_entrance = function(){
@@ -129,12 +139,13 @@ var wormhole_entrance = function(){
 
 var CurrentUrl = window.location.href;
 CurrentUrl = CurrentUrl.split("?")[0].split("#")[0];
-if (CurrentUrl.indexOf("xiami.com/album/") != -1) {
+
+if (CurrentUrl == "http://www.xiami.com/collect/552436" || CurrentUrl == "https://www.xiami.com/collect/552436") {
+	wormhole_entrance();
+} else if (CurrentUrl.indexOf("xiami.com/album/") != -1 || CurrentUrl.indexOf("xiami.com/collect/") != -1) {
 	if ($(".trackid").length != $(".song_play").length)
 		wormhole();		
 } else if (CurrentUrl.indexOf("xiami.com/song/") != -1) {
 	if ($(".unpublished").length != 0)
 		wormhole();		
-} else if (CurrentUrl == "http://www.xiami.com/collect/552436" || CurrentUrl == "https://www.xiami.com/collect/552436") {
-	wormhole_entrance();
 }

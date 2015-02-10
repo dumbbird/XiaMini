@@ -31,8 +31,10 @@ chrome.storage.sync.get(null, function (data) {
 		if (/\/album|\/song|\/artist/.test(CurrentUrl))
 			semicolConvert();	// convert ; to /	
 			
-		if (/\/album/.test(CurrentUrl))
+		if (/\/album/.test(CurrentUrl)) {
+			addDiscplay();
 			load_Taobao();		// load music.taobao.com ad
+		}
 		else if (/\/group/.test(CurrentUrl))
 			rm_postTitle();		// remove postTitle length
 		else if (/\/artist/.test(CurrentUrl) && !document.getElementById("artist_mv_block")) 
@@ -105,6 +107,24 @@ function semicolConvert() {
 	// }
 
 }
+
+function addDiscplay() {
+	if ($('#track .mgt10 strong').length <= 1)
+		return;
+	if ($('.discplay').length)
+		return;
+	var discnum = $('#track .mgt10 strong').length;
+	var discplay = '';
+	for(var x=0; x<discnum; x++) {
+		discplay = $('#track .mgt10 strong').eq(x).html();
+		discplay += '<b class="ico_cd ele_inline mah discplay"><a href="javascript:void(0)" title="选中此碟并播放"\
+		onclick="$(\'[name=recommendids]\').attr(\'checked\',false);\
+		$(\'#track .mgt10 table\').eq('+x+').find(\'[name=recommendids]\').attr(\'checked\',true);\
+		playsongs(\'recommendids\');">试听</a></b>';
+		$('#track .mgt10 strong').eq(x).html(discplay);
+	}
+}
+
 
 function load_Taobao() {
 	if (document.getElementById("do_buy"))

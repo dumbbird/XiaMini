@@ -148,9 +148,44 @@ transition-duration: .1s !important;
 transition-timing-function: ease-in !important;}
 
 .icon-wormhole {
-background-image: url(icon_wormhole.png);
-width:18px;height:18px;right:86px;
+	font-family: "iconRegular" !important;
+	display: inline-block;
+	-webkit-font-smoothing: antialiased;
+	font-size: 20px;
+	color: gray !important;
+	right: 85px; top: 0px !important;
+	cursor: pointer; text-decoration: none !important;
 }
+
+.icon-wormhole-bottom {
+	font-family: "iconRegular" !important;
+	display: inline-block;
+	-webkit-font-smoothing: antialiased;
+	font-size: 20px;
+	color: white !important;
+	right: 85px; top: 0px !important;
+	cursor: pointer; text-decoration: none !important;
+}
+
+span.icon-dislike{
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	left: 8px;
+	font-family: "iconRegular" !important;
+	display: inline-block;
+	-webkit-font-smoothing: antialiased;
+	font-size: 20px;
+	cursor: pointer; text-decoration: none
+}
+
+.mode-once {
+background-image:url(icon.png);
+background-repeat: no-repeat;
+background-position: -68px -201px;
+}
+
+#J_trackMoreMenu {height: 120px !important}
 
 #lyrics_control {
 margin: 10px 0px;

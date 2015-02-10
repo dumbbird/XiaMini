@@ -1,10 +1,10 @@
 ﻿// ==UserScript==
 // @name        XiaMi Paging
-// @author      Ai
+// @author      Ai (maintained by dumbbird)
 // @namespace   http://www.xiami.com/u/8154435?spm=0.0.0.0.j2pUVV
 // @description This is a simple paging for XiaMi.com（单纯的跳页功能）
 // @include     http://www.xiami.com/*
-// @version     1.2.0
+// @version     1.2.1
 // @grant       none
 // ==/UserScript==
 
@@ -183,21 +183,21 @@ function Paging() {
 						gopage = str + "/page/" + valuenumber;
 					} else if (/\/thread\-/.exec(str)) {
 						gopage = str.replace(/$/, "?page=" + valuenumber);
+					} else if (/artist\/album\//.exec(str)) {
+						gopage = str.replace(/$/, "/page/" + valuenumber);
+					} else if (/artist\/album\-/.exec(str)) {
+						if (/\?/.exec(str))
+							gopage = str.replace(/$/, "&page=" + valuenumber);
+						else
+							gopage = str.replace(/$/, "?page=" + valuenumber);
 					} else 
 						gopage = str.replace(/(\d+$)/, "$1/page/" + valuenumber);
 				} 
-				else if (/\?page\=/.exec(str)) 
-					gopage = str.replace(/\?page\=\d+/, "?page=" + valuenumber);
+				else if (/page\=/.exec(str)) 
+					gopage = str.replace(/page\=\d+/, "page=" + valuenumber);
 				else 
 					gopage = str.replace(/\/page\/\d+/, "/page/" + valuenumber);
-				
-				// if (spm != "") {
-					// if (/\?/.exec(gopage))
-						// gopage = gopage + "&spm=" + spm;
-					// else
-						// gopage = gopage + "?spm=" + spm;
-				// }
-					
+				//alert(gopage);				
 				window.location = gopage;
 				doane(event);
 			}
@@ -217,21 +217,22 @@ function Paging() {
 					going = str.replace(/$/, "/page/" + pagenumber);
 				} else if (/\/thread\-/.exec(str)) {
 					going = str.replace(/$/, "?page=" + pagenumber);
-				} else 
+				} else if (/artist\/album\//.exec(str)) {
+					going = str.replace(/$/, "/page/" + pagenumber);
+				} else if (/artist\/album\-/.exec(str)) {
+					if (/\?/.exec(str))
+						going = str.replace(/$/, "&page=" + pagenumber);
+					else
+						going = str.replace(/$/, "?page=" + pagenumber);
+				} else
 					going = str.replace(/(\d+$)/, "$1/page/" + pagenumber);
 			} 
-			else if (/\?page\=/.exec(str)) 
-				going = str.replace(/\?page\=\d+/, "?page=" + pagenumber);
+			else if (/page\=/.exec(str)) 
+				going = str.replace(/page\=\d+/, "page=" + pagenumber);
 			else 
 				going = str.replace(/\/page\/\d+/, "/page/" + pagenumber);
 			
-			// if (spm != "") {
-				// if (/\?/.exec(going))
-					// going = going + "&spm=" + spm;
-				// else
-					// going = going + "?spm=" + spm;
-			// }
-			
+			//alert(going);
 			window.location = going;
 		});
 		if (/\/music\/newalbum|\/album\/list/.exec(str)) { // 根据页面不同设置跳页功能不同位置

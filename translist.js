@@ -1,6 +1,6 @@
 ﻿// 从歌词组帖子中获取翻译贴，并展示在单曲页面右侧。
 // 显示ISRC号
-// 版本号：1.10.5
+// 版本号：1.10.6
 
 var loadTranslist = function () {
 	
@@ -42,9 +42,9 @@ var loadTranslist = function () {
 		// //alert(lyricsKey);
 	// }
 	
-	var realSongtitle = Re_title2(Re_title(Songtitle));			// 获取真正的曲目标题，去掉标题中的括号等信息
-	var SearchKey = realSongtitle.replace("'", "%27");	// 根据真正曲目标题来设定搜索关键词
-	//alert(Songtitle+"...."+SearchKey);
+	var realSongtitle = Re_title(Songtitle);			// 获取真正的曲目标题，去掉标题中的括号等信息
+	var SearchKey = Re_title2(realSongtitle).replace("'", "%27");	// 根据真正曲目标题来设定搜索关键词
+	//alert(Songtitle+"...."+"...."+realSongtitle+"...."+SearchKey);
 	
 	var SearchUrl = "/group/searchingroup/id/13001?" + token + "&key=" + SearchKey + "&submit=搜+索";
 	var SearchUrl_baidu = "//www.baidu.com/s?wd=翻译%20赏析%20" + SearchKey + "%20site%3Awww.xiami.com"

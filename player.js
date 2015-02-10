@@ -67,13 +67,14 @@ page/init
  * @fileOverview Sample Util Mod
  * @author abc-team
  */
-KISSY.add('utils/index/global',['node'], function(S, require, exports, module) {
+KISSY.add('utils/index/global',['node','page/mods/page'], function(S, require, exports, module) {
     // 在 pages, widget, common  KISSY模块
     // 可以通过 requires 'utils/sample' 引入这个脚本
     var Node = require("node");
     //var PageNotification = require("gallery/pageNotification/1.0/index");
     var $ = Node.all;
-
+	var Page = require("page/mods/page");	// van
+	Page = new Page();	
     // var PN = new PageNotification({
     // "closeButton": false,
     // "positionClass": "page-notification-top-full-width",
@@ -283,6 +284,10 @@ KISSY.add('utils/index/global',['node'], function(S, require, exports, module) {
                 return;
             }
             window.open('http://www.xiami.com/widget/imulti?sid=' + ids);
+        },
+		dislikeThis : function(ids, note) {
+            var note = note || 0;
+            Page._dislikeTrack(ids);
         },
         playerUploadlyric : function(sid) {
             var url = 'http://www.xiami.com/wiki/addlyric/id/' + sid;
@@ -3246,7 +3251,7 @@ KISSY.add('page/mods/xtpl/trackItem-xtpl',function (S, require, exports, module)
                     var params37 = [];
                     var id38 = getPropertyUtil(engine, scope, "grade", 0, 25);
 					if ((id38 * (1)) === (-2)) {
-						buffer += '\n\t\t<a class="icon-wormhole" title="穿越中" href="/collect/552436" target="_blank"></a>\n\t\t';
+						buffer += '\n\t\t<a class="icon-wormhole" title="穿越中" href="/collect/552436" target="_blank">F</a>\n\t\t';
 					} else {
 						params37.push((id38 * (1)) === (-1));
 						config36.params = params37;
@@ -5493,7 +5498,15 @@ KISSY.add('page/mods/xtpl/itemMenu-xtpl',function (S, require, exports, module) 
             buffer += ',\'';
             var id17 = getPropertyOrRunCommandUtil(engine, scope, {}, "note", 0, 12);
             buffer += renderOutputUtil(id17, true);
-            buffer += '\')"><i class="icon-bobo"></i>生成虾米播播</a></li>\n\t</ul>\n\t<span class="arrow"></span>\n</div>';
+			
+			// van edit
+            buffer += '\')"><i class="icon-bobo"></i>生成虾米播播</a></li>\n\t\t<li><a id="more_dislike" href="javascript:void(0)" onclick="SEIYA.dislikeThis(';
+            var id18 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 13);
+            buffer += renderOutputUtil(id18, true);
+            buffer += ',\'';
+            var id19 = getPropertyOrRunCommandUtil(engine, scope, {}, "note", 0, 13);
+            buffer += renderOutputUtil(id19, true);
+            buffer += '\')"><span class="icon-dislike">X</span>不喜欢这首歌</a></li>\n\t</ul>\n\t<span class="arrow"></span>\n</div>';
             return buffer;
         };
 });
@@ -5721,8 +5734,11 @@ KISSY.add('page/mods/xtpl/trackMenu-xtpl',function (S, require, exports, module)
             buffer += ')"><i class="icon-collect"></i>添加到精选集</a></li>\n\t\t<li><a id="J_trackMobile" href="javascript:void(0)" onclick="SEIYA.sendMobile(';
             var id3 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 5);
             buffer += renderOutputUtil(id3, true);
-            buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\n\t</ul>\n\t<span class="arrow"></span>\n</div>';
-            return buffer;
+            buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\n\t\t<li><a id="J_trackdislikeB" href="javascript:void(0)" data-sid="';
+			var id4 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 5);
+            buffer += renderOutputUtil(id4, true);
+            buffer += '" data-type="track" data-event="dislike"><span class="icon-dislike">X</span>不喜欢这首歌</a></li>\n\t</ul>\n\t<span class="arrow"></span>\n</div>';
+			return buffer;
         };
 });
 /** Compiled By kissy-xtemplate */
@@ -7444,6 +7460,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
         PlayerLog = require('./player/player-log'),
         PlayerDrag = require('./player/player-drag'),
         PlayerCover = require('./player/player-cover'),
+		Page = require("./page"),	// van
         DataCenter = require('./data/center'),
         Tpl_trackInfo = require("./xtpl/trackInfo-xtpl"),
         UTool = require("widget/tool/index"),
@@ -7512,7 +7529,7 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
             })
             self.PlayerSale = new PlayerSale();
             self.USER = new User();
-
+			self.Page = new Page();			// van
             self.PlayerCover = new PlayerCover();
 
             self._playerListen();
@@ -7642,20 +7659,30 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
 			
             if (track.grade != -2) {		// van
 				self.Fav_btn.attr("data-sid", track.songId);
+				self.Fav_btn.removeAttr("href");
+				self.Fav_btn.text("");
+				self.Fav_btn.removeAttr("target");
 				if (track.grade > -1) {
 					self.Fav_btn.attr("class", "icon-faved");
 					self.Fav_btn.attr("title", "取消收藏");
 				} else {
 					self.Fav_btn.attr("class", "icon-fav");
-					self.Fav_btn.attr("title", "收藏");
+					self.Fav_btn.attr("title", "收藏");					
 				}
 			} else {
 				self.Fav_btn.attr("data-sid", "");
-				self.Fav_btn.attr("class", "icon-wormhole");
+				self.Fav_btn.attr("class", "icon-wormhole-bottom");
 				self.Fav_btn.attr("href", "/collect/552436");
 				self.Fav_btn.attr("target", "_blank");
 				self.Fav_btn.attr("title", "穿越中");
+				self.Fav_btn.text("F");
 			}
+			// dislikeSong Button in bottom - van
+		
+			// var dislikebtn = '<a id="J_trackdislikeB" class="icon-dislike-bottom" data-sid="'+track.songId+'" data-type="track" data-event="dislike" title="不喜欢"></a>';
+			// if ($('#J_trackdislikeB').length == 0)
+				// $('#J_trackFav').before(dislikebtn);
+			// else $('#J_trackdislikeB').attr("data-sid", track.songId);
 			
             var status = self.PlayerData.get('status');
             if ("room" != self.PlayerData.get("status")) {
@@ -7935,6 +7962,10 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                     case 'J_trackMobile': // 发送
                         op = 111;
                         break;
+					case 'J_trackdislikeB':		// 不喜欢这首歌　- van
+						var sid = $(event.target).attr('data-sid');
+						self.Page._dislikeTrack(sid);
+						break;
                 }
                 if (op !== 0) {
 
@@ -9409,7 +9440,7 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                         var params26 = [];
                         var id27 = getPropertyUtil(engine, scope, "grade", 0, 20);
 						if (true) {
-							buffer += '\n\t\t<a class="icon-wormhole" title="穿越中" href="/collect/552436" target="_blank"></a>\n\t\t';
+							buffer += '\n\t\t<a class="icon-wormhole" title="穿越中" href="/collect/552436" target="_blank">F</a>\n\t\t';
 						} else {
 							params26.push(id27 === (-1));
 							config25.params = params26;
@@ -9498,7 +9529,7 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                         var params48 = [];
                         var id49 = getPropertyUtil(engine, scope, "grade", 0, 46);
 						if (false) {
-							buffer += '\n\t\t<a class="icon-wormhole" title="穿越中" href="/collect/552436" target="_blank"></a>\n\t\t';
+							buffer += '\n\t\t<a class="icon-wormhole" title="穿越中" href="/collect/552436" target="_blank">F</a>\n\t\t';
 						} else {
 							params48.push(id49 === (-1));
 							config47.params = params48;
@@ -9739,10 +9770,11 @@ KISSY.add('page/mods/player/player-event',['base'], function(S, require, exports
  * @author noyobo
  * @mail nongyoubao@alibaba-inc.com
  */
-KISSY.add('page/mods/page',['node', 'event', './player/player-event'], function(S, require, exports, module) {
+KISSY.add('page/mods/page',['node', 'event', 'io', './player/player-event'], function(S, require, exports, module) {
     // @formatter:off
     var Node = require("node"),
         Event = require("event"),
+		IO = require("io"),	// van edit
         playerEvent = require("./player/player-event");
     // @formatter:on
     var $ = Node.all;
@@ -9923,10 +9955,28 @@ KISSY.add('page/mods/page',['node', 'event', './player/player-event'], function(
                 case "close":
                     self._roamExit(sid);
                     break;
+				case "dislike":				//van
+				//	self._dislikeTrack(sid);
+                    break;
                 default:
                     S.log("没有相应操作");
             }
         },
+		_dislikeTrack: function(sid) {
+			var self = this;
+            new IO({
+            url : "http://www.xiami.com/kuang/unlike",
+            data : {
+                "id" : sid
+            },
+            success : function(respones) {
+				self._deleteTrack(sid, 'track');
+            },
+            error : function() {
+				alert('添加失败！');
+            }
+			});
+		},
         _favTrack: function(sid, type, eventType, note) {
             S.log(sid + ", " + type + ", " + eventType);
             //if (type == "myfav") {
