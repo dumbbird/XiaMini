@@ -4,7 +4,16 @@
   "a30963": [{ "song_id":"364209", "title":"長い間", "cd": "1", "index": "01"},
 		{ "song_id":"364211", "title":"未来へ", "cd": "1", "index": "03"},
 		{ "song_id":"364215", "title":"3人の写真", "cd": "1", "index": "07"}],
+  
   "1773697386": { "song_id":"1773697386", "title":"咬春", "album_id":"465009", "album_name":"赵小雷", "artist":"赵雷", "location":"http://m.cmusic.org:8081/UUAuth/V/C/201424_20151203_204803_66160.mp3?adc12a58cedd67808f7058e419c3d237", "pic":"http://img.xiami.net/images/album/img26/76326/4650091380345880_2.jpg"},
+  "364209": { "song_id":"364209", "title":"長い間", "album_id":"30963", "album_name":"長い間 ～キロロの森～", "artist":"Kiroro", "location":"http://stream17.qqmusic.qq.com/30197576.mp3", "pic":"http://img.xiami.net/images/album/img56/6856/309631376641878_2.jpg"},
+  "364210": { "song_id":"364210", "title":"すてきだね", "album_id":"30963", "album_name":"長い間 ～キロロの森～", "artist":"Kiroro", "location":"http://stream15.qqmusic.qq.com/30482615.mp3", "pic":"http://img.xiami.net/images/album/img56/6856/309631376641878_2.jpg"},
+  "364211": { "song_id":"364211", "title":"未来へ", "album_id":"30963", "album_name":"長い間 ～キロロの森～", "artist":"Kiroro", "location":"http://stream16.qqmusic.qq.com/30197575.mp3", "pic":"http://img.xiami.net/images/album/img56/6856/309631376641878_2.jpg"},
+ 
+  "364215": { "song_id":"364215", "title":"3人の写真", "album_id":"30963", "album_name":"長い間 ～キロロの森～", "artist":"Kiroro", "location":"http://stream15.qqmusic.qq.com/30197584.mp3", "pic":"http://img.xiami.net/images/album/img56/6856/309631376641878_2.jpg"},
+ 
+  "364218": { "song_id":"364218", "title":"僕らはヒーロー", "album_id":"30963", "album_name":"長い間 ～キロロの森～", "artist":"Kiroro", "location":"http://stream18.qqmusic.qq.com/30482617.mp3", "pic":"http://img.xiami.net/images/album/img56/6856/309631376641878_2.jpg"},
+	
   "1769154910": { "song_id":"1769154910", "title":"星月", "album_id":"425080", "album_name":"My August 9th: 50 Wonderful Years", "artist":"许美静", "location":"http://tyst.migu.cn/public/ringmaker01/dailyring02/2015/08/2015%E5%B9%B408%E6%9C%8804%E6%97%A509%E7%82%B956%E5%88%86%E5%86%85%E5%AE%B9%E5%87%86%E5%85%A5%E5%8D%8E%E7%BA%B3100%E9%A6%96/%E5%85%A8%E6%9B%B2%E8%AF%95%E5%90%AC/Mp3_128_44_16/%E6%98%9F%E6%9C%88-%E8%AE%B8%E7%BE%8E%E9%9D%99.mp3", "pic":"http://img.xiami.net/images/album/img58/23258/4250801439371374_2.jpg"},
   "1769634663": { "song_id":"1769634663", "title":"飞蛾扑火", "album_id":"388951", "album_name":"庚心", "artist":"韩庚", "location":"http://stream19.qqmusic.qq.com/30705347.mp3", "pic":"http://img.xiami.net/images/album/img20/76620/3889511403502644_2.jpg"},
   "1769634664": { "song_id":"1769634664", "title":"Say No", "album_id":"388951", "album_name":"庚心", "artist":"韩庚", "location":"http://stream19.qqmusic.qq.com/30701523.mp3", "pic":"http://img.xiami.net/images/album/img20/76620/3889511403502644_2.jpg"},
