@@ -5,6 +5,9 @@
 		{ "song_id":"364211", "title":"未来へ", "cd": "1", "index": "03"},
 		{ "song_id":"364215", "title":"3人の写真", "cd": "1", "index": "07"}],
 
+  "367453": { "song_id":"367453", "title":"I Wanna Go To A Place...", "album_id":"31328", "album_name":"I Wanna Go To A Place...", "artist":"Rie fu", "location":"http://stream14.qqmusic.qq.com/30114585.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/313281376474242_2.jpg"},
+  "367454": { "song_id":"367454", "title":"They Always Talk About", "album_id":"31328", "album_name":"I Wanna Go To A Place...", "artist":"Rie fu", "location":"http://stream15.qqmusic.qq.com/30114586.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/313281376474242_2.jpg"},
+  "367455": { "song_id":"367455", "title":"I So Wanted (English Version)", "album_id":"31328", "album_name":"I Wanna Go To A Place...", "artist":"Rie fu", "location":"http://stream16.qqmusic.qq.com/30114587.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/313281376474242_2.jpg"},
   "3553885": { "song_id":"3553885", "title":"砂のお城", "album_id":"319738", "album_name":"砂のお城", "artist":"分島花音", "location":"http://stream19.qqmusic.qq.com/30466428.mp3", "pic":"http://img.xiami.net/images/album/img19/57019/3197381394022410_2.jpg"},
   "3553887": { "song_id":"3553887", "title":"砂のお城 instrumental ver.", "album_id":"319738", "album_name":"砂のお城", "artist":"分島花音", "location":"http://stream14.qqmusic.qq.com/34783381.mp3", "pic":"http://img.xiami.net/images/album/img19/57019/3197381394022410_2.jpg"},
   "3553888": { "song_id":"3553888", "title":"skip turn step? instrumental ver.", "album_id":"319738", "album_name":"砂のお城", "artist":"分島花音", "location":"http://stream14.qqmusic.qq.com/34783377.mp3", "pic":"http://img.xiami.net/images/album/img19/57019/3197381394022410_2.jpg"},
