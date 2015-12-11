@@ -5,6 +5,8 @@
 		{ "song_id":"364211", "title":"未来へ", "cd": "1", "index": "03"},
 		{ "song_id":"364215", "title":"3人の写真", "cd": "1", "index": "07"}],
 
+  "1770397136": { "song_id":"1770397136", "title":"七転八起☆至上主義!", "album_id":"457807", "album_name":"七転八起☆至上主義!", "artist":"KOTOKO", "location":"http://stream17.qqmusic.qq.com/30655731.mp3", "pic":"http://img.xiami.net/images/album/img80/57280/4578071312857664_2.jpg"},
+  "1770397137": { "song_id":"1770397137", "title":"scene", "album_id":"457807", "album_name":"七転八起☆至上主義!", "artist":"KOTOKO", "location":"http://stream20.qqmusic.qq.com/37265784.mp3", "pic":"http://img.xiami.net/images/album/img80/57280/4578071312857664_2.jpg"},
   "1769265104": { "song_id":"1769265104", "title":"WHITE ALBUM", "album_id":"359426", "album_name":"WHITE ALBUM", "artist":"平野綾", "location":"http://stream20.qqmusic.qq.com/30469725.mp3", "pic":"http://img.xiami.net/images/album/img18/56418/3594261377768627_2.jpg"},
   "1769265105": { "song_id":"1769265105", "title":"ツイてるねノッてるね", "album_id":"359426", "album_name":"WHITE ALBUM", "artist":"平野綾", "location":"http://stream20.qqmusic.qq.com/30469726.mp3", "pic":"http://img.xiami.net/images/album/img18/56418/3594261377768627_2.jpg"},
   "1769265106": { "song_id":"1769265106", "title":"WHITE ALBUM (off Vocals)", "album_id":"359426", "album_name":"WHITE ALBUM", "artist":"平野綾", "location":"http://stream20.qqmusic.qq.com/30469727.mp3", "pic":"http://img.xiami.net/images/album/img18/56418/3594261377768627_2.jpg"},
