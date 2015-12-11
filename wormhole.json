@@ -5,6 +5,8 @@
 		{ "song_id":"364211", "title":"未来へ", "cd": "1", "index": "03"},
 		{ "song_id":"364215", "title":"3人の写真", "cd": "1", "index": "07"}],
 
+  "3435441": { "song_id":"3435441", "title":"ツキアカリ", "album_id":"310348", "album_name":"ツキアカリ", "artist":"Rie fu", "location":"http://stream18.qqmusic.qq.com/30413566.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/3103481376472441_2.jpg"},
+  "3435442": { "song_id":"3435442", "title":"dreams be", "album_id":"310348", "album_name":"ツキアカリ", "artist":"Rie fu", "location":"http://stream15.qqmusic.qq.com/30413593.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/3103481376472441_2.jpg"},
   "367453": { "song_id":"367453", "title":"I Wanna Go To A Place...", "album_id":"31328", "album_name":"I Wanna Go To A Place...", "artist":"Rie fu", "location":"http://stream14.qqmusic.qq.com/30114585.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/313281376474242_2.jpg"},
   "367454": { "song_id":"367454", "title":"They Always Talk About", "album_id":"31328", "album_name":"I Wanna Go To A Place...", "artist":"Rie fu", "location":"http://stream15.qqmusic.qq.com/30114586.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/313281376474242_2.jpg"},
   "367455": { "song_id":"367455", "title":"I So Wanted (English Version)", "album_id":"31328", "album_name":"I Wanna Go To A Place...", "artist":"Rie fu", "location":"http://stream16.qqmusic.qq.com/30114587.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/313281376474242_2.jpg"},
