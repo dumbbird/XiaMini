@@ -4,8 +4,10 @@
   "a30963": [{ "song_id":"364209", "title":"長い間", "cd": "1", "index": "01"},
 		{ "song_id":"364211", "title":"未来へ", "cd": "1", "index": "03"},
 		{ "song_id":"364215", "title":"3人の写真", "cd": "1", "index": "07"}],
-
-  "3435441": { "song_id":"3435441", "title":"ツキアカリ", "album_id":"310348", "album_name":"ツキアカリ", "artist":"Rie fu", "location":"http://stream18.qqmusic.qq.com/30413566.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/3103481376472441_2.jpg"},
+		
+  "1768979601": { "song_id":"1768979601", "title":"砂塵の彼方へ・・・", "album_id":"335965", "album_name":"Dream Port", "artist":"Revo / 梶浦由記", "location":"http://stream14.qqmusic.qq.com/134868274.mp3", "pic":"http://img.xiami.net/images/album/img0/3359651246851946_2.jpg"},
+  "1768979602": { "song_id":"1768979602", "title":"sand dream", "album_id":"335965", "album_name":"Dream Port", "artist":"Revo / 梶浦由記", "location":"http://stream14.qqmusic.qq.com/134868273.mp3", "pic":"http://img.xiami.net/images/album/img0/3359651246851946_2.jpg"},
+    "3435441": { "song_id":"3435441", "title":"ツキアカリ", "album_id":"310348", "album_name":"ツキアカリ", "artist":"Rie fu", "location":"http://stream18.qqmusic.qq.com/30413566.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/3103481376472441_2.jpg"},
   "3435442": { "song_id":"3435442", "title":"dreams be", "album_id":"310348", "album_name":"ツキアカリ", "artist":"Rie fu", "location":"http://stream15.qqmusic.qq.com/30413593.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/3103481376472441_2.jpg"},
   "367453": { "song_id":"367453", "title":"I Wanna Go To A Place...", "album_id":"31328", "album_name":"I Wanna Go To A Place...", "artist":"Rie fu", "location":"http://stream14.qqmusic.qq.com/30114585.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/313281376474242_2.jpg"},
   "367454": { "song_id":"367454", "title":"They Always Talk About", "album_id":"31328", "album_name":"I Wanna Go To A Place...", "artist":"Rie fu", "location":"http://stream15.qqmusic.qq.com/30114586.mp3", "pic":"http://img.xiami.net/images/album/img51/6951/313281376474242_2.jpg"},
