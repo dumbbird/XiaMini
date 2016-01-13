@@ -4,7 +4,7 @@
   "a30963": [{ "song_id":"364209", "title":"長い間", "cd": "1", "index": "01"},
 		{ "song_id":"364211", "title":"未来へ", "cd": "1", "index": "03"},
 		{ "song_id":"364215", "title":"3人の写真", "cd": "1", "index": "07"}],
-  "a552967": [{ "song_id": "1771420844", "title":"名前のない怪物", "cd":"1", "index":"07"}],
+  "a552967": [{ "song_id": "1771420844", "title":"名前のない怪物", "cd":"1", "index":"02"}],
   
   "1771420844": { "song_id":"1771420844", "title":"名前のない怪物", "album_id":"552967", "album_name":"名前のない怪物", "artist":"EGOIST", "location":"http://stream18.qqmusic.qq.com/32548871.mp3", "pic":"http://img.xiami.net/images/album/img13/98813/5529671404699875_2.jpg"},
   "1771420843": { "song_id":"1771420843", "title":"prelude", "album_id":"552967", "album_name":"名前のない怪物", "artist":"EGOIST", "location":"http://stream18.qqmusic.qq.com/32548870.mp3", "pic":"http://img.xiami.net/images/album/img13/98813/5529671404699875_2.jpg"},
