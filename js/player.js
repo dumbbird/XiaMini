@@ -250,9 +250,13 @@ KISSY.add('utils/index/global',['node','page/mods/page'], function(S, require, e
             return sValue.join(",");
         },
         syncCheck : function(elem, name) {
+			console.log(elem);
             var traget = $(elem);
             var flag = traget.prop("checked");
             $("input[name=" + name + "]:enabled").prop("checked", flag);
+        },
+		selectAll : function(name) {
+			$("input[name=" + name + "]:enabled").prop("checked", true);
         },
         inverse : ( function() {
                 var inverseObj = {};
@@ -1756,66 +1760,127 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             var self = this;
             self.set("songId", sid);
             self.clearLyric();
-            if (status) {
-				if (text.indexOf("<br") != -1) {
-					text = text.replace(/\n/g, "");				// dumbbirdedit
-					//alert(text);
-					text = text.replace(/\<br \/\>/g, "\n");	// dumbbirdedit
-					//alert(text);
-				}
-				self.lyricLoadComplete(text);
-            } else {
-                self.noLyric();
-            }
+			
+			// dumbbirdedit
 			
 			// by @dumbbird, inspired by @哀
 			//alert("render/reset");
 			rendertxt = function (){
-				function xhr(u, m, a, d, c) {
-					var xmlhttp,
-					S_Result;
-					var url = u || '';
-					var method = m || 'get';
-					var async = a || 0;
-					var postdata = d || '';
-					xmlhttp = new XMLHttpRequest;
-					xmlhttp.onreadystatechange = callback;
-					xmlhttp.open(method, url, async);
-					xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-					xmlhttp.send(postdata);
-					function callback() {
-						if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-							S_Result = xmlhttp.responseText;
-							if (c) {
-								c.call(this, S_Result);
-							} //异步方式使用回调函数处理
-						}
-					}
-					return S_Result; //同步方式可以取得返回值
-				}
 				var lyrictxt = "";
-				xhr("http://www.xiami.com/radio/lyric/sid/"+sid, 'get', 1, "",function(ResultsHtml){
-					//alert(ResultsHtml);
-					lyrictxt = ResultsHtml.replace(/\n/g, "");
-					//alert(lyrictxt);
-					lyrictxt = lyrictxt.replace(/\<br \/\>/g, "\n");
-					//alert(lyrictxt);
-					if (lyrictxt)
-						self.lyricLoadComplete(lyrictxt);
-					else
-						self.noLyric();
-				});					
+				new IO({
+					url: "http://www.xiami.com/radio/lyric/sid/"+sid,
+					dataType: 'text',
+					success: function(ResultsHtml) {
+						//alert(ResultsHtml);
+						lyrictxt = ResultsHtml.replace(/\n/g, "");
+						//alert(lyrictxt);
+						lyrictxt = lyrictxt.replace(/\<br \/\>/g, "\n");
+						//alert(lyrictxt);
+						if (lyrictxt)
+							self.lyricLoadComplete(lyrictxt);
+						else
+							self.noLyric();
+					}	
+				});
 			}
-			resetlrc = function (){
-				if (status) {					
+			rendercomment = function (){
+				if (!S.one('#J_walllist')) 
+					S.one('#J_lrcWrap').append('<div class="ui-player-lrc" id="J_walllist"><div class="ks-scroll-view" id="J_walllistView"></div></div>');
+				new IO({
+					url: 'http://www.xiami.com/song/' + +sid,
+					dataType: "text",
+					async: false,
+					success: function(responres){
+						//alert(responres);
+						var div = document.createElement('div');
+						div.id = 'temp_cmt';
+						div.setAttribute('style', 'display:none');
+						div.innerHTML = responres;
+						document.body.appendChild(div);
+						var comments = '<div class="ks-scroll-view-content">';
+						var commentList = S.all(".post_item")
+						var author, posttime, content;
+						commentList.each(function (commentNode) {
+							author = commentNode.one('.author').text();
+							posttime = commentNode.one('.time').text();
+							content = commentNode.one('.brief').text();
+							
+							//alert(author+"\n"+content);
+							comments += '<div class="cmt_item"><div class="info"> <span class="author">';
+							comments += author + '</span>';
+							comments += '<span class="time">' + posttime + '</span>';
+							comments += '</div>';
+							
+							comments += '<div class="brief">' + content + '</div>';
+							comments += '</div>';
+						});
+						comments += '</div>';
+						//alert(comments);
+						
+						S.one('#J_walllistView').html(comments);
+						self.scrollView = ScrollViewManage.forceRender("J_walllistView");
+						
+						div.parentNode.removeChild(div);										
+					}
+				});
+			
+			}
+			
+			resetlrc = function (){				
+				var wikilrc = "";				
+				if (document.getElementById("wikilrc") != null)
+					wikilrc = $('#wikilrc').text();
+				//alert(wikilrc);
+				if (wikilrc != "") {
+					self.lyricLoadComplete(wikilrc);
+				}
+				else if (status) {								
 					self.lyricLoadComplete(text);
 					//alert(text);
 					//document.getElementsByTagName("ui-lrc-line ui-lrc-current")[0].removeClass("ui-lrc-current");
 				} else {
 					self.noLyric();
 				}
+				setTimeout(function (){	
+					self.scrollView = ScrollViewManage.render("J_tracksScrollView");
+				}, 1000);
 			}
-        },
+			
+			//alert(status + text);
+			if (text.indexOf("<br") != -1) {
+				text = text.replace(/\n/g, "");				// dumbbirdedit
+				//alert(text);
+				text = text.replace(/\<br \/\>/g, "\n");	// dumbbirdedit
+				//alert(text);
+			}
+			
+			if (status) {
+				self.lyricLoadComplete(text);				
+			} else {
+				self.noLyric();
+				return 0;
+			}
+			
+			// var wikilrc = "";			
+			// function setwiki() {				
+				// if (!document.getElementById('wikilrc'))
+					// ; 
+				// else wikilrc = $('#wikilrc').text();
+				// //alert(wikilrc);
+				// if (wikilrc != "")
+					// self.lyricLoadComplete(wikilrc);
+				// else if (status) {
+					// self.lyricLoadComplete(text);				
+				// } else {
+					// self.noLyric();
+					// return 0;
+				// }
+				// return 1;
+			// }
+			// window.setTimeout(setwiki,500);
+			
+			
+		},
         /**
          * 歌词加载完成
          * @param {String} value
@@ -3521,7 +3586,7 @@ KISSY.add('page/mods/player/player-tracks',['node', 'base', 'anim', 'xtemplate',
             for (var i = 0, max = arr.length; i < max; i++) {
                 result.push('<a href="http://www.xiami.com/search/find/artist/' + arr[i] + '" target="_blank" title="' + arr[i] + '">' + arr[i] + '</a>');
             }
-            return result.join(" ; ");
+            return result.join(" / ");	// dumbbirdedit
         }
     };
 
@@ -6947,7 +7012,7 @@ KISSY.add('page/mods/player/player-cover',['io', 'xtemplate', 'event', 'node'], 
  * @fileOverview 数据请求管理中心
  * @author noyobo<nongyoubao@alibaba-inc.com>
  */
-KISSY.add('page/mods/data/center',['io', 'base'], function(S, require) {
+KISSY.add('page/mods/data/center',['io', 'base'], function(S, require, exports) {
     var IO = require('io'),
         Base = require('base');
 
@@ -6979,14 +7044,30 @@ KISSY.add('page/mods/data/center',['io', 'base'], function(S, require) {
                         self.set('uid', responres.data.uid);
                         self.set('vip', responres.data.vip);
                         self.set('vipRole', responres.data.vip_role);
-                        //alert(url);
+                        console.log(url);
 						var list = {};	// van
 						if (document.getElementById('mp3list'))
 							list = JSON.parse(document.getElementById('mp3list').innerHTML);
-						var addsongids = unescape(url.match(/\d{2,}[%2C\d{2,}]*/));
-						addsongids = addsongids.split(',');
+						
+						var addsongids = "";
+						if (!/\/type\//.test(url) && !/\/playlist-default/.test(url)) {
+							addsongids = unescape(url.match(/\d{2,}[%2C\d{2,}]*/));
+							addsongids = addsongids.split(',');
+						}
+						console.log(addsongids);
 						var templist = [];
-						if (!responres.data.trackList) {
+						var entranceMsg = "不好意思您好像没买虫洞穿越的门票呢，请收藏虫洞穿越精选集获得门票，然后重新打开播放器凭票入场哦！";
+						var hqwhMsg = "虫洞穿越温馨提示：您现在是普通音质模式，只能四维穿越，但您请求的一些虫洞穿越目标存在于五维空间，建议开一下VIP高音质开关然后重试。";
+						
+						if (!responres.data.trackList) {	// all songs wormhole parsing
+							if (!Object.keys(list).length) {
+								alert(entranceMsg);
+								window.open("http://www.xiami.com/collect/552436");
+								return false;	// wormhole entrance
+							}
+							var list_5d;
+							var title_5d, artist_5d, album_5d = '', image_5d = '';
+							var albumid_5d = '#';
 							for (x in addsongids) {
 								if (list[addsongids[x]]) {
 									list[addsongids[x]]['insert_type'] = '3';
@@ -6996,31 +7077,162 @@ KISSY.add('page/mods/data/center',['io', 'base'], function(S, require) {
 									list[addsongids[x]]['location'] = list[addsongids[x]]['location'].replace(/amp\;/g, "");
 									
 									templist.push(list[addsongids[x]]);
+								} else {
+									console.log(responres.data.hqset);
+									if(responres.data.hqset == 0) {
+										alert(hqwhMsg);
+										break;
+									}
+									var trackitem = S.one(".ui-row-item-column[data-id='" + addsongids[x] + "']");
+									if (trackitem) {
+										title_5d = S.trim(trackitem.text());
+										artist_5d = S.trim(trackitem.next().text());
+										artist_5d = artist_5d.replace(/\n/g, "").replace(/	/g, "");
+										try {
+											albumid_5d = trackitem.next().next().attr("data-album-id");
+											//console.log(albumid_5d);
+										} catch (err) {
+											albumid_5d = "#";
+										}
+										if (typeof(albumid_5d) != "undefined")
+											album_5d = S.trim(trackitem.next().next().text());
+																					
+										image_5d = "http://img.xiami.net/images/collect/436/36/552436_1453653155_tsx8.jpg";
+										console.log(title_5d + artist_5d + album_5d);
+									} else {
+										new IO({
+											url: self.host + '/song/' + addsongids[x],
+											dataType: "text",
+											async: false,
+											success: function(responres){
+												//alert(responres);
+												var div = document.createElement('div');
+												div.id = 'temp_5d';
+												div.setAttribute('style', 'display:none');
+												div.innerHTML = responres;
+												document.body.appendChild(div);
+												title_5d = S.one("meta[property='og:title']").attr("content");
+												artist_5d = S.one("meta[property='og:music:artist']").attr("content");
+												album_5d = S.one("meta[property='og:music:album']").attr("content");
+												image_5d = S.one("meta[property='og:image']").attr("content");
+												//alert(title_5d);
+												div.parentNode.removeChild(div);											
+											}
+										});
+									}
+									var json_buffer = '{"' + addsongids[x] + '": { "song_id":"' + addsongids[x] + '", "title":"' + title_5d + '", "album_id":"' + albumid_5d + '", "album_name":"' + album_5d + '", "artist":"' + artist_5d + '", "location":"http://m5.file.xiami.com/614/1298250614/1699635048/1773101841_14855742_l.mp3?auth_key=e105d2feca34d3e210403866f1a6cff1-1453766400-0-null", "pic":"' + image_5d + '"}}';
+									//alert(json_buffer);
+									list_5d = JSON.parse(json_buffer);
+									list_5d[addsongids[x]]['insert_type'] = '3';
+									list_5d[addsongids[x]]['grade'] = -2;
+									list_5d[addsongids[x]]['artist_url'] = 'http://www.xiami.com/search/find/artist/'+list_5d[addsongids[x]]['artist'];
+									list_5d[addsongids[x]]['lyric'] = 'http://www.xiami.com/radio/lyric/sid/'+list_5d[addsongids[x]]['song_id'];
+									list_5d[addsongids[x]]['location'] = list_5d[addsongids[x]]['location'].replace(/amp\;/g, "");
+								
+									templist.push(list_5d[addsongids[x]]);
+									
 								}
 							}
 							if (templist.length > 0)
 								self.set('trackList', templist);
 							else self.set('trackList', responres.data.trackList);
-						} else {
+						} 
+						else {								// default and mix
 							if (responres.data.trackList.length == addsongids.length) {
 								self.set('trackList', responres.data.trackList);
-							} else {
-								templist = responres.data.trackList;
+							} 
+							else {
+								// part of wormholes, part of non-wormholes
+								if (!Object.keys(list).length) {
+									alert(entranceMsg);
+									window.open("http://www.xiami.com/collect/552436");
+									return false;	// wormhole entrance
+								}
+								var list_5d;
+								var title_5d, artist_5d, album_5d = '', image_5d = '';
+								var albumid_5d = '#';
+								templist = responres.data.trackList;	// create mix list
 								var oldIDs = {};
+								var count_5d = 0;
 								for (x in templist) {
-									oldIDs[templist[x].song_id] = 'ok';
+									oldIDs[templist[x].song_id] = 'ok';	// mark default songids
 								}
 								for (x in addsongids) {
 									if (!oldIDs[addsongids[x]]) {
+										// check if needs wormhole
 										if (list[addsongids[x]]) {
+											// 4d wormholes
 											list[addsongids[x]]['insert_type'] = '3';
 											list[addsongids[x]]['grade'] = -2;
 											list[addsongids[x]]['artist_url'] = 'http://www.xiami.com/search/find/artist/'+list[addsongids[x]]['artist'];
 											list[addsongids[x]]['lyric'] = 'http://www.xiami.com/radio/lyric/sid/'+list[addsongids[x]]['song_id'];
+											list[addsongids[x]]['location'] = list[addsongids[x]]['location'].replace(/amp\;/g, "");
+											
 											templist.push(list[addsongids[x]]);
+										} 
+										else {
+											// 5d wormholes
+											console.log(responres.data.hqset);
+											console.log(addsongids[x]);
+											if(responres.data.hqset == 0) {
+												count_5d++;
+												continue;
+											}
+											var trackitem = S.one(".ui-row-item-column[data-id='" + addsongids[x] + "']");
+											if (trackitem) {
+												// within player
+												title_5d = S.trim(trackitem.text());
+												artist_5d = S.trim(trackitem.next().text());
+												artist_5d = artist_5d.replace(/\n/g, "").replace(/	/g, "");
+												try {
+													albumid_5d = trackitem.next().next().attr("data-album-id");
+													//console.log(albumid_5d);
+												} catch (err) {
+													albumid_5d = "#";
+												}
+												if (typeof(albumid_5d) != "undefined")
+													album_5d = S.trim(trackitem.next().next().text());
+												image_5d = "http://img.xiami.net/images/collect/436/36/552436_1453653155_tsx8.jpg";
+												console.log(title_5d + artist_5d + album_5d);
+											} 
+											else {
+												// outside player
+												// new IO({
+													// url: self.host + '/song/' + addsongids[x],
+													// dataType: "text",
+													// async: false,
+													// success: function(responres){
+														// //alert(responres);
+														// var div = document.createElement('div');
+														// div.id = 'temp_5d';
+														// div.setAttribute('style', 'display:none');
+														// div.innerHTML = responres;
+														// document.body.appendChild(div);
+														// title_5d = S.one("meta[property='og:title']").attr("content");
+														// artist_5d = S.one("meta[property='og:music:artist']").attr("content");
+														// album_5d = S.one("meta[property='og:music:album']").attr("content");
+														// image_5d = S.one("meta[property='og:image']").attr("content");
+														// //alert(title_5d);
+														// div.parentNode.removeChild(div);											
+													// }
+												// });
+											}
+											var json_buffer = '{"' + addsongids[x] + '": { "song_id":"' + addsongids[x] + '", "title":"' + title_5d + '", "album_id":"' + albumid_5d + '", "album_name":"' + album_5d + '", "artist":"' + artist_5d + '", "location":"http://m5.file.xiami.com/614/1298250614/1699635048/1773101841_14855742_l.mp3?auth_key=e105d2feca34d3e210403866f1a6cff1-1453766400-0-null", "pic":"' + image_5d + '"}}';
+											//alert(json_buffer);
+											list_5d = JSON.parse(json_buffer);
+											list_5d[addsongids[x]]['insert_type'] = '3';
+											list_5d[addsongids[x]]['grade'] = -2;
+											list_5d[addsongids[x]]['artist_url'] = 'http://www.xiami.com/search/find/artist/'+list_5d[addsongids[x]]['artist'];
+											list_5d[addsongids[x]]['lyric'] = 'http://www.xiami.com/radio/lyric/sid/'+list_5d[addsongids[x]]['song_id'];
+											list_5d[addsongids[x]]['location'] = list_5d[addsongids[x]]['location'].replace(/amp\;/g, "");
+										
+											templist.push(list_5d[addsongids[x]]);										
 										}
 									}									
 								}
+								if (count_5d)
+									alert("虫洞穿越温馨提示：您现在是普通音质模式，只能四维穿越，但有 " + count_5d + " 个虫洞穿越目标存在于五维空间，建议开启VIP高音质模式重试。");
+								
 								self.set('trackList', templist);
 							}
 						}
@@ -7436,7 +7648,7 @@ KISSY.add('utils/goldlog/index',function(S) {
  * @author noyobo
  * @mail nongyoubao@alibaba-inc.com
  */
-KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate', './player/player-swfobj', './player/player-lrc', './player/player-sale', './player/player-lister', './player/player-volume', './player/player-panel', './player/player-control', './player/player-tracks', './player/player-blur', './player/player-data', './player/player-menu', './player/player-roam', './player/player-log', './player/player-drag', './player/player-cover', './data/center', './xtpl/trackInfo-xtpl', 'widget/tool/index', 'utils/tip/index', './user', 'utils/goldlog/index'], function(S, require, exports, module) {
+KISSY.add('page/mods/player',['./page', /*van edit*/'node', 'base', 'json', 'event', 'io', 'xtemplate', './player/player-swfobj', './player/player-lrc', './player/player-sale', './player/player-lister', './player/player-volume', './player/player-panel', './player/player-control', './player/player-tracks', './player/player-blur', './player/player-data', './player/player-menu', './player/player-roam', './player/player-log', './player/player-drag', './player/player-cover', './data/center', './xtpl/trackInfo-xtpl', 'widget/tool/index', 'utils/tip/index', './user', 'utils/goldlog/index'], function(S, require, exports, module) {
     // @formatter:off
     var Node = require("node"),
         Base = require("base"),
@@ -7595,6 +7807,21 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
                 }
             };
 			
+			// dumbbirdedit
+			var tc = document.getElementById('trackchange');
+			if (!tc) {
+				tc = document.createElement("div");
+				tc.id = "trackchange";
+				document.head.appendChild(tc); 			
+			}
+		
+			tc.setAttribute("songid", track.songId);
+			tc.setAttribute("songtitle", track.song);
+			tc.setAttribute("artist", track.artist);
+			tc.click();
+			
+			//alert("click done");
+			
             var html = self.tpl_trackInfo.render(data);			
             self.Track_info.html(html);
 			
@@ -7649,9 +7876,11 @@ KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate'
 			// Lyrics & Wormhole Control - van & dumbbirdedit
 			
 			html = '<div id="lyrics_control">';
-			html += '<a id="lrc_fullscreen" title="歌词全屏显示开关">f</a>';
+			html += '<a id="lrc_fullscreen" title="歌词全屏显示开关">l</a>';
 			html += '<a id="lrc_report" title="歌词报错" href="http://www.xiami.com/group/thread-detail/tid/193387" target="_blank">r</a>';
-			html += '<a id="lrc_trans" title="文本歌词" status="txt" style="color:lightgray">s</a>';
+			html += '<a id="lrc_trans" title="文本歌词" status="txt" style="color:lightgray">Z</a>';
+			html += '<a id="lrc_wikia" title="载入维基歌词" status="wiki" style="color:lightgray">k</a>';
+			html += '<a id="comments" title="载入评论" status="disabled" style="color:lightgray">s</a>';
 			html += '</div>';
 			if ($('#lyrics_control').length == 0)
 				$('#J_lrcWrap').append(html);
@@ -8345,28 +8574,28 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                     config3.params = params4;
                     config3.fn = function (scope) {
                         var buffer = "";
-                        buffer += '\n<div class="ui-row-item ui-track-item ui-track-disabled" data-sid="';
+                        buffer += '\n<div class="ui-row-item ui-track-item" data-sid="';	//dumbbirdedit
                         var id6 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 4);
                         buffer += renderOutputUtil(id6, true);
                         buffer += '" data-type="fav" id="J_favList';
                         var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 4);
                         buffer += renderOutputUtil(id7, true);
-                        buffer += '">\n<div class="ui-track-main">\n\t<div class="ui-track-checkbox">\n\t\t<input type="checkbox" disabled="disabled" class="ui-track-item-id" name="fav" id="J_track';
+                        buffer += '">\n<div class="ui-track-main">\n\t<div class="ui-track-checkbox">\n\t\t<input type="checkbox" class="ui-track-item-id" name="fav" id="J_track';	//dumbbirdedit
                         var id8 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 7);
                         buffer += renderOutputUtil(id8, true);
                         buffer += '" value="';
                         var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 7);
                         buffer += renderOutputUtil(id9, true);
-                        buffer += '" disabled="disabled" />\n\t</div>\n\t<div class="ui-track-sort"><i>';
+                        buffer += '" />\n\t</div>\n\t<div class="ui-track-sort"><em>';	// dumbbirdedit
                         var id10 = getPropertyUtil(engine, scope, "xindex", 0, 9);
                         buffer += renderOutputUtil(id10 + (1), true);
-                        buffer += '</i></div>\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1" data-id="';
+                        buffer += '</em></div>\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1" data-id="';	// dumbbirdedit
                         var id11 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 11);
                         buffer += renderOutputUtil(id11, true);
                         buffer += '">';
                         var id12 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_name", 0, 11);
                         buffer += renderOutputUtil(id12, false);
-                        buffer += '&nbsp;&nbsp;<img src="http://gtms03.alicdn.com/tps/i3/T1iS08FvdcXXblKhDf-39-18.png" width="39" height="18" /></div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
+                        buffer += '&nbsp;&nbsp;<img src="http://www.xiami.com/images/group_photo/51/80651/27/1449570516_Nro1_4.png" width="39" height="18" /></div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';	// dumbbirdedit
                         var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 12);
                         buffer += renderOutputUtil(id13, true);
                         buffer += '">\n\t\t';
@@ -8385,7 +8614,7 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                             config17.params = params18;
                             config17.fn = function (scope) {
                                 var buffer = "";
-                                buffer += ' ; ';
+                                buffer += ' / ';
                                 return buffer;
                             };
                             buffer += runBlockCommandUtil(engine, scope, config17, "if", 14);
@@ -8727,9 +8956,9 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                 getPropertyUtil = utils.getProperty,
                 runInlineCommandUtil = utils.runInlineCommand,
                 getPropertyOrRunCommandUtil = utils.getPropertyOrRunCommand;
-            buffer += '<div class="ui-collect-title">\n\t<div class="ui-collect-title-con">\n\t\t<a class="icon-playAllBtn"  title="播放全部" onclick="SEIYA.playcollect(\'';
-            var id0 = getPropertyOrRunCommandUtil(engine, scope, {}, "list_id", 0, 3);
-            buffer += renderOutputUtil(id0, true);
+            buffer += '<div class="ui-collect-title">\n\t<div class="ui-collect-title-con">\n\t\t<a class="icon-playAllBtn"  title="播放全部" onclick="SEIYA.selectAll(\'collect\');SEIYA.playAllSongs(\'collect\', \'collect'; // SEIYA.playcollect(\'';	dumbbirdedit
+            //var id0 = getPropertyOrRunCommandUtil(engine, scope, {}, "list_id", 0, 3);
+            //buffer += renderOutputUtil(id0, true);
             buffer += '\')"></a>\n\t\t<h2>';
             var id1 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 4);
             buffer += renderOutputUtil(id1, false);
@@ -8762,7 +8991,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     config8.params = params9;
                     config8.fn = function (scope) {
                         var buffer = "";
-                        buffer += ' ui-track-disabled';
+                        buffer += ' ';	//dumbbirdedit
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config8, "if", 29);
@@ -8789,7 +9018,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     config16.params = params17;
                     config16.fn = function (scope) {
                         var buffer = "";
-                        buffer += 'disabled="disabled"';
+                        buffer += '';	// dumbbirdedit
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config16, "if", 32);
@@ -8801,10 +9030,10 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     config19.params = params20;
                     config19.fn = function (scope) {
                         var buffer = "";
-                        buffer += '<i>';
+                        buffer += '<em>';	//dumbbirdedit
                         var id22 = getPropertyUtil(engine, scope, "xindex", 0, 34);
                         buffer += renderOutputUtil(id22 + (1), true);
-                        buffer += '</i>';
+                        buffer += '</em>';	//dumbbirdedit
                         return buffer;
                     };
                     config19.inverse = function (scope) {
@@ -8830,7 +9059,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     config26.params = params27;
                     config26.fn = function (scope) {
                         var buffer = "";
-                        buffer += '&nbsp;&nbsp;<img src="http://gtms03.alicdn.com/tps/i3/T1iS08FvdcXXblKhDf-39-18.png" width="39" height="18" />';
+                        buffer += '&nbsp;&nbsp;<img src="http://www.xiami.com/images/group_photo/51/80651/27/1449570516_Nro1_4.png" width="39" height="18" />';	// dumbbirdedit
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config26, "if", 36);
@@ -9396,7 +9625,7 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                         buffer += '">';
                         var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_name", 0, 11);
                         buffer += renderOutputUtil(id13, false);
-                        buffer += '&nbsp;&nbsp;<img src="http://gtms03.alicdn.com/tps/i3/T1iS08FvdcXXblKhDf-39-18.png" width="39" height="18" /></div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
+                        buffer += '&nbsp;&nbsp;<img src="http://www.xiami.com/images/group_photo/51/80651/27/1449570516_Nro1_4.png" width="39" height="18" /></div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';	// dumbbirdedit
                         var id14 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 12);
                         buffer += renderOutputUtil(id14, true);
                         buffer += '">\n\t\t';

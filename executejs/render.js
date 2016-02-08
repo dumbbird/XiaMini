@@ -18,6 +18,7 @@ chrome.storage.sync.get(null, function (data) {
 			switch (data.Mode) {
 				case "default":
 					renderCSS();
+					feedstatus();
 					break;
 				case "collection":
 					renderCSS_Collection();
@@ -27,15 +28,10 @@ chrome.storage.sync.get(null, function (data) {
 					break;
 				}
 		}
+
 		loadGroup();		// render Group icon into header
-		if (/\/album|\/song|\/artist/.test(CurrentUrl))
-			semicolConvert();	// convert ; to /	
-			
-		if (/\/album/.test(CurrentUrl)) {
-			addDiscplay();
-			load_Taobao();		// load music.taobao.com ad
-		}
-		else if (/\/group/.test(CurrentUrl))
+		
+		if (/\/group/.test(CurrentUrl))
 			rm_postTitle();		// remove postTitle length
 		else if (/\/artist/.test(CurrentUrl) && !document.getElementById("artist_mv_block")) 
 			load_MV();
@@ -56,88 +52,14 @@ function loadGroup() {
 		el.className = 'bigtext middle ';
 	el.href = '/group';
 	el.innerHTML = '小组';
-	headEl = document.getElementsByClassName('subnav')[0];
-	headEl.style.width = '320px';
-	headEl.insertBefore(el, headEl.childNodes[3]);
+	var headEl = document.getElementsByClassName("subnav")[0];
+	if (headEl) {
+		headEl.style.width = '320px';
+		headEl.insertBefore(el, headEl.childNodes[3]);
+	}
 	// sale = document.getElementsByClassName['bigtext last'][0];
 	// sale.childNodes[0].style.display = 'none';
 };
-
-function semicolConvert() {
-	var el = $("#albums_info tbody").find("tr").eq(1);
-	if (el.length > 0) {
-		var txt = el.html();
-		if (txt.indexOf(";") != -1) {		
-			//alert(txt);
-			txt = txt.replace(/<\/a>; <a href/g, "</a>/ <a href");
-			el.html(txt);
-		}
-	}
-
-	el = $('#album_song, #track, #relate_song').find('.song_name');
-	for (var i=0; i<el.length; i++) {
-		txt = $(el).eq(i).html();	// 直接获取html
-		
-		if(txt.indexOf(";") != -1){
-			txt = txt.replace(/\&amp;/g, "&");
-			txt = txt.replace(/\&nbsp;/g, " ");
-			txt = txt.replace(/\&quot;/g, "\"");
-			txt = txt.replace(/\&lt;/g, "<");
-			txt = txt.replace(/\&gt;/g, ">");
-
-			// 如果检测到;，就做以下的替换。
-			txt = txt.replace(/;/g, " / ");	
-			//alert(txt);
-			$(el).eq(i).html(txt);		// 将html赋值回去	
-		}
-	}	
-	
-	// if (/\/song/.test(CurrentUrl)) {
-		// el = document.getElementById("share_bar");
-		// if (el) {
-			// el.setAttribute("style", "visibility:hidden")
-		// }
-		// el = $('li.do_share');
-		// if (el.length > 0) {
-			// txt = '<a class="weibo" style="top: 10px; left:125px; position: relative;" title="分享到微博" onclick="return shareWeibo();" href="">';
-			// txt += '<i style="display: inline-block;width: 16px;height: 16px;margin-right: 2px;background: url(\'http://img.xiami.net/static/img/common/share_icon.png\') no-repeat -32px 0;vertical-align: middle;"></i></a>';
-			// txt += '<a class="laiwang" style="top: 10px; left:130px; position: relative;" title="分享到来往" onclick="return shareLaiwang();" href=""><i style="display: inline-block;width: 16px;height: 16px;margin-right: 2px;background: url(\'http://img.xiami.net/static/img/common/share_icon.png\') no-repeat -263px 0;vertical-align: middle;"></i></a>';
-			// el.append(txt);
-		// }
-	// }
-
-}
-
-function addDiscplay() {
-	if ($('#track .mgt10 strong').length <= 1)
-		return;
-	if ($('.discplay').length)
-		return;
-	var discnum = $('#track .mgt10 strong').length;
-	var discplay = '';
-	for(var x=0; x<discnum; x++) {
-		discplay = $('#track .mgt10 strong').eq(x).html();
-		discplay += '<b class="ico_cd ele_inline mah discplay"><a href="javascript:void(0)" title="选中此碟并播放"\
-		onclick="$(\'[name=recommendids]\').attr(\'checked\',false);\
-		$(\'#track .mgt10 table\').eq('+x+').find(\'[name=recommendids]\').attr(\'checked\',true);\
-		playsongs(\'recommendids\');">试听</a></b>';
-		$('#track .mgt10 strong').eq(x).html(discplay);
-	}
-}
-
-
-function load_Taobao() {
-	if (document.getElementById("do_buy"))
-		return;
-	var link = $('#taobao_cd a').attr('href');
-	
-	if (link) {
-		//alert(link);
-		var do_buy = '<li id="do_buy" class="do_buy"><a href="' + link + '" target="_blank" class="wrap" title="去淘宝音乐馆淘碟">';
-		do_buy += '<span><i></i>淘碟</span></a></li>';
-		$('.acts_list').append(do_buy);
-	}
-}
 
 function rm_postTitle() {
 	if (document.getElementById("topicpost"))
@@ -182,6 +104,85 @@ function load_MV() {
 
 }
 
+function feedstatus() {
+	if ( $('#user_extra').length == 0 || $('.f_xiamini').length != 0)
+		return;
+		
+	if ($('#timeline').length == 0) {
+		el = document.createElement("div");
+		el.id = "timeline";
+		el.innerHTML = '<div class="content"><div class="action"><a class="more new" href="/fresh">更多新动态</a></div></div>';
+		var headEl = document.getElementsByClassName("primary")[1];
+		if (headEl) 		
+			headEl.insertBefore(el, headEl.childNodes[5]);
+	}
+	xhr("http://m.xiami.com/web", 'get', 1,"",function(ResultsHtml){
+		var feedlist = $(ResultsHtml).find('.feed_brief');
+		//alert(feedlist.text());
+		var feedstatus = "";
+		var feedhtml, feedevent, feedobj, feedtime;
+		var max = 7;
+		for (i=0; i<max && i<feedlist.length; i++) {
+			var feedhtml = feedlist.eq(i).html();
+			var indexa = feedhtml.split("<a href", 2).join("<a href").length;
+			if (indexa == feedhtml.length) {
+				max++;
+				continue;
+			}
+			feedevent = feedhtml.substring(0, indexa);
+			feedevent = feedevent.replace("&lt;", "");
+			feedevent = feedevent.replace("web/profile/id", "u");
+			//alert(feedevent);
+			var indexb = feedhtml.indexOf("<span class");
+			feedobj = feedhtml.substring(indexa, indexb);
+			feedobj = feedobj.replace("&gt;", "");
+			feedobj = feedobj.replace("web/groupthread/tid/", "g/thread-");
+			feedobj = feedobj.replace("web/album/id", "album");
+			feedobj = feedobj.replace("web/song/id", "song");
+			feedobj = feedobj.replace("web/artist/id", "artist");
+			//alert(feedobj);
+			feedstatus += '<div class="item popup f_xiamini">';
+			feedstatus += '<div class="main"><div class="user"><div class="image"><a href="">';
+			feedstatus += '<img src="http://img.xiami.net/images/group_photo/76/11376/61/1447236710_i4cI_3.png" alt="Xiamini动态"></a></div></div>';
+			
+			feedtime = feedlist.eq(i).find(".feed_time").text();
+			//alert(feedtime);
+			feedstatus += '<div class="info"><p><em style="display: block;">' + feedtime + '</em>';
+			feedstatus += feedevent;			
+			feedstatus += '<strong>' + feedobj + '</strong></p></div></div>';
+			
+			//feedstatus += '<b class="icon toplay" onclick="playcollect(15153046);" style="display: none;"></b></p></div></div>';
+			//feedstatus += '<div class="extra" style="display: none;"><b class="triangle"><i>◆</i>◆</b><div class="container"><p class="loading"></p></div>';
+			feedstatus += '</div>';
+		
+		}
+		
+		$('#timeline .content .item').attr('style', 'display:none');
+		$('#timeline .content .loading').remove();
+		$('#recommend_room').attr('style', 'display:none');
+		$(feedstatus).insertBefore('#timeline .content .action');
+	});
+}
+
+function feed320K() {
+	if ($('#personalnav').length == 0)
+		return;
+	var feed320K = '<span id="feed320k" class="tag" data-tab="/tag/合格320K"><a href="" onclick="return false;">320K专门店</a></span>';
+	// var css = '<style type="text/css"> #personalnav .320k {float: right;}'
+				// + '#personalnav .320k a {'
+				// + 'height: 42px; padding: 0 20px; line-height: 42px; font-size: 14px;'
+				// + '}</style>';
+	//$('head').append(css);
+	$('#feed320k').click(function (){
+		xhr("http://www.xiami.com/space/lib-album/u/4275776", 'get', 1,"",function(ResultsHtml){
+			var albumlist = $('.album_item100_thread');
+			alert(albumlist.length);
+		});
+	});
+	
+	$('#personalnav .content').append(feed320K);
+}
+
 function rm_guess() {
 	if (document.getElementById("artist_recommend"))
 		$("#artist_recommend").attr("style", "display:none");
@@ -203,7 +204,7 @@ function loadMini(id,css) {
 	var el = document.createElement("link");
 	el.id = id;
 	el.rel = 'stylesheet';
-	el.href = chrome.extension.getURL(css);
+	el.href = chrome.extension.getURL("css/"+css);
 	headEl = document.getElementsByTagName("head")[0];
 	headEl.appendChild(el);
 }

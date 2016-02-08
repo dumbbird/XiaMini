@@ -33,9 +33,7 @@
   "web_accessible_resources": [
     "css/*", "executejs/*",
     "database/wormhole.json", 
-    "database/classical-schema.xml", 
-    "js/player.js", 
-    "adminjs/xiami.js", "adminjs/qqplayer.js", "adminjs/app.js", "adminjs/albumedit.js"
+    "js/player.js"
   ]
 }
 

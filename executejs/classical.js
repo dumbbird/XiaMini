@@ -1,6 +1,7 @@
 ﻿// 古典专辑曲目列表优化
 // 古典曲目标题显示优化
 // 建立古典作曲家作品列表
+// semi column convert
 // 版本号：1.10.4
 
 // title rearrange
@@ -14,7 +15,14 @@ function Re_title3(ti){ //中断类
 	ti = ti.toLowerCase();
 	return ti;
 }
-	
+
+// function LinkedList() {}
+// LinkedList.prototype = {
+  // length: 0,
+  // first: null,
+  // last: null
+// };
+
 // rearrange classical music tracklist
 var clTracklistArr = function() {
 
@@ -35,6 +43,9 @@ var clTracklistArr = function() {
 	var workTitles = new Array();		// 存放古典作品标题，一般会下属多个tracks
 	var sectionTitles = new Array();	// 存放古典作品乐章标题，一般每一乐章一个track
 	var workTrackIndex = new Array();	// 记录古典专辑中每一组作品的第一乐章的track number
+	var WTI = {};		
+	WTI.array = []; 					// 记录精简合并后的古典专辑中每一组作品的第一乐章的track number
+	WTI.various = [];
 	
 	var trackLists = $('#track').find('.track_list');
 	var buffer, index;					// 临时存放数据之用
@@ -44,6 +55,8 @@ var clTracklistArr = function() {
 		workTitles = [];
 		sectionTitles = [];
 		workTrackIndex = [];
+		WTI.array = []; 
+		WTI.various = [];
 		workTrackIndex.push(1);				// 从track1开始记录
 		
 		trackTitles = trackLists.eq(k).find('.song_name a:first-child');
@@ -66,10 +79,31 @@ var clTracklistArr = function() {
 		var tracks = trackLists.eq(k).find('tr');
 
 		var new_html = '';
-		var j = 0;
+		var j;
+		var flag = 0;
+		for (j=0; j<workTrackIndex.length; j++) {
+			if (flag && j==workTrackIndex.length-1)
+				;
+			else {
+				flag = 0;
+				WTI.array.push(workTrackIndex[j]);
+			}
+			while ( workTrackIndex[j+1] == (workTrackIndex[j]+1) && workTrackIndex[j+2] == (workTrackIndex[j]+2)) {
+				flag = 1;
+				j++;
+			}
+			if (flag)
+				WTI.various.push(true);
+			else
+				WTI.various.push(false);
+		}
+		// alert(WTI.array);
+		// alert(WTI.various);
+		
+		j = flag = 0;
 		var html_a,	// 存放chkbox, trackid的html 
 			html_b;	// 存放song_hot, song_hot_bar, song_act的html
-		var songtitle_html, replacee;
+		var songtitle_html, replacee, workTitle;
 		for (i=0; i<tracks.length; i++) {
 			buffer = tracks.eq(i).html();
 			
@@ -77,35 +111,46 @@ var clTracklistArr = function() {
 			html_a = buffer.substring(0, index);
 			index = buffer.indexOf('<td class="song_hot">');
 			html_b = buffer.substring(index);
-
-			songtitle_html = tracks.eq(i).find('.song_name').html();
-			if (songtitle_html.indexOf(' - ') != -1) {
-				replacee = Re_title4(workTitles[i]+' - ');								
-			}
-			else {
-				index = workTitles[i].indexOf(": ");
-				if (index != -1) {
-					replacee = Re_title4(workTitles[i].substring(0, index+2));					
-				}
-				// if no sectiontitles, use the worktitle as songtitle, but get rid of composer
-			}
-			songtitle_html = songtitle_html.replace(replacee, "");
 			
-			if ((i+1) == workTrackIndex[j]) {
+			// build worktitle
+			if ( j != WTI.array.length && (i+1) == WTI.array[j] ) {
+				
+				if ( WTI.various[j] ) {
+					workTitle = "Various";
+					flag = 1;
+				}
+				else {
+					workTitle = workTitles[i];
+					flag = 0;
+				}
+				
 				if (i > 0)
 					new_html += '</tbody>';
 				new_html += '<tbody><tr class="same_group group_first">';	
 				new_html += '<td class="work_expand" style="width:20px"><a href="javascript:;" class="slide_up" title="展开并勾选该作品的所有乐章"></a></td>'
 				new_html += '<td class="trackid">' + IndexToColumn(j+1) + '</td>' + '<td class="song_name" colspan="4">'
-					+ '<h3 class="work_title">' + workTitles[i] + '</h3>' + '</td>';
+					+ '<h3 class="work_title">' + workTitle + '</h3>' + '</td>';
 				new_html += '</tr></tbody>';
 				new_html += '<tbody class="same_song_group">';
+				
 				j++;
 			}
+			
+			songtitle_html = tracks.eq(i).find('.song_name').html();
+			if (!flag && songtitle_html.indexOf(' - ') != -1) {
+				replacee = Re_title4(workTitles[i]+' - ');								
+			} else {
+				index = workTitles[i].indexOf(": ");
+				if (index != -1) 
+					replacee = Re_title4(workTitles[i].substring(0, index+2));				
+					// if no sectiontitles, use the worktitle as songtitle, but get rid of composer
+			}
+			songtitle_html = songtitle_html.replace(replacee, "").replace(" title=\"\">", "title=\""+ trackTitles.eq(i).text() +"\">");
+			//alert(songtitle_html);
+			
 			new_html += '<tr class="same_group" style="height:40px">';
 			new_html += html_a + '<td class="song_name">' + songtitle_html + '</td>' + html_b;
 			new_html += '</tr>';		
-			
 		}
 		new_html += '</tbody>';
 		//alert (new_html);
@@ -205,7 +250,7 @@ var clTitArr = function () {
 		work_html += '</tr>';
 	$('#albums_info tbody tr:first').before(work_html);
 	return;
-}
+};
 
 var loadWorklist = function(xurl) {
 	var work_xml = xhr(chrome.extension.getURL(xurl), 'get', 0);
@@ -250,7 +295,8 @@ var loadWorklist = function(xurl) {
 	worklist_html += '<div class="acts"><a title="展开全部作品" href="/artist/top/id/97714" class="more">全部作品</a></div>';
 	//alert(worklist_html);	
 	$("#artist_trends").before(worklist_html);
-}
+};
+
 
 var CurrentUrl = window.location.href;
 CurrentUrl = CurrentUrl.split("?")[0].split("#")[0];
@@ -275,5 +321,5 @@ if (CurrentUrl.indexOf("xiami.com/artist/") != -1) {
 	var id = CurrentUrl.substring(index+1);
 	var xml_url = "classical-schema.xml";
 	//alert(xml_url);
-	loadWorklist(xml_url);
+	//loadWorklist(xml_url);
 }

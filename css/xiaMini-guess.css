@@ -16,14 +16,15 @@ font-style: normal;}
 #albums, 
 #collects,
 #pr_ad,
-#task,
-#pyramid,
+/*#task,
+#pyramid,*/
 #friend,
 /*#scene,*/
 #hsy,
 #hot_room,
+#listenMod,
 #sidebutton,
-#group,
+/*#group,*/
 .primary #report,
 #charts .extra,
 .athena-main-panel,
@@ -47,13 +48,17 @@ font-style: normal;}
 #timeline .action .new {border-color:#f60 !important; background-color:#f60 !important;}
 #timeline .action .new:hover{background-color:#f60 !important;}
 /*.primary .account a sup {background-color:#3399FF !important; border-color:white !important;}*/
+/*
+.listen-mod .item-cover .img {height: 120px !important}
+.listen-mod img {float:right; margin-right: 20px}
+.listen-mod .item-cover {padding-bottom: 20px}
+#group, #listenMod {margin-top:10px !important}
+#album {margin-top:30px !important}
+*/
+/* album and single page */
 
-
-/* //////////////////////// album and single page ////////////////// */
-#nav,
 .adm_block.mgt20,
 #song_fans_block,
-#song_tags_block,
 #hot_events_show,
 #artist_fangroup_block,
 #artist_recommend
@@ -63,16 +68,17 @@ li.do_share span {display:none}
 
 #main_wrapper {margin-left: 30px !important;}
 #wrapper div#title {padding: 20px 0 10px 30px !important;}
+.lrc_main {font-family: "Consolas", monospace;} /*Courier New*/
 
-/* ///////////////////////// album page ////////////////////// */
-#album_info {min-height: 250px !important;}
-#album_rank {float: left !important;}
-#album_info table {float:right !important; width: 250px; padding: 5px !important }
-#album_info ul {float:left !important; padding: 10px !important}
-#album_cover p.grade {margin: -45px 0 0 250px !important; z-index:2 !important; position: relative; overflow: auto !important}
-
-td.song_name {width: 300px !important; word-break: break-word !important}
-#lrc {font-family: "Courier New"}
+.icon.mv {
+	background:url(http://www.xiami.com/images/group_photo/51/80651/27/1449205355_qINF.png) no-repeat !important;
+	width: 30px;
+	height: 14px;
+	text-indent:-9999px;
+	font: inherit !important;
+	border-radius: inherit !important;
+	margin-left: 3px;
+}
 
 /* Single Page Case 1 */
 #song_block .album_relation 
@@ -102,6 +108,7 @@ top: 370px !important;
 right: 10px !important}
 
 #relate_song,
+#song_tags_block,
 #album_song,
 #trans_list
 {position: relative; top:300px !important}
@@ -109,15 +116,18 @@ right: 10px !important}
 
 
 /* ////////////////////////// player /////////////////// */
-#J_mainWrap {padding-left: 220px; padding-right: 350px}
-.ui-album-cover {position:fixed; top: 250px; left: -22px}
+
+#J_mainWrap {padding-left: 250px; padding-right: 350px}
+.main-sidebar, .collect-list {width:220px !important}
+.ui-album-cover {position:fixed; left: -5px}
 .ui-album-sale {position:fixed !important; bottom: 130px !important; left: 10px !important}
-#J_collectScrollView .ks-scrollbar {visibility: hidden} 
-.main-outher {width: 350px ; padding-right: 5px !important}
-.menu-outer {border-bottom: 0px !important}
+/*.collect-list, #J_collectScrollView .ks-scrollbar {visibility: hidden} */
+.collect-list {top:390px !important}
+.main-outher {width: 340px ; padding-right: 5px !important}
+.menu-outer {border-top: 1px solid #ccc; margin-top:220px}
 .seiya-chatroom {min-width:30px !important; right:350px !important}
 .seiya-chatroom .col-main {right: 0px !important}
-.ui-player-lrc {top: 50px !important; width: 350px }
+.ui-player-lrc {top: 45px !important; width: 340px }
 /*
 .ui-lrc-line {
 text-align: center;
@@ -188,24 +198,59 @@ background-position: -68px -201px;
 #J_trackMoreMenu {height: 120px !important}
 
 #lyrics_control {
-margin: 10px 0px;
+margin: 5px 0px;
 text-align:center;
-width: 350px;
+width: 100%;
 position: relative;
 }
-#lrc_edit, #lrc_fullscreen, #lrc_report {
-font-family: "iconRegular" !important;
-display: inline-block;
--webkit-font-smoothing: antialiased;
-font-size: 15px;
-color:black; cursor: pointer; margin: 10px; text-decoration: none}
 
-#lrc_trans {
+#lrc_trans {color:#f60;}
+
+#lyrics_control a {
 font-family: "iconRegular" !important;
 display: inline-block;
 -webkit-font-smoothing: antialiased;
 font-size: 15px;
-color:#f60; cursor: pointer; margin: 10px; text-decoration: none}
+color:lightgray; cursor: pointer; margin: 10px; text-decoration: none}
+
+#J_walllist {
+	width: 100%;
+}
+#J_walllistView {	
+	height: 100%;	
+}
+#J_walllist .cmt_item {
+    padding-bottom: 20px;
+	padding-right: 10px;
+	padding-left: 5px;
+    overflow: hidden;
+	border-bottom: 1px #ebebeb solid;
+	background-color: rgba(255,255,255,0.7);
+}
+#J_walllist .cmt_item .info {
+    position: relative;
+    height: 22px;
+    line-height: 22px;
+    padding: 0 5px;
+    font-size: 12px;
+    background: #f5f5f5;
+    border-bottom: 1px #ebebeb solid;
+    border-top: 1px #d9d9d9 solid;
+    overflow: hidden;
+}
+
+.cmt_item .info span {margin-right: 8px}
+
+#J_walllist .cmt_item .brief {
+    font-size: 12px;
+    color: #333;
+    line-height: 1.5;
+    padding: 5px 0 0 2px;
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow: hidden;
+}
+
 /*
 #lrc_trans:hover  {
 font-family: "iconRegular" !important;
@@ -213,7 +258,7 @@ display: inline-block;
 -webkit-font-smoothing: antialiased;
 color:green; cursor: pointer; margin: 10px; text-decoration: none}
 */
-#lrc_edit:hover, #lrc_fullscreen:hover, #lrc_report:hover {
+#lrc_wikia:hover, #lrc_fullscreen:hover, #lrc_report:hover {
 font-family: "iconRegular" !important;
 display: inline-block;
 -webkit-font-smoothing: antialiased;
@@ -278,7 +323,7 @@ background-position: -28px -277px;}
   background-position: 0px -581px;
 }
 
-/* ///////////////////////////////Lyrics Edit Page//////////////////////////////// */
+/* Lyrics Edit Page */
 textarea#editLrcText,
 textarea#editLyricText,
 #lrc_input {font-family: "Courier New"; font-size:12px !important}
@@ -296,7 +341,13 @@ background:url(http://www.xiami.com/images/group_photo/1/13001/2/1416542609_qeV6
 .profile_title .usr_info .medal_lyricmember1{background-position: -200px 0;}
 .profile_title .usr_info .medal_lyricmember2{background-position: -200px -25px;}
 
-/* ///////////////////////////////Artist Page//////////////////////////////// */
+/* Artist Page */
+
+#title .mshow-wrapper {
+	float: right !important;
+	margin-right: 10px;
+}
+
 #artist_work .acts a.more {
 padding: 10px 20px;
 line-height: 30px;
@@ -316,4 +367,28 @@ border-bottom: 1px #f0f0f0 solid;
 overflow:hidden; 
 white-space:nowrap; 
 text-overflow: ellipsis; 
+}
+
+td.song_name {width: 300px !important; word-break: break-word !important}
+
+/* Collection page */
+.Qsong_item .s_info span.song_name {width:inherit !important; min-width:280px; max-width:65%}
+.Qsong_item .s_info p {min-width:50px}
+.Qsong_item .s_info {height: inherit !important}
+
+/* Responsive */
+@media screen and (min-device-width: 1400px) {
+	#header .wrapper, #main .wrapper, #wrapper {max-width: 1200px !important}
+	#nav {margin-left: -70px !important}
+	#main .wrapper .section {margin-right:-372px !important}
+	#main .wrapper .section .container {margin-right:372px !important}
+	#main .wrapper .sidebar {width: 332px !important}
+	#albums .view {/*max-width: 840px !important;*/ margin: 15px auto;}	
+	#slider {margin: 15px auto !important}
+	#relate_collect ul li {margin-right: 20px !important; margin-left: 20px !important}
+	/*.albumBlock_list {padding: 5px 20px 0 40px !important}*/
+	.albumBlock_list ul li  {margin: 15px 36px 0 0 !important}
+}
+@media screen and (max-device-width: 1400px) {
+	#nav {display: none !important}
 }

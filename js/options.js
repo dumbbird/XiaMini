@@ -49,7 +49,7 @@ function loadMini(id,css) {
 	var el = document.createElement("link");
 	el.id = id;
 	el.rel = 'stylesheet';
-	el.href = chrome.extension.getURL(css);
+	el.href = chrome.extension.getURL("css/"+css);
 	headEl = document.getElementsByTagName("head")[0];
 	headEl.appendChild(el);
 }

@@ -95,7 +95,7 @@ function Paging() {
 			case truststr == "/album/list": {
 					num = 14;
 					page = number / num;
-					pagenumber = Math.ceil(page);
+					pagenumber = 655;
 					break;
 				}
 		}
@@ -142,6 +142,11 @@ function Paging() {
 		var gopagelabel = '<label><input type="text" id="custompage" class="px" size="" title="输入页码，按回车快速跳转" value=""><span title="共  页">/ &#160;</span><a id="pagenumbernum"></a></label>'
 			$(".p_redirect_l").before(gopagelabel);
 		var textnumber = $(".p_curpage").text();
+		//alert(textnumber);
+		if (textnumber == "") {
+			textnumber = 1;
+			$(".all_page span").before(gopagelabel);
+		}
 		if (pagenumber == textnumber && $(".p_redirect").length == 1) {
 			$(".p_curpage").after(gopagelabel);
 		}
@@ -154,12 +159,12 @@ function Paging() {
 		$("#pagenumbernum").text(pagenumber + " 页");
 		$("#custompage").keyup(function () { // 限制文本框内容
 			$(this).val($(this).val().replace(/\D|^0/g, ''));
-			if ($("#custompage").val() > pagenumber) {
-				$("#custompage").val($(this).val().replace(/(\d+)\d/g, '$1'));
-				if ($("#custompage").val() > pagenumber) {
-					$("#custompage").val($(this).val().replace(/\d/g, ''));
-				}
-			}
+			// if ($("#custompage").val() > pagenumber) {
+				// $("#custompage").val($(this).val().replace(/(\d+)\d/g, '$1'));
+				// if ($("#custompage").val() > pagenumber) {
+					// $("#custompage").val($(this).val().replace(/\d/g, ''));
+				// }
+			// }
 		}).bind("paste", function () { // CTR+V事件处理
 			$(this).val($(this).val().replace(/\D|^0/g, ''));
 		}).css("ime-mode", "disabled"); // CSS设置输入法不可用

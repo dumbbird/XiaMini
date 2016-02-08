@@ -1,0 +1,60 @@
+@font-face {
+	font-family: test;
+	src: local("STZhongsong"), local("ST Zhongsong"), local("STKaiti"), local("ST Kaiti"), local("KaiTi"), local(Arial);
+	unicode-range: U+2E80-2FDF, U+3400-4DBF, U+4E00-9FFF, U+3040-312F, U+31A0-31BF, U+FF00-FFEF;
+}
+@font-face {
+	font-family: test;
+	src: local("Batang"), local("STFangsong"), local("ST Fangsong"), local("FangSong"), local(Arial);
+	unicode-range: U+1100-11FF, U+3130-318F, U+AC00-D7AF;
+}
+@font-face {
+	font-family: test;
+	src: local(Georgia), local(Arial);
+	unicode-range: U+00-024F;
+}
+
+@font-face {
+	font-family: trans;
+	src: local("STFangsong"), local("ST Fangsong"), local("FangSong"), local(Arial);
+	unicode-range: U+2E80-2FDF, U+3400-4DBF, U+4E00-9FFF, U+3040-312F, U+31A0-31BF, U+FF00-FFEF;
+}
+@font-face {
+	font-family: trans;
+	src: local(Georgia), local(Arial);
+	unicode-range: U+00-024F;
+}
+
+.ui-lrc-line {
+	line-height:50px !important;
+	text-shadow: 0 0 20px white;
+	font-family: test !important;
+	color: black;
+	}
+.ui-trans-line {
+	line-height:50px !important;
+	text-shadow: 0 0 20px white;
+	font-family: trans !important;
+	color: black;
+	}
+	
+.ui-player-lrc ul .ui-lrc-current,
+.ui-player-lrc ul .ui-trans-current {	
+	color: #f60 !important;
+	font-weight: bold;
+	background-color: rgba(255,255,255,0.7);				
+				}
+#J_albumCover,
+.no-lrc,
+.seiya-enter
+{display: none !important}
+
+#bottom {z-index: 6 !important}
+#J_playerCover {width: 1% !important}
+#J_lyricScrollWrap {width: 100%; left: 0%}
+#J_lrcWrap {margin-top: -40px; padding-right: 0; z-index: 6 !important; width: 100% !important}
+#lyrics_control {text-shadow: 0px 1px 0px gray !important}
+#J_playerLrc {font-size: 201% !important}
+#J_walllistView {margin-top: 20px}
+#J_walllist .cmt_item .info, #J_walllist .cmt_item .brief {font-size: 15px !important;}
+#J_walllist .cmt_item .info {height: 40px !important; line-height:40px !important;}
