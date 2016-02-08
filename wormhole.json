@@ -19,7 +19,19 @@
 	      { "song_id": "1771150856", "title":"陰陽師", "cd":"1", "index":"11"},
 	      { "song_id": "1771150857", "title":"優等生", "cd":"1", "index":"12"},
 	      { "song_id": "1771150858", "title":"式神", "cd":"1", "index":"13"}],
-	      
+
+  "1771150846": { "song_id":"1771150846", "title":"白金ディスコ", "album_id":"526837", "album_name":"白金ディスコ｣&｢偽物語」劇伴音楽集 其ノ參", "artist":"神前暁", "location":"http://stream11.qqmusic.qq.com/31713700.mp3", "pic":"http://img.xiami.net/images/album/img84/86984/5268371359011636_2.png"},
+  "1771150847": { "song_id":"1771150847", "title":"白金ディスコ -instrumental-", "album_id":"526837", "album_name":"白金ディスコ｣&｢偽物語」劇伴音楽集 其ノ參", "artist":"神前暁", "location":"http://stream11.qqmusic.qq.com/31713701.mp3", "pic":"http://img.xiami.net/images/album/img84/86984/5268371359011636_2.png"},
+  "1771150848": { "song_id":"1771150848", "title":"喧嘩", "album_id":"526837", "album_name":"白金ディスコ｣&｢偽物語」劇伴音楽集 其ノ參", "artist":"神前暁", "location":"http://stream11.qqmusic.qq.com/31713702.mp3", "pic":"http://img.xiami.net/images/album/img84/86984/5268371359011636_2.png"},
+  "1771150849": { "song_id":"1771150849", "title":"「兄ちゃん。あとは、任せた」", "album_id":"526837", "album_name":"白金ディスコ｣&｢偽物語」劇伴音楽集 其ノ參", "artist":"神前暁", "location":"http://stream11.qqmusic.qq.com/31713703.mp3", "pic":"http://img.xiami.net/images/album/img84/86984/5268371359011636_2.png"},
+  "1771150850": { "song_id":"1771150850", "title":"偽物", "album_id":"526837", "album_name":"白金ディスコ｣&｢偽物語」劇伴音楽集 其ノ參", "artist":"神前暁", "location":"http://stream11.qqmusic.qq.com/31713704.mp3", "pic":"http://img.xiami.net/images/album/img84/86984/5268371359011636_2.png"},
+  "1771150851": { "song_id":"1771150851", "title":"嘘", "album_id":"526837", "album_name":"白金ディスコ｣&｢偽物語」劇伴音楽集 其ノ參", "artist":"神前暁", "location":"http://stream11.qqmusic.qq.com/31713705.mp3", "pic":"http://img.xiami.net/images/album/img84/86984/5268371359011636_2.png"},
+  "1771150853": { "song_id":"1771150853", "title":"快楽", "album_id":"526837", "album_name":"白金ディスコ｣&｢偽物語」劇伴音楽集 其ノ參", "artist":"神前暁", "location":"http://stream11.qqmusic.qq.com/31713707.mp3", "pic":"http://img.xiami.net/images/album/img84/86984/5268371359011636_2.png"},
+  "1771150855": { "song_id":"1771150855", "title":"罰ゲーム", "album_id":"526837", "album_name":"白金ディスコ｣&｢偽物語」劇伴音楽集 其ノ參", "artist":"神前暁", "location":"http://stream11.qqmusic.qq.com/31713709.mp3", "pic":"http://img.xiami.net/images/album/img84/86984/5268371359011636_2.png"},
+  "1771150856": { "song_id":"1771150856", "title":"陰陽師", "album_id":"526837", "album_name":"白金ディスコ｣&｢偽物語」劇伴音楽集 其ノ參", "artist":"神前暁", "location":"http://stream11.qqmusic.qq.com/31713710.mp3", "pic":"http://img.xiami.net/images/album/img84/86984/5268371359011636_2.png"},
+  "1771150857": { "song_id":"1771150857", "title":"優等生", "album_id":"526837", "album_name":"白金ディスコ｣&｢偽物語」劇伴音楽集 其ノ參", "artist":"神前暁", "location":"http://stream11.qqmusic.qq.com/31713711.mp3", "pic":"http://img.xiami.net/images/album/img84/86984/5268371359011636_2.png"},
+  "1771150858": { "song_id":"1771150858", "title":"式神", "album_id":"526837", "album_name":"白金ディスコ｣&｢偽物語」劇伴音楽集 其ノ參", "artist":"神前暁", "location":"http://stream11.qqmusic.qq.com/31713712.mp3", "pic":"http://img.xiami.net/images/album/img84/86984/5268371359011636_2.png"},
+  	      
   "1770146306": { "song_id":"1770146306", "title":"ハナノイロ", "album_id":"435461", "album_name":"ハナノイロ", "artist":"nano.RIPE", "location":"http://stream11.qqmusic.qq.com/30831243.mp3", "pic":"http://img.xiami.net/images/album/img3/82703/4354611302585968_2.jpg"},
   "1772471413": { "song_id":"1772471413", "title":"ebb and flow", "album_id":"689409855", "album_name":"ebb and flow", "artist":"Ray", "location":"http://stream17.qqmusic.qq.com/35176443.mp3", "pic":"http://img.xiami.net/images/album/img54/409854/4098541389409854_2.jpg"},
   "1769380921": { "song_id":"1769380921", "title":"For You", "album_id":"369277", "album_name":"For You", "artist":"AZU", "location":"http://stream17.qqmusic.qq.com/30662040.mp3", "pic":"http://img.xiami.net/images/album/img72/57372/3692771391059146_2.jpg"},
