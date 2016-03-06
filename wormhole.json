@@ -19,7 +19,17 @@
 	      { "song_id": "1771150856", "title":"陰陽師", "cd":"1", "index":"11"},
 	      { "song_id": "1771150857", "title":"優等生", "cd":"1", "index":"12"},
 	      { "song_id": "1771150858", "title":"式神", "cd":"1", "index":"13"}],
-	     
+  "a31950": [{ "song_id": "372028", "title":"Beautiful World", "cd":"1", "index":"01"},
+	     { "song_id": "372029", "title":"Kiss & Cry", "cd":"1", "index":"02"},
+	     { "song_id": "372030", "title":"Fly Me To The Moon (In Other Words) (2007 MIX)", "cd":"1", "index":"03"},
+	     { "song_id": "372031", "title":"Beautiful World (Original Karaoke)", "cd":"1", "index":"04"}],
+		
+  "372028": { "song_id":"372028", "title":"Beautiful World", "album_id":"31950", "album_name":"Beautiful World/Kiss & Cry", "artist":"宇多田ヒカル", "location":"http://m2.music.126.net/8_2nJ4T396wi6TE0dmOy_A==/3434874326076550.mp3", "pic":"http://img.xiami.net/images/album/img0/7100/319501352362517_2.jpg"},
+  "372029": { "song_id":"372029", "title":"Kiss & Cry", "album_id":"31950", "album_name":"Beautiful World/Kiss & Cry", "artist":"宇多田ヒカル", "location":"http://stream12.qqmusic.qq.com/30405273.mp3", "pic":"http://img.xiami.net/images/album/img0/7100/319501352362517_2.jpg"},
+  "372030": { "song_id":"372030", "title":"Fly Me To The Moon (In Other Words) (2007 MIX)", "album_id":"31950", "album_name":"Beautiful World/Kiss & Cry", "artist":"宇多田ヒカル", "location":"http://m2.music.126.net/lCi3Jk7-ibggnqh7p9dKyQ==/3418381651700570.mp3", "pic":"http://img.xiami.net/images/album/img0/7100/319501352362517_2.jpg"},
+  "372031": { "song_id":"372031", "title":"Beautiful World (Original Karaoke)", "album_id":"31950", "album_name":"Beautiful World/Kiss & Cry", "artist":"宇多田ヒカル", "location":"http://stream18.qqmusic.qq.com/132381581.mp3", "pic":"http://img.xiami.net/images/album/img0/7100/319501352362517_2.jpg"},
+  "372033": { "song_id":"372033", "title":"Fly Me To The Moon (In Other Words)", "album_id":"31950", "album_name":"Beautiful World/Kiss & Cry", "artist":"宇多田ヒカル", "location":"http://m2.music.126.net/TF7GMVDn8tUOFfwnQkK71g==/3302932931307934.mp3", "pic":"http://img.xiami.net/images/album/img0/7100/319501352362517_2.jpg"},
+  	     
   "1774016652": { "song_id":"1774016652", "title":"浮遊旋律", "album_id":"1624924433", "album_name":"憂鬱日和。", "artist":"沢井美空", "location":"http://stream20.qqmusic.qq.com/132219621.mp3", "pic":"http://img.xiami.net/images/album/img30/924430/9244301424924430_2.jpg"},
   "1774016653": { "song_id":"1774016653", "title":"カラフル。", "album_id":"1624924433", "album_name":"憂鬱日和。", "artist":"沢井美空", "location":"http://stream20.qqmusic.qq.com/132219622.mp3", "pic":"http://img.xiami.net/images/album/img30/924430/9244301424924430_2.jpg"},
   "1774016654": { "song_id":"1774016654", "title":"parallel love", "album_id":"1624924433", "album_name":"憂鬱日和。", "artist":"沢井美空", "location":"http://stream20.qqmusic.qq.com/132219623.mp3", "pic":"http://img.xiami.net/images/album/img30/924430/9244301424924430_2.jpg"},
