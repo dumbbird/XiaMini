@@ -36,7 +36,17 @@
         	 { "song_id": "1600000011", "title":"ぼくはくま", "cd":"1", "index":"11"},
 		 { "song_id": "1600000012", "title":"虹色バス", "cd":"1", "index":"12"},
 		 { "song_id": "1600000013", "title":"Flavor Of Life", "cd":"1", "index":"13"}],
-
+		 
+  "1775440090": { "song_id":"1775440090", "title":"冥明", "album_id":"2100252486", "album_name":"冥明", "artist":"苏运莹", "location":"http://stream12.qqmusic.qq.com/135664545.mp3", "pic":"http://img.xiami.net/images/album/img62/403062/4030621451403063_2.jpg"},
+  "1775440092": { "song_id":"1775440092", "title":"香香的幻想", "album_id":"2100252486", "album_name":"冥明", "artist":"苏运莹", "location":"http://stream12.qqmusic.qq.com/135683269.mp3", "pic":"http://img.xiami.net/images/album/img62/403062/4030621451403063_2.jpg"},
+  "1775440094": { "song_id":"1775440094", "title":"精灵", "album_id":"2100252486", "album_name":"冥明", "artist":"苏运莹", "location":"http://stream12.qqmusic.qq.com/135566107.mp3", "pic":"http://img.xiami.net/images/album/img62/403062/4030621451403063_2.jpg"},
+  "1775440096": { "song_id":"1775440096", "title":"光良里只是意会", "album_id":"2100252486", "album_name":"冥明", "artist":"苏运莹", "location":"http://stream12.qqmusic.qq.com/135683270.mp3", "pic":"http://img.xiami.net/images/album/img62/403062/4030621451403063_2.jpg"},
+  "1775440098": { "song_id":"1775440098", "title":"倒挂金钩", "album_id":"2100252486", "album_name":"冥明", "artist":"苏运莹", "location":"http://stream12.qqmusic.qq.com/135683271.mp3", "pic":"http://img.xiami.net/images/album/img62/403062/4030621451403063_2.jpg"},
+  "1775440100": { "song_id":"1775440100", "title":"徒步", "album_id":"2100252486", "album_name":"冥明", "artist":"苏运莹", "location":"http://stream12.qqmusic.qq.com/135683272.mp3", "pic":"http://img.xiami.net/images/album/img62/403062/4030621451403063_2.jpg"},
+  "1775440102": { "song_id":"1775440102", "title":"2-0+1", "album_id":"2100252486", "album_name":"冥明", "artist":"苏运莹", "location":"http://stream12.qqmusic.qq.com/135393553.mp3", "pic":"http://img.xiami.net/images/album/img62/403062/4030621451403063_2.jpg"},
+  "1775440104": { "song_id":"1775440104", "title":"空人得坚强", "album_id":"2100252486", "album_name":"冥明", "artist":"苏运莹", "location":"http://stream12.qqmusic.qq.com/135683273.mp3", "pic":"http://img.xiami.net/images/album/img62/403062/4030621451403063_2.jpg"},
+  "1775440106": { "song_id":"1775440106", "title":"复", "album_id":"2100252486", "album_name":"冥明", "artist":"苏运莹", "location":"http://stream12.qqmusic.qq.com/135683274.mp3", "pic":"http://img.xiami.net/images/album/img62/403062/4030621451403063_2.jpg"},
+  "1775440108": { "song_id":"1775440108", "title":"宝贵", "album_id":"2100252486", "album_name":"冥明", "artist":"苏运莹", "location":"http://stream12.qqmusic.qq.com/135683275.mp3", "pic":"http://img.xiami.net/images/album/img62/403062/4030621451403063_2.jpg"},
   "1774280126": { "song_id":"1774280126", "title":"SUN", "album_id":"1431053795", "album_name":"SUN", "artist":"星野源", "location":"http://stream11.qqmusic.qq.com/132634250.mp3", "pic":"http://img.xiami.net/images/album/img86/85086/14310537951431053796_2.jpg"},
   "1774280127": { "song_id":"1774280127", "title":"Moon Sick", "album_id":"1431053795", "album_name":"SUN", "artist":"星野源", "location":"http://stream11.qqmusic.qq.com/132634251.mp3", "pic":"http://img.xiami.net/images/album/img86/85086/14310537951431053796_2.jpg"},
   "1774280128": { "song_id":"1774280128", "title":"いち に さん", "album_id":"1431053795", "album_name":"SUN", "artist":"星野源", "location":"http://stream11.qqmusic.qq.com/132634252.mp3", "pic":"http://img.xiami.net/images/album/img86/85086/14310537951431053796_2.jpg"},
