@@ -36,7 +36,9 @@
         	 { "song_id": "1600000011", "title":"ぼくはくま", "cd":"1", "index":"11"},
 		 { "song_id": "1600000012", "title":"虹色バス", "cd":"1", "index":"12"},
 		 { "song_id": "1600000013", "title":"Flavor Of Life", "cd":"1", "index":"13"}],
-
+  
+  "1775256578": { "song_id":"1775256578", "title":"翠盖红莲", "album_id":"168454", "album_name":"春江帆影", "artist":"陈云山", "location":"http://other.web.rh01.sycdn.kuwo.cn/resource/n3/20/36/3344613150.mp3", "pic":"http://img.xiami.net/images/album/img84/87184/1684541446744631_2.jpg"},
+ 
   "1770015150": { "song_id":"1770015150", "title":"CHANGE THE WORLD", "album_id":"423990", "album_name":"犬夜叉 ベストソング ヒストリー", "artist":"V6", "location":"http://stream11.qqmusic.qq.com/37248254.mp3", "pic":"http://img.xiami.net/images/album/img0/62500/4239901319769937_2.jpg"},
   "360063": { "song_id":"360063", "title":"夢であるように", "album_id":"30453", "album_name":"夢であるように", "artist":"DEEN", "location":"http://stream18.qqmusic.qq.com/32631439.mp3", "pic":"http://img.xiami.net/images/album/img44/6744/30453_2.jpg"},
   "1773330643": { "song_id":"1773330643", "title":"TOKYO Dreamer", "album_id":"504647174", "album_name":"TOKYO Dreamer", "artist":"Nico Touches the Walls", "location":"http://stream20.qqmusic.qq.com/37209964.mp3", "pic":"http://img.xiami.net/images/album/img73/647173/6471731404647173_2.jpg"},
