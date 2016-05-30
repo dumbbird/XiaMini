@@ -37,6 +37,10 @@
 		 { "song_id": "1600000012", "songName":"虹色バス", "cd":"1", "index":"12"},
 		 { "song_id": "1600000013", "songName":"Flavor Of Life", "cd":"1", "index":"13"}],
 
+  "1772158821": { "song_id":"1772158821", "songName":"恋音と雨空", "album_id":"1778265541", "album_name":"恋音と雨空", "artist":"AAA", "location":"http://stream12.qqmusic.qq.com/35010519.mp3", "pic":"http://img.xiami.net/images/album/img5/32205/17782655411378265608_2.jpg"},
+  "1772158822": { "song_id":"1772158822", "songName":"MASK", "album_id":"1778265541", "album_name":"恋音と雨空", "artist":"AAA", "location":"http://stream12.qqmusic.qq.com/35010520.mp3", "pic":"http://img.xiami.net/images/album/img5/32205/17782655411378265608_2.jpg"},
+  "1772158823": { "song_id":"1772158823", "songName":"恋音と雨空 (Instrumental)", "album_id":"1778265541", "album_name":"恋音と雨空", "artist":"AAA", "location":"http://stream12.qqmusic.qq.com/35010521.mp3", "pic":"http://img.xiami.net/images/album/img5/32205/17782655411378265608_2.jpg"},
+  "1772158824": { "song_id":"1772158824", "songName":"MASK (Instrumental)", "album_id":"1778265541", "album_name":"恋音と雨空", "artist":"AAA", "location":"http://stream12.qqmusic.qq.com/35010522.mp3", "pic":"http://img.xiami.net/images/album/img5/32205/17782655411378265608_2.jpg"},
   "1773390764": { "song_id":"1773390764", "songName":"有一个美丽的地方", "album_id":"477618", "album_name":"多情的葫芦丝", "artist":"哏德全", "location":"http://other.web.rf01.sycdn.kuwo.cn/resource/n2/67/64/3572600965.mp3", "pic":"http://img.xiami.net/images/album/img8/57208/4776181442737136_2.jpg"},
   "1773390765": { "song_id":"1773390765", "songName":"放马山歌", "album_id":"477618", "album_name":"多情的葫芦丝", "artist":"哏德全", "location":"http://other.web.rf01.sycdn.kuwo.cn/resource/n2/19/86/3765309445.mp3", "pic":"http://img.xiami.net/images/album/img8/57208/4776181442737136_2.jpg"},
   "1773390762": { "song_id":"1773390762", "songName":"傣寨情歌", "album_id":"477618", "album_name":"多情的葫芦丝", "artist":"哏德全", "location":"http://other.web.rf01.sycdn.kuwo.cn/resource/n3/5/46/3359101360.mp3", "pic":"http://img.xiami.net/images/album/img8/57208/4776181442737136_2.jpg"},
