@@ -1,6 +1,6 @@
-﻿var flag = false;
+var flag = false;
 var cvbright = 99999;
-var BR_THRESHOLD = 15000;
+var BR_THRESHOLD = 25000;
 
 function removeMini(id) {
 	var el;
@@ -43,8 +43,10 @@ function switchtolrc(bright) {
 		$('.ui-lrc-line, .ui-trans-line').removeAttr("style");
 }
 function switchtotxt(bright) {
-	$("#J_rendertxt").click();
+	$("#J_rendertxt").click();	// include remove t_xiamini
+	//removeMini(["t_xiamini"]);	
 	if ($('#full_xiamini').length) {
+		console.log(bright);
 		setTimeout(function (){
 			if (bright < BR_THRESHOLD)
 				$('.ui-lrc-line, .ui-trans-line').css("color", "#fff");
@@ -67,6 +69,17 @@ function switchtotlrc(bright) {
 		$('.ui-lrc-line, .ui-trans-line').removeAttr("style");
 }
 
+// 显隐歌词栏
+function hideLrc() {
+	if (document.getElementById('hl_xiamini')) {
+		removeMini(["hl_xiamini"]);
+		$('#J_hideLrc').attr("title", "点击隐藏右侧歌词评论栏");
+	} else {
+		loadMini("hl_xiamini","hidelrc.css");
+		$('#J_hideLrc').attr("title", "点击显示右侧歌词评论栏");
+	}
+}
+
 // 加载comments
 function loadcomments() {
 	$("#J_lyricScrollWrap").hide();
@@ -81,25 +94,54 @@ function loadcomments() {
 
 // 从comments返回歌词
 function reset(bright) {
-	if ($('.no-lrc').length)
-		//loadcomments()
-		;
+	$("#J_walllist").hide();
+	$("#J_lyricScrollWrap").show();
+	$('#comments').attr('status', 'disabled');
+	$('#comments').attr('style', 'color:lightgray');
+	$("#J_resetlrc").click();
+	if ($('#full_xiamini, #k_xiamini').length) {
+		setTimeout(function (){
+			if (bright < BR_THRESHOLD)
+				$('.ui-lrc-line, .ui-trans-line').css("color", "#fff");
+			else
+				$('.ui-lrc-line, .ui-trans-line').css("color", "black");
+		}, 1000);	// 全屏模式下reset到歌词，取决于背景亮度来设置歌词字体颜色
+	}	
+	else
+		$('.ui-lrc-line, .ui-trans-line').removeAttr("style");	// 非全屏模式reset到歌词，直接remove所有style恢复原状
+}
+
+// KTV歌词模式
+function ktvLrc(bright) {
+	if ($("#comments").attr("status") == "enabled")
+		reset(bright);
+	if (document.getElementById('k_xiamini')) {
+		loadMini("full_xiamini","fullscreenlrc.css");
+		removeMini(["k_xiamini"]);
+		setTimeout(function (){	
+			$("#J_transdislrc").click();
+			if (bright < BR_THRESHOLD) {
+				$('.ui-lrc-line, .ui-trans-line').css("color", "#fff");
+				$('.ui-lrc-line').css("text-shadow", "");
+			}
+			else
+				$('.ui-lrc-line, .ui-trans-line').css("color", "black");
+		}, 1000);
+		$('#J_hideLrc').attr("title", "点击进入KTV全屏模式");
+	}
 	else {
-		$("#J_walllist").hide();
-		$("#J_lyricScrollWrap").show();
-		$('#comments').attr('status', 'disabled');
-		$('#comments').attr('style', 'color:lightgray');
-		$("#J_resetlrc").click();
-		if ($('#full_xiamini').length) {
-			setTimeout(function (){
-				if (bright < BR_THRESHOLD)
-					$('.ui-lrc-line, .ui-trans-line').css("color", "#fff");
-				else
-					$('.ui-lrc-line, .ui-trans-line').css("color", "black");
-			}, 1000);	// 全屏模式下reset到歌词，取决于背景亮度来设置歌词字体颜色
-		}	
-		else
-			$('.ui-lrc-line, .ui-trans-line').removeAttr("style");	// 非全屏模式reset到歌词，直接remove所有style恢复原状
+		loadMini("k_xiamini","ktvlrc.css");
+		removeMini(["full_xiamini"]);
+		setTimeout(function (){	
+		$("#J_transdislrc").click();
+			if (bright < BR_THRESHOLD) {
+				$('.ui-lrc-line').css("color", "#fff");
+				$('.ui-lrc-line').css("text-shadow", "0 0 10px black");
+			}
+			else
+				$('.ui-lrc-line, .ui-trans-line').css("color", "black");
+		}, 1000);
+		$('#J_hideLrc').attr("title", "点击返回普通全屏模式");
 	}
 }
 
@@ -123,10 +165,10 @@ function brightness(imgEl) {
     height = canvas.height = imgEl.height;
     width = canvas.width = imgEl.width;
 
-    context.drawImage(imgEl, 0, 0);
+    context.drawImage(imgEl, width*0.25, 0, width*0.5, height, 0, 0, width*0.5, height);
 
     try {
-        data = context.getImageData(0, 0, width, height);
+        data = context.getImageData(0, 0, width*0.5, height);
     } catch(e) {
         /* security error, img on diff domain */
         return brightness;
@@ -153,7 +195,43 @@ function brightness(imgEl) {
 
 }
 
+function openmaxlrc(bright) {
+	$("#J_tab").hide("fast", function () {
+		$(".main-sidebar").hide("fast", function () {
+			loadMini("full_xiamini","fullscreenlrc.css");
+			$('#J_blurBackground').css("z-index", "5");
+			//$("#J_lrcWrap").width(middlewidth);
+			//$("#J_lyricScrollWrap").css("width", "100%");
+			$("#lyrics_control").css("width", "100%");
+			$('#J_hideLrc').attr("title", "点击进入KTV全屏模式");
+			$('#J_hideLrc').text("Ｋ");
+		});
+	});
+	setTimeout(function (){	
+		$("#J_transdislrc").click();
+		if (bright < BR_THRESHOLD)
+			$('.ui-lrc-line, .ui-trans-line').css("color", "#fff");
+		else
+			$('.ui-lrc-line, .ui-trans-line').css("color", "black");
+		}, 1000);			
+}
 
+function closemaxlrc() {	
+	removeMini(["full_xiamini", "k_xiamini"]);
+	$('#J_hideLrc').attr("title", "点击隐藏右侧歌词评论栏");
+	$('#J_hideLrc').text("s");
+	$('#J_blurBackground').css("z-index", "0");
+	$("#J_lrcWrap").animate({
+		width : "340px"
+	},
+		function () {
+		$(".main-sidebar").show("fast", function () {
+			$("#J_tab").show("fast");
+			$('.ui-lrc-line, .ui-trans-line').removeAttr("style");
+			$("#J_transdislrc").click();				
+		});
+	});
+}
 function lyricsFull() {
 	// reset
 	$("#J_lrcWrap").removeAttr("style");
@@ -188,53 +266,9 @@ function lyricsFull() {
 			}
 		}
 	});
-	
-	function openmaxlrc(bright) {
-		$("#lrc_fullscreen").hover(function(){
-			$(this).css("color", "lightgray");
-		}, function() {
-			$(this).css("color", "#f60");
-		});
-		
-		$("#J_tab").hide("fast", function () {
-			$(".main-sidebar").hide("fast", function () {
-				loadMini("full_xiamini","fullscreenlrc.css");
-				$('#J_blurBackground').css("z-index", "5");
-				//$("#J_lrcWrap").width(middlewidth);
-				//$("#J_lyricScrollWrap").css("width", "100%");
-				$("#lyrics_control").css("width", "100%");
-			});
-		});
-		setTimeout(function (){	
-			$("#J_resetlrc").click();
-			if (bright < BR_THRESHOLD)
-				$('.ui-lrc-line, .ui-trans-line').css("color", "#fff");
-			}, 1000);			
-	}
-
-	function closemaxlrc() {
-		$("#lrc_fullscreen").hover(function(){
-			$(this).css("color", "#f60");
-		}, function() {
-			$(this).css("color", "lightgray");
-		});		
-		
-		removeMini(["full_xiamini"]);
-		$('#J_blurBackground').css("z-index", "0");
-		$("#J_lrcWrap").animate({
-			width : "340px"
-		},
-			function () {
-			$(".main-sidebar").show("fast", function () {
-				$("#J_tab").show("fast");
-				$('.ui-lrc-line, .ui-trans-line').removeAttr("style");
-				$("#J_resetlrc").click();				
-			});
-		});
-	}
 }
 
-function wikialrc() {
+function wikialrc(bright) {
 	// need songid, songtitle and artist information
 	var songid = $('#trackchange').attr("songid");
 	var songtitle = $('#trackchange').attr("songtitle");
@@ -242,20 +276,23 @@ function wikialrc() {
 	var artist = artists[0];
 	for (var i=1; i<artists.length; i++)
 		artist += " / "+artists[i];
-	//alert(artist);
-	songtitle = songtitle.replace("[", "(").replace("]", ")");
-	artist = artist.replace("[", "(").replace("]", ")");	
-	var url = 'http://zh.lyricsinfo.wikia.com/wiki/' + encodeURIComponent(songtitle) + '_(' + encodeURIComponent(artist) + ')/lrc';
-	//alert(url);
-	var wkrequest = xhr(url, "get",0);
+
+	songtitle = songtitle.replace("[", "(").replace("]", ")").replace(" ", "_");
+	artist = artist.replace("[", "(").replace("]", ")").replace(" ", "_");;	
+	var url = 'http://zh.lyricsinfo.wikia.com/wiki/' + encodeURIComponent(songtitle) + '_(' + encodeURIComponent(artist) + ')';
+	var wkrequest = xhr(url+"/lrc", "get",0);
 	var lrc = $(wkrequest).find('.poem.lrc.'+songid).text();
 	var danmaku = $(wkrequest).find('.poem.damn.'+songid).text();
-	//alert(lrc);
+
 	if (lrc == "" && danmaku == "") {
-		alert("不好意思呢，暂无维基歌词~");
-		$('#wikilrc').html("");
-		$('#dmlrc').html("");
-		return -1;
+		var wkrequest = xhr(url, "get",0);
+		var lrc = $(wkrequest).find('.poem').text();
+		if (lrc == "") {
+			alert("不好意思呢，暂无维基歌词~");
+			$('#wikilrc').html("");
+			$('#dmlrc').html("");
+			return -1;
+		}
 	}	
 		
 	if ($('#wikilrc').length == 0) {
@@ -273,10 +310,20 @@ function wikialrc() {
 	
 	$('#lrc_wikia').css("color", "#f60");
 	$('#J_resetlrc').click();
-	alert("已加载完毕:)");
+	if ($('#full_xiamini, #k_xiamini').length) {
+		setTimeout(function (){
+			if (bright < BR_THRESHOLD)
+				$('.ui-lrc-line, .ui-trans-line').css("color", "#fff");
+			else
+				$('.ui-lrc-line, .ui-trans-line').css("color", "black");
+			alert("已加载完毕:)");
+		}, 1000);	// 全屏模式下载入wikia歌词，取决于背景亮度来设置歌词字体颜色
+	}	
+	else {
+		$('.ui-lrc-line, .ui-trans-line').removeAttr("style");	// 非全屏模式载入wikia歌词，直接remove所有style恢复原状
+		alert("已加载完毕:)");
+	}
 }
-
-
 
 function lyricsControl() {
 	if (flag)
@@ -315,11 +362,30 @@ function lyricsControl() {
 		div = "<div id='J_comments' onclick='rendercomment()'></div>";
 		$(document.body).append(div); 
 	}
-			
+	if (!document.getElementById("J_hideLrc")) {
+		div = "<span id='J_hideLrc' class='icon-lrc' title='右侧歌词评论栏显隐'>s</span>";
+		$('.track-controls').append(div); 
+	}
+	
+	// hide-LRC swith
+	$('.icon-lrc').click(function () {
+		if (document.getElementById("full_xiamini") || document.getElementById("k_xiamini")) {
+			if ($('#lrc_trans').attr("status") != "txt") 
+				ktvLrc(cvbright);
+			else
+				alert("静态文本歌词无法KTV哦～");
+		} else
+			hideLrc();
+	});
+	
 	// t-LRC switch	
 	$("#lrc_trans").click(function () {
 		if ($(".no-lrc").length != 0)
 			return;
+		if ($("#k_xiamini").length != 0) {
+			alert("KTV模式下暂时不能使用该功能哦～");
+			return;
+		}
 		$("#lrc_trans").removeAttr("style");
 		// removeMini(["t_xiamini"]);
 		if ($("#lrc_trans").attr("status") == "tlrc") {
@@ -334,9 +400,9 @@ function lyricsControl() {
 			}
 		} else if ($("#lrc_trans").attr("status") == "lrc") {
 			//alert("lrc");
-			if ($('.ui-trans-line').length != 0)
-				removeMini(["t_xiamini"]);
 			switchtotxt(cvbright);
+			//if ($('.ui-trans-line').length != 0)
+				
 		} else if ($("#lrc_trans").attr("status") == "txt") {
 			//alert("txt");
 			switchtotlrc(cvbright);		
@@ -346,7 +412,7 @@ function lyricsControl() {
 	// wikia switch
 	$('#lrc_wikia').click(function (){
 		if (confirm("确定要加载维基歌词么？")) {
-			wikialrc();
+			wikialrc(cvbright);
 		}
 	});
 	
@@ -361,44 +427,84 @@ function lyricsControl() {
 	});
 	
 	$('#trackchange').click(function (){
-		$('#lrc_wikia').css("color", "lightgray");
-		$('#wikilrc').html("");
-		$('#dmlrc').html("");
-		setTimeout(function (){
-			var cv = document.getElementsByClassName("ui-canvas-current")[0];
-			if (cv) {
-				cvbright = brightness(cv);
-				console.log(cvbright);
-				if ($('#full_xiamini').length) {
-					if (cvbright < BR_THRESHOLD)
-						$('.ui-lrc-line, .ui-trans-line').css("color", "#fff");
-					else
-						$('.ui-lrc-line, .ui-trans-line').css("color", "black");
+		var repeat = $('#trackchange').attr("repeat");
+		//console.log(repeat);
+		if (repeat == "1" && $('#full_xiamini, #k_xiamini').length) {
+			setTimeout(function (){
+				//alert(cvbright);
+				if (cvbright < BR_THRESHOLD)
+					$('.ui-lrc-line, .ui-trans-line').css("color", "#fff");
+				else
+					$('.ui-lrc-line, .ui-trans-line').css("color", "black");
+								
+			}, 4000);			
+		}
+		
+		else if (repeat == "0") {
+			$('#lrc_wikia').css("color", "lightgray");
+			$('#wikilrc').html("");
+			$('#dmlrc').html("");
+			
+			setTimeout(function (){
+				var cv = document.getElementsByClassName("ui-canvas-current")[0];
+				if (cv) {
+					cvbright = brightness(cv);
+					console.log(cvbright);
+					if ($('#full_xiamini, #k_xiamini').length) {
+						loadMini("full_xiamini","fullscreenlrc.css");
+						removeMini(["k_xiamini"]);
+						if (cvbright < BR_THRESHOLD)
+							$('.ui-lrc-line, .ui-trans-line').css("color", "#fff");
+						else
+							$('.ui-lrc-line, .ui-trans-line').css("color", "black");
+						$('#J_hideLrc').attr("title", "点击进入KTV全屏模式");
+					}
 				}
-			}
-		}, 2000);
-		reset(cvbright);
-		$("#J_walllist").remove();
+			}, 2000);
+			
+			// reset lrc from comment
+			reset(cvbright);
+			$("#J_walllist").remove();
+		}
 	});
 }
 
-function htmlDecode (str){
+function htmlDecode(str) {
 	var div = document.createElement("div");
 	div.innerHTML = str;
 	return div.innerHTML;
 }
 
+function updateHeader() {		
+	var el, html;
+	
+	el = $("#J_pagePlayList .ui-playlist-header .ui-row-item-body .ui-row-item-column.c1").eq(0);
+	html = el.html().replace("歌曲", "曲名 (古典乐章节)");
+	el.html(html);
+	
+	el = $("#J_pagePlayList .ui-playlist-header .ui-row-item-body .ui-row-item-column.c2").eq(0);
+	html = el.html().replace("演唱者", "主艺人");
+	el.html(html);
+	
+	el = $("#J_pagePlayList .ui-playlist-header .ui-row-item-body .ui-row-item-column.c3").eq(0);
+	if (el.text().indexOf("(古典作品名)") == -1) {
+		html = el.html().replace("专辑", "专辑 (古典作品名)");
+		el.html(html);
+	}
+}
+
 // lyrics control base
 $(function (){ 
-	var CurrentUrl = window.location.href;
+	var CurrentUrl = window.location.href;	
 	if (CurrentUrl.indexOf("#loaded") != -1) {
+		updateHeader();
 		setTimeout(function (){	
 			var cv = document.getElementsByClassName("ui-canvas-current")[0];
 			if (cv) {
 				cvbright = brightness(cv);
 				console.log(cvbright);
 			}
-			lyricsControl(); 
+			lyricsControl();
          }, 2000);
 	}
 });
