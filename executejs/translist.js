@@ -213,7 +213,6 @@ var loadfromWikia = function (){
 	var wikiaR = xhr(url, 'get', 0);
 	var p_items = $(wikiaR).find(".poem");
 	var datasid = 0;
-	var songid = CurrentUrl.split("song/")[1];
 	var wikialyrics = "";
 	for (var i=0; i<p_items.length; i++) {
 		datasid = p_items.eq(i).data("sid");
@@ -255,7 +254,6 @@ var backtoXiami = function (){
 }
 
 var loadLRCwikia = function (){
-	var songid = CurrentUrl.split("song/")[1];
 	var codes = '&lt;poem class="lrc ' + songid + '"&gt;' + '<br />';
 	var wkrequest = xhr("http://www.xiami.com/wiki/addlrc/id/"+songid, "get",0);
 	codes += $(wkrequest).find('#editLrcText').text().replace(/\n/g, "<br />");
@@ -393,12 +391,26 @@ var loadWikia = function () {
 	});
 }
 
+function loadSongUrl () {
+	if (document.getElementById("song_url")) return;
+	
+	var notes = '<div id="song_url" class="block sec_Rlt mgt20" style="align:center"><h3>本单曲的真实地址是</h3>' 
+				+ '<div class="content clearfix">';	
+			notes += '<strong>http://www.xiami.com/song/' + songid + '</strong>';
+			//notes += '<div id="quality_note" class="blank10"><p></div>';				
+			notes += '</div>';					
+			notes += '<div class="acts"><a class="more" href="/group/80651" target="_blank">Xiamini</a></div>';
+			notes += '</div>';
+			$(".music_counts").after(notes);
+			
+}
+
 var CurrentUrl = window.location.href;
 CurrentUrl = CurrentUrl.split("?")[0].split("#")[0];
 if (/com\/song/.test(CurrentUrl)) {
 	var transList = "";
 	var lyricstext = "";	
-	
+	var songid = $("#qrcode .acts").text();
 	var Songtitle = $('#title h1').contents().filter(function () {
 		return this.nodeType == 3;
 	}).text();
@@ -419,6 +431,7 @@ if (/com\/song/.test(CurrentUrl)) {
 	//alert(url);
 	
 	removeTranslist();
+	loadSongUrl();
 	headerModify();
 	semicolConvert();
 	loadWikia();

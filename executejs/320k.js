@@ -1,6 +1,6 @@
 ﻿// 从320K专门店获取音质信息，并展示在专辑页面右侧。
-// 增加DiscPlay、taobao音乐馆、wikia等。
-// 版本号：1.10.4
+// 增加DiscPlay、taobao音乐馆、wikia、wormhole生成器等。
+// 版本号：2.10.6
 
 // title rearrange
 function Re_title4(ti){ 
@@ -26,7 +26,35 @@ function getFeatArtists (songids, i){
 	else
 		return feat_artists;
 }
+
+function loadAlbumUrl () {
+	if (document.getElementById("album_url")) return;
 	
+	var notes = '<div id="album_url" class="block sec_Rlt mgt20" style="align:center"><h3>本专辑的真实地址是</h3>' 
+				+ '<div class="content clearfix">';	
+			notes += '<strong>http://www.xiami.com/album/' + albumid + '</strong>';
+			//notes += '<div id="quality_note" class="blank10"><p></div>';				
+			notes += '</div>';					
+			notes += '<div class="acts"><a class="more" href="/group/80651" target="_blank">Xiamini</a></div>';
+			notes += '</div>';
+			$("#qrcode").before(notes);
+			
+}
+
+function loadArtistUrl () {
+	if (document.getElementById("artist_url")) return;
+	
+	var notes = '<div id="album_url" class="block sec_Rlt mgt20" style="align:center"><h3>本艺人的真实地址是</h3>' 
+				+ '<div class="content clearfix">';	
+			notes += '<strong>http://www.xiami.com/artist/' + artistid + '</strong>';
+			//notes += '<div id="quality_note" class="blank10"><p></div>';				
+			notes += '</div>';					
+			notes += '<div class="acts"><a class="more" href="/group/80651" target="_blank">Xiamini</a></div>';
+			notes += '</div>';
+			$("#qrcode").before(notes);
+			
+}
+
 // load 320K information
 var loadQualitynotes = function() {
 	if (document.getElementById("quality_notes")) return;
@@ -129,6 +157,7 @@ function addAlbumWikia() {
 		var id, title;
 		var songids = $('.song_name');	// get most updated tracklist
 
+		var ids = "<p>&lt;!-- ";
 		var tracklist = "<p>";
 		tracklist += "{{专辑" + "<br>" +
 					 "| 专辑名 = " + albumname + "<br>" +
@@ -160,16 +189,20 @@ function addAlbumWikia() {
 				id = j;
 				title = $(songids).eq(i).find("a").eq(0).text().replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 				var feat_artists = getFeatArtists(songids, i);				
-				tracklist += "# [[" + title + " (" + feat_artists + ")|" + title + "]]<br />";
+				tracklist += "# [[" + title + " (" + feat_artists + ")|" + title + "]]";
+				ids += id + ", ";
+				//tracklist += " - [[" + title + " (" + feat_artists + ")/lrc|LRC]];
+				tracklist += "<br />";
 			}
 		}
-		tracklist += "</p>"
+		ids += "--&gt;</p>";
+		tracklist += "</p>";
 		//alert(albumid + " ... " + albumname + ' ... ' + pic);
-		//alert(tracklist);
+		//alert(ids);
 		if ($('.album_intro_brief').length)
-			$('.album_intro_brief').html(tracklist);
+			$('.album_intro_brief').html(tracklist+ids);
 		else
-			$('#share_bar').after('<div id="album_intro"><div class="album_intro_brief">' + tracklist + '</div></div>');
+			$('#share_bar').after('<div id="album_intro"><div class="album_intro_brief">' + tracklist + ids + '</div></div>');
 	});
 }
 
@@ -186,7 +219,7 @@ function load_Taobao() {
 	}
 }
 
-function addwormhole() {
+function addWormhole() {
 	if (document.getElementById("wh_generator"))
 		return;
 
@@ -202,7 +235,7 @@ function addwormhole() {
 		wormhole = '<p><strong>想提交自己的虫洞申请？或更多了解如何成为虫洞穿越观光团导游吗？在<a href="http://www.xiami.com/collect/552436">这张精选集</a>下面留言联系我哈。</strong></p>'
 		wormhole += '<br /><table cellspacing="0" cellpadding="0" class="track_list"><tbody>';
 		for (var i = j = 0; i < wh_songids.length; i++) {
-			avail = ($(wh_songids).eq(i).parent().find(".song_hot").text() == "") ? false : true;
+			avail = ($(wh_songids).eq(i).parent().find(".song_hot_bar").text() == "") ? false : true;
 			//alert(avail);
 			if (avail)	continue;
 			try {
@@ -214,10 +247,10 @@ function addwormhole() {
 
 			if(j) {
 				id = j;
-				title = $(wh_songids).eq(i).find("a").eq(0).text().replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+				title = $(wh_songids).eq(i).find("a").eq(0).text().replace(/^\s\s*/, '').replace(/\s\s*$/, '').replace(/"/g, '\\"');
 				var feat_artists = getFeatArtists(wh_songids, i);
 					
-				wormhole += '&nbsp;&nbsp;"' + id + '": { "song_id":"' + id + '", "title":"' + title 
+				wormhole += '&nbsp;&nbsp;"' + id + '": { "song_id":"' + id + '", "songName":"' + title 
 						+ '", "album_id":"' + albumid + '", "album_name":"' + albumname 
 						+ '", "artist":"' + feat_artists + '", "location":"", "pic":"' + pic + '"},<br />';
 			}
@@ -226,8 +259,8 @@ function addwormhole() {
 		wormhole += "<br /><p><strong>六维穿越代码模板：<br />"
 					+ "把下面代码中的1234567 (请最好填入消失曲目的实际ID)、XXX (曲目名称)、x (disc序号，1/2/3 etc.)、yy(曲序，01/02/03 etc.) "
 					+ "分别替换成你想要生成的虫洞数据，然后在location处加入虫洞地址。</strong><br />";
-		wormhole += '&nbsp;&nbsp;"a' + albumid + '": [{ "song_id": "1234567", "title":"XXX", "cd":"x", "index":"yy"}],<br />';
-		wormhole += '&nbsp;&nbsp;"1234567": { "song_id":"1234567", "title":"XXX", "album_id":"' + albumid + '", "album_name":"' + albumname 
+		wormhole += '&nbsp;&nbsp;"a' + albumid + '": [{ "song_id": "1234567", "songName":"XXX", "cd":"x", "index":"yy"}],<br />';
+		wormhole += '&nbsp;&nbsp;"1234567": { "song_id":"1234567", "songName":"XXX", "album_id":"' + albumid + '", "album_name":"' + albumname 
 						+ '", "artist":"' + artist + '", "location":"", "pic":"' + pic + '"},<br />';
 		wormhole += "</p>"
 		wormhole += "</tbody></table>";
@@ -268,17 +301,114 @@ function semicolConvert() {
 	}
 }
 
+function songidDecode() {
+	// alert("semi");
+	try {
+		var tracks = $('.song_name');
+		var decodedSongID = "";
+		var decodedSong = "";
+		//alert(tracks.length);
+		for (var i=0; i<tracks.length; i++) {
+			//encodedSongID = $(tracks).eq(i).find("a").eq(0).attr("href");	// 直接获取html
+			//console.log(encodedSongID);
+			decodedSongID = $(tracks).eq(i).parent().find(".chkbox input").attr("value");
+			//console.log(decodedSongID);
+			decodedSong = $(tracks).eq(i).find("a");
+			$(decodedSong).each(function() {
+				if($(this).attr("href").indexOf("/song/") != -1)
+					$(this).attr("href", "/song/" + decodedSongID);
+			});
+			//$(tracks).eq(i).find("a.show_zhcn").attr("href", "/song/" + decodedSongID);
+		}
+	}
+	catch (err) {
+		console.log(err);
+	}
+}
+
+function artistidDecode() {
+	// alert("semi");
+	try {
+		var albumArtist = $('#album_info table tbody tr').find("a");
+		var decodedArtist = $('#nav a').eq(1).attr('href').replace("profile-", "");
+		//alert(decodedArtist);
+		
+		$(albumArtist).each(function() {
+			if($(this).attr("href").indexOf("/artist/") != -1)
+				$(this).attr("href", decodedArtist);
+		});
+		
+		//alert(tracks.length);
+	}
+	catch (err) {
+		console.log(err);
+	}
+}
+
+function albumidDecode() {
+	// alert("semi");
+	try {
+		var sideAlbums = $('.album_item55_side').find(".name");
+		var blockAlbums = $('.album_item100_block').find(".cover");
+		var discogAlbums = $('.album_item100_thread');
+		var decodedAlbum = "";
+		var decodedAlbumid = 0;
+		//alert(decodedArtist);
+		
+		$(sideAlbums).each(function() {
+			decodedAlbum = $(this).find(".ico_cd a")[0];
+			if (decodedAlbum) {
+				decodedAlbumid = decodedAlbum.getAttributeNode('onclick').value.split("\'")[1];
+				//alert(decodedAlbumid);
+				if($(this).find("a").eq(0).attr("href").indexOf("/album/") != -1 && decodedAlbumid != 0)
+					$(this).find("a").eq(0).attr("href", "/album/" + decodedAlbumid);
+			}
+		});
+		
+		$(blockAlbums).each(function() {
+			decodedAlbum = $(this).find(".ico_cd a")[0];
+			if (decodedAlbum) {
+				decodedAlbumid = decodedAlbum.getAttributeNode('onclick').value.split("\'")[1];
+				//alert(decodedAlbumid);
+				if($(this).find("a").eq(0).attr("href").indexOf("/album/") != -1 && decodedAlbumid != 0)
+					$(this).find("a").eq(0).attr("href", "/album/" + decodedAlbumid);
+			}
+		});
+		
+		$(discogAlbums).each(function() {
+			decodedAlbumid = $(this).attr("id").split("album_")[1];
+			//alert(decodedAlbumid);
+			decodedAlbum = $(this).find("a");
+			$(decodedAlbum).each(function() {
+				if($(this).attr("href").indexOf("/album/") != -1 && decodedAlbumid != 0)
+					$(this).attr("href", "/album/" + decodedAlbumid);
+			});
+			
+		});
+		
+		//alert(tracks.length);
+	}
+	catch (err) {
+		console.log(err);
+	}
+}
+
 removeQualitynotes();
 var CurrentUrl = window.location.href;
 CurrentUrl = CurrentUrl.split("?")[0].split("#")[0];
-if (CurrentUrl.indexOf("xiami.com/album/") != -1 || CurrentUrl.indexOf("xiami.com/artist/") != -1)
-	semicolConvert();
-if (CurrentUrl.indexOf("xiami.com/album/") != -1) {
-	addDiscplay();
-	load_Taobao();		// load music.taobao.com ad
+
 	
+if (CurrentUrl.indexOf("xiami.com/artist/") != -1) {
+	var artistid = $("#qrcode .acts").text();
+	songidDecode();
+	loadArtistUrl();
+	albumidDecode();
+	semicolConvert();
+}
+if (CurrentUrl.indexOf("xiami.com/album/") != -1) {	
+
 	// get album info
-	var albumid = CurrentUrl.split("album/")[1];
+	var albumid = $("#qrcode .acts").text();
 	var albumname = $("meta[property='og:title']").attr("content");
 	var artist = $("meta[property='og:music:artist']").attr("content");
 	var pic = $("meta[property='og:image']").attr("content");
@@ -286,10 +416,37 @@ if (CurrentUrl.indexOf("xiami.com/album/") != -1) {
 	var language = $(albumInfo).eq(1).find("td").eq(1).text();
 	var date = $(albumInfo).eq(3).find("td").eq(1).text();
 	var type = $(albumInfo).eq(4).find("td").eq(1).text();
-	
+
+	songidDecode();
+	artistidDecode();
+	loadAlbumUrl();
+	albumidDecode();
+	semicolConvert();
+	addDiscplay();
+	load_Taobao();		// load music.taobao.com ad	
 	loadQualitynotes();	
 	addAlbumWikia();
 	var tab = "	";
-	addwormhole();
-	//alert("123");
+	addWormhole();
+}
+
+if (CurrentUrl.indexOf("xiami.com/search") != -1) {
+	//var artistid = $("#qrcode .acts").text();
+	var searchTabs = $('.search_tab ul li a');
+	$(searchTabs).each(function() {	
+		if($(this).attr("class") == "current")
+			return true;
+		if($(this).attr("title") == "专辑" || $(this).attr("title") == "艺人")
+			$(this).attr("href", $(this).attr("href") + "&l=1");
+	});
+	
+	songidDecode();
+	albumidDecode();
+	//semicolConvert();
+}
+
+if (CurrentUrl.indexOf("xiami.com/space/") != -1) {
+	songidDecode();
+	albumidDecode();
+	//semicolConvert();
 }

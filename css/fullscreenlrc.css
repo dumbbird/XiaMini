@@ -1,6 +1,6 @@
 @font-face {
 	font-family: test;
-	src: local("STZhongsong"), local("ST Zhongsong"), local("STKaiti"), local("ST Kaiti"), local("KaiTi"), local(Arial);
+	src: local("STZhongsong"), local("ST Zhongsong"), local("STSong"), local("ST Song");
 	unicode-range: U+2E80-2FDF, U+3400-4DBF, U+4E00-9FFF, U+3040-312F, U+31A0-31BF, U+FF00-FFEF;
 }
 @font-face {
@@ -10,7 +10,7 @@
 }
 @font-face {
 	font-family: test;
-	src: local(Georgia), local(Arial);
+	src: local(Book Antiqua), local(Palatino), local(Didot), local(Georgia);
 	unicode-range: U+00-024F;
 }
 
@@ -21,27 +21,26 @@
 }
 @font-face {
 	font-family: trans;
-	src: local(Georgia), local(Arial);
+	src: local(Big Caslon), local(Book Antiqua), local(Palatino), local(Didot), local(Georgia);
 	unicode-range: U+00-024F;
 }
 
 .ui-lrc-line {
 	line-height:50px !important;
 	text-shadow: 0 0 20px white;
-	font-family: test !important;
-	color: black;
+	font-family: "Big Caslon", test !important;
 	}
 .ui-trans-line {
-	line-height:50px !important;
+	line-height:40px !important;
 	text-shadow: 0 0 20px white;
 	font-family: trans !important;
-	color: black;
+	font-size: 90% !important
 	}
 	
 .ui-player-lrc ul .ui-lrc-current,
 .ui-player-lrc ul .ui-trans-current {	
 	color: #f60 !important;
-	font-weight: bold;
+	text-shadow: 0.5px 0 0 #f60 !important;
 	background-color: rgba(255,255,255,0.7);				
 				}
 #J_albumCover,
@@ -53,8 +52,11 @@
 #J_playerCover {width: 1% !important}
 #J_lyricScrollWrap {width: 100%; left: 0%}
 #J_lrcWrap {margin-top: -40px; padding-right: 0; z-index: 6 !important; width: 100% !important}
-#lyrics_control {text-shadow: 0px 1px 0px gray !important}
+#lyrics_control {text-shadow: 0px 1px 0px gray !important; font-weight: bold}
 #J_playerLrc {font-size: 201% !important}
 #J_walllistView {margin-top: 20px}
 #J_walllist .cmt_item .info, #J_walllist .cmt_item .brief {font-size: 15px !important;}
 #J_walllist .cmt_item .info {height: 40px !important; line-height:40px !important;}
+#lrc_fullscreen{color:#f60 !important}
+#lrc_fullscreen:hover{color:lightgray !important}
+span.icon-lrc{font-family: inherit !important; top: 0px !important; font-weight:bold}

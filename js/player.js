@@ -1,18 +1,342 @@
-﻿/*! music-player - v0.9.10 build by Kissy-cake 
+﻿/*! xiamini music-player - v1.0.7 build by Kissy-cake 
  * @Author: baoma <nongyoubao@alibaba-inc.com> 
  * Copyright (c) XIAMI 
- */!function(){var a=window,b="undefined";a.XiamiPlayer={player_runing:function(a,b){return!1},player_song_start:function(b,c){var d=a.seiya.eventListener;d&&d.fire("player","start",{currentSong:b,list:c})},player_song_end:function(){var b=a.seiya.eventListener;b&&b.fire("player","end")},player_room_lists:function(a,c){b==typeof c&&(c=0),typeof SEIYA!==b&&SEIYA.addSongs(escape("/song/playlist/id/"+a),3),typeof __PLAYER__!==b&&__PLAYER__.PlayerData.set("passtime",c)},player_room_exit:function(){typeof __PLAYER__!==b&&__PLAYER__.PlayerData.exitRoom()}},a.login_callback=function(c){if(c){typeof __SIDEBAR__!==b&&__SIDEBAR__.Collect.sync(),typeof __USER__!==b&&__USER__.sync(),typeof __OVERLAY__!==b&&__OVERLAY__.destroy();var d=a.seiya.eventListener,e=a.seiya.user;d&&e&&e.room_id?d.fire("popup","enterRoom",e.room_id):d.fire("popup","resetMainNav")}},a.taobaoLogin=function(){var b=-1!==location.href.indexOf("www.xiami.com")?"https://login.xiami.com":"",c=location.href;c=c.split("#")[0],c=encodeURIComponent(c),a.open(b+"/member/login?done="+c+"#taobao","_self")},a.openWind=function(b){var c=(a.screen.height-420)/2,d=(a.screen.width-520)/2;a.open(b,"connect_window","height=420, width=560, toolbar=no, menubar=no, scrollbars=yes, resizable=no,top="+c+",left="+d+", location=no, status=no")},a.sinaLogin=function(){a.openWind("/sina?done")},a.qqLogin=function(){a.openWind("/share/connect/type/qzone?done")},a.onbeforeunload=function(){document.getElementById("J_xiamiPlayerSwf").netclose()}}(KISSY);/*
+ */
+ 
+ /**
+ * @fileoverview 全局工具类
+ * @author 宝码<noyobo@gmail.com>
+ **/
+(function(S) {
+    /**
+     * 全局工具函数
+     * @exports window
+     * @author noyobo
+     * @copyright XIAMI.COM
+     * @version 1.0
+     */
+    var win = window;
+    var UNDEF = 'undefined';
+    /**
+     * @class
+     */
+    // win.XiamiPlayer = {
+    //     /**
+    //      * @description 用于播主播放器向外推送列表
+    //      * @param  {String} track 正在播放的歌曲信息
+    //      * @param  {String} json  即将播放的20首歌曲列表
+    //      */
+    //     player_runing: function(track, json) {
+    //         return false;
+    //         var api = win.seiya.api;
+    //         var user = win.seiya.user;
+
+    //         if (user.is_audience) {
+    //             api.pushFollowUserId(user.room_id);
+    //         } else {
+    //             var list = JSON.parse(json);
+    //             var songIds = [];
+    //             for (var i = 0; i < list.length; i++) {
+    //                 songIds.push(list[i].songId);
+    //             }
+    //             api.pushSongIds(songIds);
+    //         }
+    //     },
+    //     /**
+    //      * 用于播主播放器向外推送列表
+    //      * @param  {Json<string>} currentSongString 当前正在播放的歌曲
+    //      * @param  {Json<string>} listString        即将播放的歌曲列表
+    //      */
+    //     player_song_start: function(currentSongString, listString) {
+    //         var eventListener = win.seiya.eventListener;
+    //         eventListener && eventListener.fire('player', 'start', {
+    //             currentSong: currentSongString,
+    //             list: listString
+    //         });
+    //     },
+    //     /**
+    //      * 用于听众播放器通知歌曲播放结束
+    //      */
+    //     player_song_end: function() {
+    //         var eventListener = win.seiya.eventListener;
+
+    //         eventListener && eventListener.fire('player', 'end');
+    //     },
+    //     /**
+    //      * 用于向播放器推送播间列表
+    //      * @param  {String} ids      加载歌曲ID列表,字符串, 以,间隔
+    //      * @param  {Number} position 已播放秒数
+    //      */
+    //     player_room_lists: function(ids, position) {
+    //         // console.log('player_room_lists', ids);
+    //         if (UNDEF == typeof position) position = 0;
+    //         if (typeof(SEIYA) !== UNDEF) {
+    //             SEIYA.addSongs(escape('/song/playlist/id/' + ids), 3);
+    //         }
+    //         if (typeof(__PLAYER__) !== UNDEF) {
+    //             __PLAYER__.PlayerData.set('passtime', position);
+    //         }
+    //     },
+    //     /**
+    //      * 用于播放器结束播放播间列表
+    //      */
+    //     player_room_exit: function() {
+    //         if (typeof(__PLAYER__) !== UNDEF) {
+    //             __PLAYER__.PlayerData.exitRoom();
+    //         }
+    //     }
+    // };
+
+    /**
+     * 异步登录回调
+     * @param  {Nunber} uid userid
+     */
+    win.login_callback = function(uid) {
+        if (!uid)
+            return;
+        if (typeof(__SIDEBAR__) !== UNDEF) {
+            __SIDEBAR__.Collect.sync();
+        }
+        if (typeof(__USER__) !== UNDEF) {
+            __USER__.sync();
+        }
+        if (typeof(__OVERLAY__) !== UNDEF) {
+            __OVERLAY__.destroy();
+        }
+
+        var eventListener = win.seiya.eventListener;
+        var user = win.seiya.user;
+        if (eventListener && user && user.room_id) {
+            // 在某个播间中登录则刷新页面
+            eventListener.fire('popup', 'enterRoom', user.room_id);
+        } else {
+            // 在列表中登录只更新主入口状态
+            eventListener.fire('popup', 'resetMainNav');
+        }
+    };
+    /**
+     * 淘宝登录回调
+     */
+    win.taobaoLogin = function() {
+        var LOGIN_ROOR = location.href.indexOf("www.xiami.com") !== -1 ? "https://login.xiami.com" : "";
+        var url = location.href;
+        url = url.split("#")[0];
+        url = encodeURIComponent(url);
+        win.open(LOGIN_ROOR + "/member/login?done=" + url + "#taobao", "_self");
+        //win.open(LOGIN_ROOR + "/member/login?taobao=1", "_self");
+    };
+    /**
+     * 打开window dialog
+     */
+    win.openWind = function(url) {
+        var top = (win.screen.height - 420) / 2;
+        var left = (win.screen.width - 520) / 2;
+        win.open(url, 'connect_window', 'height=420, width=560, toolbar=no, menubar=no, scrollbars=yes, resizable=no,top=' + top + ',left=' + left + ', location=no, status=no');
+    };
+    /**
+     * 新浪登录
+     */
+    win.sinaLogin = function() {
+        win.openWind('/sina?done');
+    };
+    /**
+     * QQ登录
+     */
+    win.qqLogin = function() {
+        win.openWind('/share/connect/type/qzone?done');
+    };
+    win.onbeforeunload = function() {
+        document.getElementById("J_xiamiPlayerSwf").netclose();
+        // if(typeof(__PLAYER__)!== UNDEF){
+        //     __PLAYER__.PlayerData.save();
+        // }
+    };
+    win.filterPlaySong = function(num, msg) {
+        var ht, warm;
+        warm = '应版权方要求，已过滤部分歌曲';
+
+        if (msg) {
+            warm = msg;
+        }
+        if (num && num != '') {
+            warm = '应版权方要求，已过滤' + num + '首歌曲'
+        }
+        ht = '<h3>温馨提示</h3>' +
+            '<div class="dialog_content dialog-buy-music">' +
+            '<div style="color:#999;" class="wram">' + warm + '</div>' +
+            '</div>' +
+            '<a class="Closeit" onclick="closedialog();if (typeof nIntervId != \'undefined\') {clearInterval(nIntervId);}" title="" href="javascript:void(0);">关闭</a>';
+
+        showDialog('', ht);
+
+        setTimeout(function() {
+            closedialog();
+            if (typeof nIntervId != 'undefined') {
+                clearInterval(nIntervId);
+            }
+        }, 2000);
+    };
+    win.buyMusic = function(type, id, action) {
+        var url, ht, warm, typeName;
+        if (location.href.match('idaily\.local\.xiami\.com') || location.href.match('gindis\.xiami\.com') || location.href.match('site\.local\.xiami\.com')) {
+            url = 'http://im.local.xiami.com';
+        } else {
+            url = 'http://m.xiami.com';
+        }
+        typeName = '歌曲';
+        if (type == 'album') {
+            typeName = '专辑';
+        }
+        warm = '<div>对不起~暂时不支持网站购买，请在支付宝<br/>或者手机浏览器中扫描下面的二维码购买' + typeName + '~</div>';
+
+        // 购买URL
+        if (type && id) {
+            url += '/throne';
+            if (type == 'album') {
+                url += '?album_id=' + id;
+            } else if (type == 'song') {
+                url += '?song_id=' + id;
+            } else {
+                console.log('购买类别不存在');
+            }
+        }
+
+        // 提示文案
+        if (action) {
+            if (type == 'album') {
+                warm = '<div>抱歉，您需要支持歌手的数字专辑才可以' + action + '~</p><p>请在支付宝或者浏览器中扫描以下的二维码支付~</div>';
+            } else if (type == 'song') {
+                warm = '<div>抱歉，您需要先购买以后才可以' + action + '~<br/>请在支付宝或者浏览器中扫描以下的二维码支付~</div>';
+            }
+        }
+
+        // 提示内容
+        ht = '<style>.dialog_popup {width: 495px;height:325.5px;margin-left: -248px!important;margin-top: -165px!important;}</style><h3>付费提示</h3>' +
+            '<div class="dialog_content dialog-buy-music">' +
+            '<div class="wram">' + warm + '</div>' +
+            '<div class="qrcode"><img src="/qrcode?u=' + url + '&w=200" /></div>' +
+            '<div class="intro">说明：购买成功以后刷新页面即可使用~</div>' +
+            '</div>' +
+            '<a class="Closeit" onclick="closedialog();" title="" href="javascript:void(0);">关闭</a>';
+        showDialog('', ht)
+    }
+    window.selectDownlodQuality = function(data, id) {
+        var ht, warm, lowht, highht, fdata;
+        if (typeof data == 'string') {
+            if (data == '') {
+                alert('没有可下载歌曲');
+                return;
+            }
+            data = JSON.parse(decodeURIComponent(data));
+            if (id) {
+                data.id = id;
+            }
+        }
+        if (data.LOW == 'FREE') {
+            lowht = '<li style="cursor:pointer" onclick="prepareZipx(\'song\', ' + data.id + ', 1)" class="item">流畅品质</li>';
+        } else if (data.LOW == 'NEED_PAY') {
+            lowht = '<li style="cursor:pointer" onclick="buyMusic(\'song\', ' + data.id + ', 1);" class="item"><b class="identities ident-small">付费</b>流畅品质</li>'
+        } else {
+            lowht = '';
+        }
+
+        if (data.HIGH == 'FREE') {
+            highht = '<li style="cursor:pointer" onclick="prepareZipx(\'song\', ' + data.id + ', 2)" class="item">高品质</li>';
+        } else if (data.HIGH == 'NEED_PAY') {
+            highht = '<li style="cursor:pointer" onclick="buyMusic(\'song\', ' + data.id + ', 2);" class="item"><b class="identities ident-small">付费</b>高品质</li>'
+        } else {
+            highht = '';
+        }
+        ht = '<style>.dialog_popup {width: 300px;}</style><h3>选择下载的品质</h3>' +
+            '<div class="dialog_content dialog-downlod-music">' +
+            '<ul class="cklist">' + lowht + highht + '</ul>' +
+            '</div>' +
+            '<a class="Closeit" onclick="closedialog();" title="" href="javascript:void(0);">关闭</a>';
+
+        showDialog('', ht);
+    }
+
+    window.GOODTip = function(html) {
+        var ht, warm;
+        ht = '<style>.dialog_popup {width: 300px;}</style><h3>提示</h3>' +
+            '<div class="dialog_content dialog-login-music">' + html +
+            '</div>' +
+            '<a class="Closeit" onclick="closedialog();" title="" href="javascript:void(0);">关闭</a>';
+
+        showDialog('', ht);
+    };
+
+    window.downloadHeartbeat = 0;
+    window.tipsLock = 0;
+    window.prepareZipx = function(type, id, quality) {
+        var self = this;
+        //self._httpTab.removeClass('normal').addClass('prepare').find('em').text('mp3准备中');
+        GOODTip('<div style="line-height:1.5;">正在加载歌曲文件，<br/>请稍等，好了以后我们会为您自动下载</div>');
+        var delay = setInterval(function() {
+            var url = '/download/get-link';
+            if (downloadHeartbeat > 0) {
+                url = '/download/get-link?ping=1';
+            }
+            downloadHeartbeat++;
+            $.ajax({
+                url: url,
+                dataType: 'json',
+                data: {
+                    type: type,
+                    id: id,
+                    quality: quality ? quality : ''
+                },
+                cache: false,
+                success: function(data) {
+                    if (data.errorCode == 1 || data.errorCode == 999) {
+                        clearInterval(delay);
+                        downloadHeartbeat = 0;
+                        GOODTip(data.errorMessage);
+                        return;
+                    }
+                    if (!tipsLock) {
+                        tipsLock = 1;
+                        //GOODTip('<div style="line-height:1.5;">正在加载歌曲文件，<br/>请稍等，好了以后我们会为您自动下载</div>');
+                    }
+                    if (data.errorCode == 0) {
+                        if (data.url != '') {
+                            clearInterval(delay);
+                            downloadHeartbeat = 0;
+                            $('body').append('<iframe style="display:none;" src="' + data.url + '"></iframe>');
+                            //alert.html('如浏览器长时间无响应，点击<a href="'+data.url+'">这里重试</a>');
+                        }
+                        tipsLock = 0;
+                    } else {
+                        clearInterval(delay);
+                        downloadHeartbeat = 0;
+                        tipsLock = 0;
+                        //summary.removeClass('success').addClass('failure').find('i').text('下载失败！');
+                        alert(data.errorMessage);
+                    }
+                },
+                error: function() {
+                    alert('Load Error, please check your network');
+                }
+            });
+        }, 2000);
+        // closedialog();
+    }
+})(KISSY);
+
+ /*
 combined files : 
 
 utils/index/global
 page/mods/shortcut
 utils/swfobject/index
 page/mods/player/player-swfobj
+utils/base
+page/mods/player/player-audio
+page/mods/player/player-ad
 utils/scrollView/scrollViewManage
 page/mods/xtpl/lrc-xtpl
 page/mods/xtpl/lrcText-xtpl
 page/mods/player/player-lrc
-utils/base
 page/mods/player/player-sale
 page/mods/player/player-lister
 page/mods/player/player-volume
@@ -39,6 +363,7 @@ page/mods/player/player-log
 utils/dd/plugin/scroll
 page/mods/player/player-drag
 page/mods/player/player-cover
+page/mods/player/player-switch
 page/mods/data/center
 page/mods/xtpl/trackInfo-xtpl
 utils/tip/index
@@ -94,12 +419,12 @@ KISSY.add('utils/index/global',['node','page/mods/page'], function(S, require, e
     var global = {
         download : function(id, note) {
             var note = note || 0;
-            var url = 'http://www.xiami.com/download/pay?id=' + ENURI(id)  + '&rec_note=' + ENURI(note);
+            var url = '/download/pay?id=' + ENURI(id)  + '&rec_note=' + ENURI(note);
             window.open(url);
         },
         //推广的下载单曲
         promotion_download : function (id,type,pid){
-            var url = 'http://www.xiami.com/download/pay?id='+ ENURI(id) +'&ptype='+type +'&pid='+pid;
+            var url = '/download/pay?id='+ ENURI(id) +'&ptype='+type +'&pid='+pid;
             window.open(url);
         },
         downloadsongs : function(ids, type, pid) {
@@ -123,6 +448,10 @@ KISSY.add('utils/index/global',['node','page/mods/page'], function(S, require, e
                 alert("请先选择歌曲!");
                 return;
             }
+            if (ids.split(',').length>100) {
+                alert('多选操作最多支持100首，你已选中'+ids.split(',').length+'首，请删减后重试。');
+                return false;
+            }
             var url = '/song/collects/ids/' + ENURI(ids);
             this.showDialog(url);
         },
@@ -141,6 +470,9 @@ KISSY.add('utils/index/global',['node','page/mods/page'], function(S, require, e
             var url = "/music/send/id/" + ENURI(id)  + '?rec_note=' + ENURI(note);
             this.showDialog(url);
         },
+		switchOldVersion: function() {
+			$('.track-play-menu') .toggle();
+		},
         showDialog : function(url) {
             //var url = 'http://www.xiami.com' + url;
             window.showDialog(url);
@@ -193,10 +525,15 @@ KISSY.add('utils/index/global',['node','page/mods/page'], function(S, require, e
             if (! atPlay) {
                 atPlay = 0;
             };
-            try {
-                document.getElementById("J_xiamiPlayerSwf").jsAddSongs(url, atPlay);
-            } catch(e) {
-                throw new Error("jsAddSongs not function");
+            if (!!document.createElement('audio').canPlayType) {
+                window.__XIAMIPLAYER__.addSongs({"url": url, "atPlay": atPlay});
+            }
+            else {
+                try {
+                    document.getElementById("J_xiamiPlayerSwf").jsAddSongs(url, atPlay);
+                } catch(e) {
+                    throw new Error("jsAddSongs not function");
+                }                
             }
         },
         addPlaySongs : function(name, type_name, type_id) {
@@ -1377,6 +1714,402 @@ KISSY.add('page/mods/player/player-swfobj',['utils/swfobject/index', 'swf'], fun
     module.exports = player;
 });
 
+KISSY.add('utils/base',function(S, COOKIE) {
+
+    var SERVER_HOST = '';
+    //@zhongtang 音频广告地址
+    var AD_SERVER_HOST = -1 === location.host.indexOf('gitlabswf') ? "http://i.music.taobao.com" : "http://i.music.taobao.com";
+
+    var Base = {
+        UPDATE_VIP: SERVER_HOST + "/vip/role",
+        SEARCH_JSON: SERVER_HOST + "/search/json",
+        SAVE_PLAYLIST: SERVER_HOST + "/member/edit-playlist",
+        SET_HQ: SERVER_HOST + "/vip/update-tone",
+        /**
+         * 收藏操作
+         */
+        FAV_SOUND_URL: SERVER_HOST + "/song/favjson", // url:song/favjson?ids=131321&_xiamitoken=2ae1e1cb19a9a9c5666ff4953bcb415d&callback=js
+        /**
+         * 精选集 相关接口
+         */
+        COLLECT_EDIT_NAME_URL: SERVER_HOST + "/playercollect/update", //url:playercollect/update?title=gg&list_id=1
+        COLLECT_DELETE_URL: SERVER_HOST + "/playercollect/delete", // /playercollect/delete?list_id=25063511&_xiamitoken=2271ec173798f12845f68117a1b43aeb
+        COLLECT_GET_LIST_URL: SERVER_HOST + "/playercollect/list",
+        COLLECT_DETAIL_URL: SERVER_HOST + "/playercollect/detail",
+        COLLECT_CREATE_URL: SERVER_HOST + "/playercollect/create", // playercollect/create?title=tettg
+        COLLECT_DELETE_SONG_URL: SERVER_HOST + "/playercollect/delsong", //sids string 单个或者多个songid,用，隔开 list_id int 专辑id
+        COLLECT_ADD_URL: SERVER_HOST + '/playercollect/addsong',
+        /**
+         * 我收藏的单曲
+         */
+        MY_FAV_TRCKS_URL: SERVER_HOST + "/playersong/getgradesong",
+        /**
+         * 播放历史
+         */
+        HISTORY_TRACKS_URL: SERVER_HOST + "/play/recent-list",
+        HISTOTY_DELETE_URL: SERVER_HOST + "/play/remove-track", //id/73668/gmt/1389268935/_xiamitoken/a523a4dc980b5fe75b093e60e0707c1d"
+        // 漫游歌曲地址
+        ROAM_SONGS_URL: SERVER_HOST + "/play/get-manyou-song",
+
+        // 专辑促销地址
+        ALBUM_PROMOTION_URL: SERVER_HOST + '/app/promotion/getitemnew',
+        //ALBUM_PROMOTION_URL: 'json/getitemnew.json',
+
+        //@zhongtang
+        // 含有广告的艺人ID（数组）地址
+        AD_ARTISTIDARR_URL: AD_SERVER_HOST + '/player/list_ad_related_artist.do', //SERVER_HOST + 'list_ad_related_artist.do',//
+
+        //@zhongtang
+        // 艺人相关广告信息地址 根据艺人ID获取相关广告信息
+        AD_ARTIST_MSG_URL: AD_SERVER_HOST + '/player/get_player_ad_detail.do',//SERVER_HOST + 'get_player_ad_detail.do',// player/get_player_ad_detail.do?artistId=1231&nick=nick 艺人ID
+        //@zhongtang
+        //定制用户投放广告
+        AD_USER_URL: AD_SERVER_HOST + '/player/get_available_ad.do', // player/get_available_ad.do?uid=12312321 & uid=用户ID
+        AD_PLAYLOG: AD_SERVER_HOST + '/player/send_event.do',// player/send_event.do?id=12&did=112&uid=12&event=play
+
+        getToken: function() {
+            return COOKIE.get("_xiamitoken");
+        },
+        getUser: function() {
+            return COOKIE.get("user");
+        }
+    };
+
+    return Base;
+}, {
+    // @formatter:off
+    requires: ["cookie"]
+});
+
+/**
+ * @author noyodo
+ * @description 播放器核心. 只接受控制
+ */
+var timer;
+window.onload = function() {
+    document.cookie = 'XMPLAYER_isOpen=1;path=/;domain=.xiami.com';
+};
+window.onunload = function() {
+    clearInterval(timer);
+    document.cookie = 'XMPLAYER_isOpen=0;path=/;domain=.xiami.com';
+};
+KISSY.add('page/mods/player/player-audio',['node', 'cookie', 'event', 'io', 'utils/base'], function(S, require, exports, module) {
+
+    // @formatter:off
+    var Node = require("node"),
+        Cookie = require("cookie"),
+        Event = require("event"),
+        IO = require("io"),
+        BaseConfig = require("utils/base");
+    // @formatter:on
+    var $ = Node.all;
+
+    function player(config) {
+        this.init();
+    };
+
+    player.prototype = {
+        init: function() {
+            var self = this;
+            self._audio = document.createElement('audio');
+            self._audio.id = 'J_xiamiPlayer';
+
+            self._volumeValue = Number(Cookie.get('XMPLAYER_volumeValue')) || 0.5;
+            self._playMode = Number(Cookie.get('XMPLAYER_playMode')) || 1;
+
+            document.cookie = 'XMPLAYER_addSongsToggler=0;path=/;domain=.xiami.com';
+
+            self._error_top = 0;
+            self._loadedToggler = false;
+
+            self._attachEvent();
+        },
+        _attachEvent: function() {
+            var self = this;
+            clearInterval(timer);
+            timer = setInterval(function() {
+                if (Cookie.get('XMPLAYER_addSongsToggler') == '1') {
+                    document.cookie = 'XMPLAYER_addSongsToggler=0;path=/;domain=.xiami.com';
+                    window.__XIAMIPLAYER__.addSongs({"url": Cookie.get('XMPLAYER_url'), "atPlay": 0});
+                }
+            }, 1000);
+            var record_0s;
+            var record_30s;
+            var record_120s;
+            $(self._audio).on('loadstart', function() {
+                record_0s = true;
+                record_30s = true;
+                record_120s = true;
+                window.__XIAMIPLAYER__.ready('{"volume": '+self._volumeValue+',"mode": '+self._playMode+'}');
+            });
+            $(self._audio).on('durationchange', function() {
+                self._error_top = 0;
+                self._loadedToggler = true;
+                window.__XIAMIPLAYER__.soundOpen('{"length": '+self._audio.duration*1000+'}');
+            });
+            $(self._audio).on('timeupdate', function() {
+                if (record_0s && self._audio.currentTime > 0) {
+                    new Image().src = 'http://www.xiami.com/count/playstat?song_id='+self._sid+'&vip_role='+self._vipRole+'&type=0';
+                    record_0s = false;
+                }
+                if (record_30s && self._audio.currentTime > 30) {
+                    new Image().src = 'http://www.xiami.com/count/playstat?song_id='+self._sid+'&vip_role='+self._vipRole+'&type=1';
+                    record_30s = false;
+                }
+                if (record_120s && self._audio.currentTime > 120) {
+                    new Image().src = 'http://www.xiami.com/count/playstat?song_id='+self._sid+'&vip_role='+self._vipRole+'&type=2';
+                    new Image().src = 'http://www.xiami.com/count/playrecord?sid='+self._sid+'&ishq='+self._ishq+'&t='+self._t+'&object_id='+self._object_id+'&object_name='+self._object_name;
+                    record_120s = false;
+                }
+                var progress = self._audio.buffered.end(self._audio.buffered.length - 1);
+                window.__XIAMIPLAYER__.soundProgress('{"duration": '+self._audio.duration*1000+',"progress": '+progress*1000+'}');
+                window.__XIAMIPLAYER__.soundPlaying('{"duration": '+self._audio.duration*1000+',"position": '+self._audio.currentTime*1000+'}');
+            });
+            $(self._audio).on('loadeddata', function() {
+                if (self._loadedToggler) {
+                    self._loadedToggler = false;
+                    window.__XIAMIPLAYER__.soundLoadComplete('{"duration": '+self._audio.duration*1000+'}');
+                }
+            });
+            $(self._audio).on('ended', function() {
+                if (record_120s) {
+                    new Image().src = 'http://www.xiami.com/count/playrecord?sid='+self._sid+'&ishq='+self._ishq+'&t='+self._t+'&object_id='+self._object_id+'&object_name='+self._object_name;
+                }
+                new Image().src = 'http://www.xiami.com/count/playstat?song_id='+self._sid+'&vip_role='+self._vipRole+'&type=3';
+                window.__XIAMIPLAYER__.soundComplete();
+            });
+            $(self._audio).on('error', function() {
+                self._error_top += 1;
+                window.__XIAMIPLAYER__.soundError(self._error_top);
+            });
+        },
+        support: function() {
+            var self = this;
+            return !!self._audio.canPlayType;
+        },
+        _getLocation: function(sourceString) {
+            if (sourceString.indexOf("http://") !== -1) {
+                return sourceString;
+            }
+            var total = Number(sourceString.charAt(0));
+            var newString = sourceString.substring(1);
+            var chu = Math.floor(newString.length/total);
+            var yu = newString.length%total;
+            var stor = new Array();
+            for (var i = 0; i<yu; i++) {
+                if (stor[i] == undefined) {
+                    stor[i] = "";
+                }
+                stor[i] = newString.substr((chu+1)*i, chu+1);
+            }
+            
+            for (i = yu; i<total; i++) {
+                stor[i] = newString.substr(chu*(i-yu)+(chu+1)*yu, chu);
+            }
+            
+            var pinString = "";
+            for (i = 0; i<stor[0].length; i++) {
+                for (var j = 0; j<stor.length; j++) {
+                    pinString += stor[j].charAt(i);
+                }
+            }
+            
+            pinString = unescape(pinString);
+            var returnString = "";
+            for (i = 0; i<pinString.length; i++) {
+                if (pinString.charAt(i) == "^") {
+                    returnString += "0";
+                } else {
+                    returnString += pinString.charAt(i);
+                }
+            }
+            returnString = returnString.replace("+"," ");
+            return returnString;
+        },
+        _getLyric: function(url) {
+            var self = this;
+            if (url) {
+                new IO({
+                    // crossDomain : true,
+                    // headers : {
+                    //     'X-Requested-With': false
+                    // },
+                    type : "get",
+                    url : url,
+                    data : {},
+                    dataType : "text",
+                    success : function(response) {
+                        window.__XIAMIPLAYER__.lyricComplete(true, response.replace(/\"/g, '&quot;'));
+                    },
+                    error : function(response) {
+                        window.__XIAMIPLAYER__.lyricComplete(false, '');
+                    } 
+                });
+            }
+            else {
+                window.__XIAMIPLAYER__.lyricComplete(false, '');                
+            }
+        },
+        _sendLog: function(url, data) {
+            var self = this;
+            if (url) {
+                new IO({
+                    type : "get",
+                    url : url,
+                    data : data,
+                    dataType : "text"
+                });
+            }
+        },
+        /**
+         * 加载歌曲 jsonvalue
+         * @param {String} value
+         */
+        load: function(value, pos) {
+            var self = this;
+			//alert(value);
+            value = JSON.parse(value);
+			
+            self._sid = value.songId;
+            self._object_name = value.objectName;
+            self._object_id = value.objectId;
+            self._ishq = self._modeHQ && self._isVIP ? 1 : 0;
+			//alert(value.grade);
+            if ( (self._ishq || value.tryhq) && value.grade != -2)
+            {
+				//alert("begin");
+                new IO({
+                    type : "get",
+                    url : "http://www.xiami.com/song/gethqsong/sid/"+self._sid,
+                    data : {},
+                    dataType : "json",
+                    success : function(response) {
+                        self._audio.src = self._getLocation(response.location);
+                        self._audio.autoplay = true;
+                        self._getLyric(value.lyric);
+                        self._t = (new Date()).getTime().toString();
+                        window.__XIAMIPLAYER__.playerRuning();
+                    }
+                });   
+				//alert("end");
+            }
+            else {
+                self._audio.src = self._getLocation(value.url);
+                self._audio.autoplay = true;
+                self._getLyric(value.lyric);
+                self._t = (new Date()).getTime().toString();
+                window.__XIAMIPLAYER__.playerRuning();
+            }
+        },
+        sync: function() {
+            var self = this;
+            new IO({
+                type : "get",
+                url : BaseConfig.UPDATE_VIP,
+                data : {
+                    "user_id": self._uid
+                },
+                dataType : "json",
+                success : function(response) {
+                    self._isVIP = response.data.vip == 1 ? true : false;
+                }
+            });
+        },
+        play: function() {
+            var self = this;
+            if (self._audio.paused) self._audio.play();
+        },
+        pause: function() {
+            var self = this;
+            if (!self._audio.paused) self._audio.pause();
+        },
+        stop: function() {
+            var self = this;
+            // try {
+            //     self._swf.jsStop();
+            // } catch (e) {
+            //     throw new Error("jsStop not a function in swf:" + e);
+            // }
+        },
+        status: function() {
+            var self = this;
+            if (self._audio.ended) {
+                return 'stop';
+            }
+            else if (self._audio.paused) {
+                return 'pause';
+            }
+            else {
+                return 'play';
+            }
+        },
+        /**
+         * 切换高品质
+         * @param {Boolean} value
+         */
+        changeHq: function(value) {
+            var self = this;
+            if (S.isBoolean(value)) {
+                new IO({
+                    type : "get",
+                    url : BaseConfig.SET_HQ,
+                    data : {
+                        "tone_type": value ? 1 : 0,
+                        "user_id": self._uid
+                    },
+                    dataType : "json",
+                    success : function(response) {
+                        if (response.status==1) self._modeHQ = value;
+                    }
+                });
+            } else {
+                throw new Error("arguments are not Boolean");
+            }
+        },
+        /**
+         * 跳跃播放 设置当前播放头, 并从这里开始播放
+         * @param  {Number} value 播放头位置, 百分比位置为 0-1 的数值
+         */
+        position: function(value) {
+            var self = this;
+            if (self._audio.duration && value >= 0 && value <= 1) {
+                self._audio.currentTime = self._audio.duration * value;
+            } else {
+                throw new Error("arguments are not 0-1");
+            }
+        },
+        volume: function(value) {
+            var self = this;
+            if (S.isNumber(value) && value >= 0 && value <= 1) {
+                var v = Number(value.toFixed(2));
+                self._audio.volume = v;
+                self._volumeValue = v;
+                document.cookie = 'XMPLAYER_volumeValue='+ v +';path=/;domain=.xiami.com;max-age='+ 60*60*24*365;
+            } else {
+                throw new Error("arguments are not 0-1");
+            }
+        },
+        mode: function(value) { //1 顺序播放，2 随机播放，0 循环单曲
+            var self = this;
+            try {
+                self._playMode = value;
+                document.cookie = 'XMPLAYER_playMode='+ value +';path=/;domain=.xiami.com;max-age='+ 60*60*24*365;
+            } catch (e) {
+                throw new Error("setMode not a function in swf:" + e);
+            }
+        },
+        config: function(value) {
+            var self = this;
+            self._uid = value.uid || 0;
+            self._isVIP = value.isVIP || false;
+            self._vipRole = value.vipRole || 0;
+            self._modeHQ = value.modeHQ || false;
+        }
+    };
+
+    module.exports = player;
+});
+
 KISSY.add('utils/scrollView/scrollViewManage',['node', 'event', 'scroll-view', 'scroll-view/plugin/scrollbar'], function(S, require, exports, module) {
     // @formatter:off
     var Node = require("node"),
@@ -1391,8 +2124,9 @@ KISSY.add('utils/scrollView/scrollViewManage',['node', 'event', 'scroll-view', '
         render : function(name, config) {
             var self = this;
             if (S.UA.ie && S.UA.ie < 8) {
-                $("#" + name).css("overflow-y", "auto");
-                return false;
+                var view = $("#" + name)
+                view.css("overflow-y", "auto");
+                return view;
             }
             var config = config || {};
             var option = S.mix(config, {
@@ -1762,6 +2496,8 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             self.clearLyric();
 			
 			// dumbbirdedit
+			if ($('#wikilrc').length && $('#wikilrc').text() != "")
+				text = $('#wikilrc').text();
 			
 			// by @dumbbird, inspired by @哀
 			//alert("render/reset");
@@ -1780,14 +2516,18 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 							self.lyricLoadComplete(lyrictxt);
 						else
 							self.noLyric();
+						var el = document.getElementById("t_xiamini");
+						if (el) {
+							el.parentNode.removeChild(el);
+						}
 					}	
 				});
 			}
 			rendercomment = function (){
-				if (!S.one('#J_walllist')) 
-					S.one('#J_lrcWrap').append('<div class="ui-player-lrc" id="J_walllist"><div class="ks-scroll-view" id="J_walllistView"></div></div>');
+				if ($('#J_walllist').length == 0) 
+					$('#J_lrcWrap').append('<div class="ui-player-lrc" id="J_walllist"><div class="ks-scroll-view" id="J_walllistView"></div></div>');
 				new IO({
-					url: 'http://www.xiami.com/song/' + +sid,
+					url: 'http://www.xiami.com/commentlist/turnpage/id/' + sid + '/page/1/ajax/1?type=4',
 					dataType: "text",
 					async: false,
 					success: function(responres){
@@ -1798,7 +2538,8 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 						div.innerHTML = responres;
 						document.body.appendChild(div);
 						var comments = '<div class="ks-scroll-view-content">';
-						var commentList = S.all(".post_item")
+						var commentList = $(".post_item");
+						//console.log(commentList);
 						var author, posttime, content;
 						commentList.each(function (commentNode) {
 							author = commentNode.one('.author').text();
@@ -1817,7 +2558,7 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 						comments += '</div>';
 						//alert(comments);
 						
-						S.one('#J_walllistView').html(comments);
+						$('#J_walllistView').html(comments);
 						self.scrollView = ScrollViewManage.forceRender("J_walllistView");
 						
 						div.parentNode.removeChild(div);										
@@ -1825,8 +2566,7 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 				});
 			
 			}
-			
-			resetlrc = function (){				
+			resetlrc = function (){		
 				var wikilrc = "";				
 				if (document.getElementById("wikilrc") != null)
 					wikilrc = $('#wikilrc').text();
@@ -1842,7 +2582,7 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 					self.noLyric();
 				}
 				setTimeout(function (){	
-					self.scrollView = ScrollViewManage.render("J_tracksScrollView");
+					self.scrollView = ScrollViewManage.sync("J_tracksScrollView");
 				}, 1000);
 			}
 			
@@ -1859,26 +2599,7 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 			} else {
 				self.noLyric();
 				return 0;
-			}
-			
-			// var wikilrc = "";			
-			// function setwiki() {				
-				// if (!document.getElementById('wikilrc'))
-					// ; 
-				// else wikilrc = $('#wikilrc').text();
-				// //alert(wikilrc);
-				// if (wikilrc != "")
-					// self.lyricLoadComplete(wikilrc);
-				// else if (status) {
-					// self.lyricLoadComplete(text);				
-				// } else {
-					// self.noLyric();
-					// return 0;
-				// }
-				// return 1;
-			// }
-			// window.setTimeout(setwiki,500);
-			
+			}	
 			
 		},
         /**
@@ -1913,14 +2634,14 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 			
 			// dumbbirdedit, inspired by @哀
 			var el = document.getElementById("lrc_trans");
-			el.setAttribute("style", "color:lightgray");
+			el.setAttribute("class", "");
 			el.setAttribute("status", "txt");
 			el.setAttribute("title", "文本歌词");
 			
         },
         changeCurrent: function(oldIndex, newIndex) {
             var self = this;
-			
+
             if (oldIndex != -1) {
 				self.LyricLine.item(0).removeClass("ui-lrc-current");	// dumbbirdedit
                 self.LyricLine.item(oldIndex).removeClass("ui-lrc-current");
@@ -1931,12 +2652,14 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 				self._checkPosition(a);
             }
 			
-			// dumbbirdedit
-			if (-1 != oldIndex && self.TransLine.item(oldIndex).removeClass("ui-trans-current"), -1 != newIndex) {
-				self.TransLine.item(0).removeClass("ui-trans-current");			
-				var e = self.TransLine.item(newIndex); 
-				e.addClass("ui-trans-current");
-			}
+			// dumbbirdedit, add in null justification
+			if (oldIndex != -1 && self.TransLine.item(oldIndex) != null)
+				if (-1 != oldIndex && self.TransLine.item(oldIndex).removeClass("ui-trans-current"), -1 != newIndex) {
+					//alert(oldIndex);
+					self.TransLine.item(0).removeClass("ui-trans-current");			
+					var e = self.TransLine.item(newIndex); 
+					e.addClass("ui-trans-current");
+				}
 			
         },
         syncTime: function(time) {
@@ -2016,18 +2739,19 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
             };
             self.wrap.html(html);
             self.LyricLine = self.wrap.all(".ui-lrc-line");
-			self.TransLine = self.wrap.all(".ui-trans-line"); //dumbbirdedit
+			self.TransLine = self.wrap.all(".ui-trans-line"); //dumbbirdedit, item will be null when unavailable
+
             self.scrollView = ScrollViewManage.render("J_lyricScrollView");
 			
 			// dumbbirdedit
 			if (roll) {
 				var el = document.getElementById("lrc_trans");
 				if (document.getElementById("t_xiamini") /*&& document.getElementsByClassName("ui-trans-line").length != 0*/) {
-					el.setAttribute("style", "color:green");
+					el.setAttribute("class", "lrc");
 					el.setAttribute("status", "lrc");
 					el.setAttribute("title", "LRC开启/t-LRC关闭中 (翻译隐藏)");
 				} else {
-					el.setAttribute("style", "color:#f60");
+					el.setAttribute("class", "tlrc");
 					el.setAttribute("status", "tlrc");
 					el.setAttribute("title", "LRC/t-LRC开启中");
 				}
@@ -2037,8 +2761,12 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 			transdislrc = function (){
 				//alert("transdislrc");
 				self.LyricLine = self.wrap.all(".ui-lrc-line"),
-				self.TransLine = self.wrap.all(".ui-trans-line"), //dumbbirdedit
-				self.scrollView = ScrollViewManage.render("J_lyricScrollView");
+				self.TransLine = self.wrap.all(".ui-trans-line"), //dumbbirdedit				
+				setTimeout(function (){
+					self.scrollView = ScrollViewManage.sync("J_lyricScrollView");
+					self.scrollView = ScrollViewManage.render("J_tracksScrollView");
+				}, 500);
+				//self.fire("soundPlaying");
 			}			
         },
         _splitLyric: function(value) {
@@ -2141,7 +2869,7 @@ KISSY.add('page/mods/player/player-lrc',['node', 'base', 'io', 'xtemplate', 'ani
 			
 			// dumbbirdedit, inspired by @哀
 			var el = document.getElementById("lrc_trans");
-			el.setAttribute("style", "color:lightgray");
+			el.setAttribute("class", "");
 			el.setAttribute("status", "txt");
 			el.setAttribute("title", "文本歌词");
 			
@@ -3265,11 +3993,20 @@ KISSY.add('page/mods/xtpl/trackItem-xtpl',function (S, require, exports, module)
                 var id20 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 17);
                 buffer += renderOutputUtil(id20, true);
                 buffer += '"><span title="';
-                var id21 = getPropertyOrRunCommandUtil(engine, scope, {}, "title", 0, 17);
-                buffer += renderOutputUtil(id21, false);
+                var id21 = getPropertyOrRunCommandUtil(engine, scope, {}, "songName", 0, 17);
+				buffer += renderOutputUtil(id21, false);
                 buffer += '">';
-                var id22 = getPropertyOrRunCommandUtil(engine, scope, {}, "title", 0, 17);
-                buffer += renderOutputUtil(id22, false);
+				
+				// dumbbirdedit
+                var id21_val = renderOutputUtil(id21, false);				
+				var workTitle = /^(.+: .+? - )/g.exec(id21_val);
+				if (workTitle != null)
+					id21_val = id21_val.replace(workTitle[0], "");
+				//console.log(workTitle);					
+
+                var id22 = getPropertyOrRunCommandUtil(engine, scope, {}, "songName", 0, 17);
+                buffer += id21_val;
+				//buffer += renderOutputUtil(id22, false);
                 buffer += '</span></div>\n\t\t';
                 var config23 = {};
                 var params24 = [];
@@ -3291,12 +4028,17 @@ KISSY.add('page/mods/xtpl/trackItem-xtpl',function (S, require, exports, module)
                     var id29 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_id", 0, 20);
                     buffer += renderOutputUtil(id29, true);
                     buffer += '" target="_blank" title="';
-                    var id30 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 20);
-                    buffer += renderOutputUtil(id30, false);
+                    var id30 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 20);					
+					buffer += renderOutputUtil(id30, false);
                     buffer += '">';
                     var id31 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 20);
-                    buffer += renderOutputUtil(id31, false);
-                    buffer += '</a></div>\n\t\t';
+					// dumbbirdedit
+					if (workTitle != null)
+						buffer += workTitle[0].slice(0,-2);
+					else
+						buffer += renderOutputUtil(id31, false);
+                    buffer += '</a>';					
+					buffer += '</div>\n\t\t';
                     return buffer;
                 };
                 var inverse32 = config23.fn;
@@ -3537,8 +4279,7 @@ KISSY.add('page/mods/player/player-tracks',['node', 'base', 'anim', 'xtemplate',
             //         roamBody.remove();
             //         self.tracksWrap.all(".ui-track-item").removeClass("ui-track-roaming")
             //     }).run();
-            // }
-
+            // }			
         },
         /**
          * 同步歌曲面板视图
@@ -5348,10 +6089,16 @@ KISSY.add('page/mods/player/player-data',['base', 'json', 'io', 'utils/base', '.
              title: "Mine Mine"
              tryhq: 0
              */
+			
+			if (!obj.songName) {
+				obj.songName = obj.title;
+				//console.log(obj.songName);
+			}
+				
             var result = {};
             result.url = obj.location;
             result.songId = +obj.song_id;
-            result.song = obj.title;
+            result.song = obj.songName;			
             result.artist = obj.artist;
             result.artistId = +obj.artist_id;
             result.album = obj.album_name;
@@ -5366,6 +6113,9 @@ KISSY.add('page/mods/player/player-data',['base', 'json', 'io', 'utils/base', '.
             result.tryhq = Number(obj.tryhq) || 0;
             result.artistUrl = obj.artist_url;
             result.rec_note = obj.rec_note;
+                result.musicType = obj.music_type || 0;
+                result.downloadJson = obj.downloadjson || '';
+                result.listenLevel = obj.purviews && obj.purviews.LISTEN || {};
 
             return result;
         }
@@ -5799,8 +6549,10 @@ KISSY.add('page/mods/xtpl/trackMenu-xtpl',function (S, require, exports, module)
             buffer += ')"><i class="icon-collect"></i>添加到精选集</a></li>\n\t\t<li><a id="J_trackMobile" href="javascript:void(0)" onclick="SEIYA.sendMobile(';
             var id3 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 5);
             buffer += renderOutputUtil(id3, true);
-            buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\n\t\t<li><a id="J_trackdislikeB" href="javascript:void(0)" data-sid="';
+            buffer += ')"><i class="icon-mobile"></i>发送到手机</a></li>\n\t\t<li><a id="J_winopenPlay" href="javascript:void(0)" onclick="SEIYA.switchOldVersion()" title="弹窗"><i class="icon-winopenPlay"></i>切换到旧播放器</a></li><li><a id="J_trackdislikeB" href="javascript:void(0)" onclick="SEIYA.dislikeThis(';
 			var id4 = getPropertyOrRunCommandUtil(engine, scope, {}, "id", 0, 5);
+			buffer += renderOutputUtil(id4, true);
+			buffer += ')" data-sid="';			
             buffer += renderOutputUtil(id4, true);
             buffer += '" data-type="track" data-event="dislike"><span class="icon-dislike">X</span>不喜欢这首歌</a></li>\n\t</ul>\n\t<span class="arrow"></span>\n</div>';
 			return buffer;
@@ -7008,6 +7760,30 @@ KISSY.add('page/mods/player/player-cover',['io', 'xtemplate', 'event', 'node'], 
     return cover;
 });
 
+// 歌曲切换试听打点
+
+KISSY.add('page/mods/player/player-switch',function(S, require, exports, module) {
+    module.exports = {
+        gold: function(gmkey, kvkey, logkey, chksum) {
+            if (!window.goldlog) {
+                S.log('aplus没有正确加载，无法进行黄金令箭统计.')
+                return
+            }
+            logkey = logkey || '/xiamipc.1.22'
+            chksum = chksum || 'H46807196'
+            gmkey = gmkey || ''
+            kvkey = kvkey || ''
+            if (S.isObject(gmkey)) {
+                gmkey = S.param(gmkey)
+            };
+            this._record(logkey, gmkey, kvkey, chksum)
+        },
+        _record: function(logkey, gmkey, kvkey, chksum) {
+            window.goldlog.record.apply(this, arguments)
+        }
+    };
+})
+
 /**
  * @fileOverview 数据请求管理中心
  * @author noyobo<nongyoubao@alibaba-inc.com>
@@ -7044,7 +7820,7 @@ KISSY.add('page/mods/data/center',['io', 'base'], function(S, require, exports) 
                         self.set('uid', responres.data.uid);
                         self.set('vip', responres.data.vip);
                         self.set('vipRole', responres.data.vip_role);
-                        console.log(url);
+                        //console.log(url);
 						var list = {};	// van
 						if (document.getElementById('mp3list'))
 							list = JSON.parse(document.getElementById('mp3list').innerHTML);
@@ -7054,30 +7830,38 @@ KISSY.add('page/mods/data/center',['io', 'base'], function(S, require, exports) 
 							addsongids = unescape(url.match(/\d{2,}[%2C\d{2,}]*/));
 							addsongids = addsongids.split(',');
 						}
-						console.log(addsongids);
+						//console.log(addsongids);
 						var templist = [];
 						var entranceMsg = "不好意思您好像没买虫洞穿越的门票呢，请收藏虫洞穿越精选集获得门票，然后重新打开播放器凭票入场哦！";
 						var hqwhMsg = "虫洞穿越温馨提示：您现在是普通音质模式，只能四维穿越，但您请求的一些虫洞穿越目标存在于五维空间，建议开一下VIP高音质开关然后重试。";
+						var failMsg = "非常抱歉，虾米官方封锁了五维引力波穿越，请咨询虫洞穿越导游来获取这首歌的四维虫洞。";
 						
 						if (!responres.data.trackList) {	// all songs wormhole parsing
+							//console.log("need wormhole");
 							if (!Object.keys(list).length) {
 								alert(entranceMsg);
 								window.open("http://www.xiami.com/collect/552436");
 								return false;	// wormhole entrance
 							}
 							var list_5d;
+							var flag_5d = false;
 							var title_5d, artist_5d, album_5d = '', image_5d = '';
 							var albumid_5d = '#';
 							for (x in addsongids) {
+								if (addsongids[x] == "")
+									continue;
 								if (list[addsongids[x]]) {
 									list[addsongids[x]]['insert_type'] = '3';
 									list[addsongids[x]]['grade'] = -2;
 									list[addsongids[x]]['artist_url'] = 'http://www.xiami.com/search/find/artist/'+list[addsongids[x]]['artist'];
 									list[addsongids[x]]['lyric'] = 'http://www.xiami.com/radio/lyric/sid/'+list[addsongids[x]]['song_id'];
 									list[addsongids[x]]['location'] = list[addsongids[x]]['location'].replace(/amp\;/g, "");
-									
+									list[addsongids[x]]['result.listenLevel'] = 1;
 									templist.push(list[addsongids[x]]);
 								} else {
+									flag_5d = true;
+									
+								/*
 									console.log(responres.data.hqset);
 									if(responres.data.hqset == 0) {
 										alert(hqwhMsg);
@@ -7128,17 +7912,22 @@ KISSY.add('page/mods/data/center',['io', 'base'], function(S, require, exports) 
 									list_5d[addsongids[x]]['artist_url'] = 'http://www.xiami.com/search/find/artist/'+list_5d[addsongids[x]]['artist'];
 									list_5d[addsongids[x]]['lyric'] = 'http://www.xiami.com/radio/lyric/sid/'+list_5d[addsongids[x]]['song_id'];
 									list_5d[addsongids[x]]['location'] = list_5d[addsongids[x]]['location'].replace(/amp\;/g, "");
-								
+									list[addsongids[x]]['result.listenLevel'] = 1;
 									templist.push(list_5d[addsongids[x]]);
-									
+									*/
 								}
 							}
+							if (flag_5d) {
+								alert(failMsg);
+								window.open("http://www.xiami.com/collect/552436");
+							}
+							
 							if (templist.length > 0)
 								self.set('trackList', templist);
 							else self.set('trackList', responres.data.trackList);
-						} 
+						}
 						else {								// default and mix
-							if (responres.data.trackList.length == addsongids.length) {
+							if (addsongids.length == 0 || responres.data.trackList.length == addsongids.length) {
 								self.set('trackList', responres.data.trackList);
 							} 
 							else {
@@ -7158,6 +7947,8 @@ KISSY.add('page/mods/data/center',['io', 'base'], function(S, require, exports) 
 									oldIDs[templist[x].song_id] = 'ok';	// mark default songids
 								}
 								for (x in addsongids) {
+									if (addsongids[x] == "")
+										continue;
 									if (!oldIDs[addsongids[x]]) {
 										// check if needs wormhole
 										if (list[addsongids[x]]) {
@@ -7167,72 +7958,75 @@ KISSY.add('page/mods/data/center',['io', 'base'], function(S, require, exports) 
 											list[addsongids[x]]['artist_url'] = 'http://www.xiami.com/search/find/artist/'+list[addsongids[x]]['artist'];
 											list[addsongids[x]]['lyric'] = 'http://www.xiami.com/radio/lyric/sid/'+list[addsongids[x]]['song_id'];
 											list[addsongids[x]]['location'] = list[addsongids[x]]['location'].replace(/amp\;/g, "");
-											
+											list[addsongids[x]]['result.listenLevel'] = 1;
 											templist.push(list[addsongids[x]]);
 										} 
 										else {
 											// 5d wormholes
-											console.log(responres.data.hqset);
-											console.log(addsongids[x]);
-											if(responres.data.hqset == 0) {
-												count_5d++;
-												continue;
-											}
-											var trackitem = S.one(".ui-row-item-column[data-id='" + addsongids[x] + "']");
-											if (trackitem) {
-												// within player
-												title_5d = S.trim(trackitem.text());
-												artist_5d = S.trim(trackitem.next().text());
-												artist_5d = artist_5d.replace(/\n/g, "").replace(/	/g, "");
-												try {
-													albumid_5d = trackitem.next().next().attr("data-album-id");
-													//console.log(albumid_5d);
-												} catch (err) {
-													albumid_5d = "#";
-												}
-												if (typeof(albumid_5d) != "undefined")
-													album_5d = S.trim(trackitem.next().next().text());
-												image_5d = "http://img.xiami.net/images/collect/436/36/552436_1453653155_tsx8.jpg";
-												console.log(title_5d + artist_5d + album_5d);
-											} 
-											else {
-												// outside player
-												// new IO({
-													// url: self.host + '/song/' + addsongids[x],
-													// dataType: "text",
-													// async: false,
-													// success: function(responres){
-														// //alert(responres);
-														// var div = document.createElement('div');
-														// div.id = 'temp_5d';
-														// div.setAttribute('style', 'display:none');
-														// div.innerHTML = responres;
-														// document.body.appendChild(div);
-														// title_5d = S.one("meta[property='og:title']").attr("content");
-														// artist_5d = S.one("meta[property='og:music:artist']").attr("content");
-														// album_5d = S.one("meta[property='og:music:album']").attr("content");
-														// image_5d = S.one("meta[property='og:image']").attr("content");
-														// //alert(title_5d);
-														// div.parentNode.removeChild(div);											
-													// }
-												// });
-											}
-											var json_buffer = '{"' + addsongids[x] + '": { "song_id":"' + addsongids[x] + '", "title":"' + title_5d + '", "album_id":"' + albumid_5d + '", "album_name":"' + album_5d + '", "artist":"' + artist_5d + '", "location":"http://m5.file.xiami.com/614/1298250614/1699635048/1773101841_14855742_l.mp3?auth_key=e105d2feca34d3e210403866f1a6cff1-1453766400-0-null", "pic":"' + image_5d + '"}}';
-											//alert(json_buffer);
-											list_5d = JSON.parse(json_buffer);
-											list_5d[addsongids[x]]['insert_type'] = '3';
-											list_5d[addsongids[x]]['grade'] = -2;
-											list_5d[addsongids[x]]['artist_url'] = 'http://www.xiami.com/search/find/artist/'+list_5d[addsongids[x]]['artist'];
-											list_5d[addsongids[x]]['lyric'] = 'http://www.xiami.com/radio/lyric/sid/'+list_5d[addsongids[x]]['song_id'];
-											list_5d[addsongids[x]]['location'] = list_5d[addsongids[x]]['location'].replace(/amp\;/g, "");
+											count_5d++;
+											/* console.log(responres.data.hqset);
+											// console.log(addsongids[x]);
+											// if(responres.data.hqset == 0) {
+												// count_5d++;
+												// continue;
+											// }
+											// var trackitem = S.one(".ui-row-item-column[data-id='" + addsongids[x] + "']");
+											// if (trackitem) {
+												// // within player
+												// title_5d = S.trim(trackitem.text());
+												// artist_5d = S.trim(trackitem.next().text());
+												// artist_5d = artist_5d.replace(/\n/g, "").replace(/	/g, "");
+												// try {
+													// albumid_5d = trackitem.next().next().attr("data-album-id");
+													// //console.log(albumid_5d);
+												// } catch (err) {
+													// albumid_5d = "#";
+												// }
+												// if (typeof(albumid_5d) != "undefined")
+													// album_5d = S.trim(trackitem.next().next().text());
+												// image_5d = "http://img.xiami.net/images/collect/436/36/552436_1453653155_tsx8.jpg";
+												// console.log(title_5d + artist_5d + album_5d);
+											// } 
+											// else {
+												// // outside player
+												// // new IO({
+													// // url: self.host + '/song/' + addsongids[x],
+													// // dataType: "text",
+													// // async: false,
+													// // success: function(responres){
+														// // //alert(responres);
+														// // var div = document.createElement('div');
+														// // div.id = 'temp_5d';
+														// // div.setAttribute('style', 'display:none');
+														// // div.innerHTML = responres;
+														// // document.body.appendChild(div);
+														// // title_5d = S.one("meta[property='og:title']").attr("content");
+														// // artist_5d = S.one("meta[property='og:music:artist']").attr("content");
+														// // album_5d = S.one("meta[property='og:music:album']").attr("content");
+														// // image_5d = S.one("meta[property='og:image']").attr("content");
+														// // //alert(title_5d);
+														// // div.parentNode.removeChild(div);											
+													// // }
+												// // });
+											// }
+											// var json_buffer = '{"' + addsongids[x] + '": { "song_id":"' + addsongids[x] + '", "title":"' + title_5d + '", "album_id":"' + albumid_5d + '", "album_name":"' + album_5d + '", "artist":"' + artist_5d + '", "location":"http://m5.file.xiami.com/614/1298250614/1699635048/1773101841_14855742_l.mp3?auth_key=e105d2feca34d3e210403866f1a6cff1-1453766400-0-null", "pic":"' + image_5d + '"}}';
+											// //alert(json_buffer);
+											// list_5d = JSON.parse(json_buffer);
+											// list_5d[addsongids[x]]['insert_type'] = '3';
+											// list_5d[addsongids[x]]['grade'] = -2;
+											// list_5d[addsongids[x]]['artist_url'] = 'http://www.xiami.com/search/find/artist/'+list_5d[addsongids[x]]['artist'];
+											// list_5d[addsongids[x]]['lyric'] = 'http://www.xiami.com/radio/lyric/sid/'+list_5d[addsongids[x]]['song_id'];
+											// list_5d[addsongids[x]]['location'] = list_5d[addsongids[x]]['location'].replace(/amp\;/g, "");
 										
-											templist.push(list_5d[addsongids[x]]);										
+											// templist.push(list_5d[addsongids[x]]);	*/									
 										}
 									}									
 								}
-								if (count_5d)
-									alert("虫洞穿越温馨提示：您现在是普通音质模式，只能四维穿越，但有 " + count_5d + " 个虫洞穿越目标存在于五维空间，建议开启VIP高音质模式重试。");
-								
+								if (count_5d) {
+									alert(failMsg);
+									window.open("http://www.xiami.com/collect/552436");
+								}
+									
 								self.set('trackList', templist);
 							}
 						}
@@ -7321,7 +8115,7 @@ KISSY.add('page/mods/xtpl/trackInfo-xtpl',function (S, require, exports, module)
                 };
                 config0.inverse = function (scope) {
                     var buffer = "";
-                    buffer += '\n<a id="J_trackName" href="http://www.xiami.com/song/';
+                    buffer += '\n<a id="J_trackName" href="/song/';
                     var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 5);
                     buffer += renderOutputUtil(id7, true);
                     buffer += '" title="';
@@ -7480,7 +8274,7 @@ KISSY.add('page/mods/xtpl/user-xtpl',function (S, require, exports, module) {
             };
             config0.inverse = function (scope) {
                 var buffer = "";
-                buffer += '\n<div class="user">\n<div class="avatar">\n\t<a href="http://www.xiami.com/u/';
+                buffer += '\n<div class="user">\n<div class="avatar">\n\t<a href="/u/';
                 var id3 = getPropertyOrRunCommandUtil(engine, scope, {}, "uid", 0, 13);
                 buffer += renderOutputUtil(id3, true);
                 buffer += '" target="_blank" title="';
@@ -7648,39 +8442,44 @@ KISSY.add('utils/goldlog/index',function(S) {
  * @author noyobo
  * @mail nongyoubao@alibaba-inc.com
  */
-KISSY.add('page/mods/player',['./page', /*van edit*/'node', 'base', 'json', 'event', 'io', 'xtemplate', './player/player-swfobj', './player/player-lrc', './player/player-sale', './player/player-lister', './player/player-volume', './player/player-panel', './player/player-control', './player/player-tracks', './player/player-blur', './player/player-data', './player/player-menu', './player/player-roam', './player/player-log', './player/player-drag', './player/player-cover', './data/center', './xtpl/trackInfo-xtpl', 'widget/tool/index', 'utils/tip/index', './user', 'utils/goldlog/index'], function(S, require, exports, module) {
-    // @formatter:off
-    var Node = require("node"),
-        Base = require("base"),
-        Json = require("json"),
-        Event = require('event'),
-        IO = require('io'),
-        Xtemplate = require("xtemplate"),
-        //PlayerSwf = require("./player/player-swf"),
-        PlayerSwf = require("./player/player-swfobj"),
-        PlayerLrc = require("./player/player-lrc"),
-        PlayerSale = require('./player/player-sale'),
-        PlayerLister = require("./player/player-lister"),
-        PlayerVolume = require("./player/player-volume"),
-        PlayerPanel = require("./player/player-panel"),
-        PlayerControl = require("./player/player-control"),
-        PlayerTracks = require("./player/player-tracks"),
-        PlayerBlur = require("./player/player-blur"),
-        PlayerData = require("./player/player-data"),
-        PlayerMenu = require("./player/player-menu"),
-        PlayerRoam = require("./player/player-roam"),
-        PlayerLog = require('./player/player-log'),
-        PlayerDrag = require('./player/player-drag'),
-        PlayerCover = require('./player/player-cover'),
-		Page = require("./page"),	// van
-        DataCenter = require('./data/center'),
-        Tpl_trackInfo = require("./xtpl/trackInfo-xtpl"),
-        UTool = require("widget/tool/index"),
-        Tip = require("utils/tip/index"),
-        User = require("./user"),
-        Goldlog = require('utils/goldlog/index');
-    // @formatter:on
-    var $ = Node.all;
+KISSY.add('page/mods/player',['node', 'base', 'json', 'event', 'io', 'xtemplate', './player/player-swfobj', './player/player-audio', './player/player-lrc', './player/player-sale', './player/player-lister', './player/player-volume', './player/player-panel', './player/player-control', './player/player-tracks', './player/player-blur', './player/player-data', './player/player-menu', './player/player-roam', './player/player-log', './player/player-drag', './player/player-cover', './player/player-switch', './data/center', './xtpl/trackInfo-xtpl', 'widget/tool/index', 'utils/tip/index', './user', 'utils/goldlog/index'], function(S, require, exports, module) {
+  // @formatter:off
+
+  var Node = require("node"),
+    Base = require("base"),
+    Json = require("json"),
+    Event = require('event'),
+    IO = require('io'),
+    Xtemplate = require("xtemplate"),
+    //PlayerSwf = require("./player/player-swf"),
+    PlayerSwf = require("./player/player-swfobj"),
+    PlayerAudio = require("./player/player-audio"),
+    PlayerLrc = require("./player/player-lrc"),
+    PlayerSale = require('./player/player-sale'),
+    PlayerLister = require("./player/player-lister"),
+    PlayerVolume = require("./player/player-volume"),
+    PlayerPanel = require("./player/player-panel"),
+    PlayerControl = require("./player/player-control"),
+    PlayerTracks = require("./player/player-tracks"),
+    PlayerBlur = require("./player/player-blur"),
+    PlayerData = require("./player/player-data"),
+    PlayerMenu = require("./player/player-menu"),
+    PlayerRoam = require("./player/player-roam"),
+    PlayerLog = require('./player/player-log'),
+    PlayerDrag = require('./player/player-drag'),
+    PlayerCover = require('./player/player-cover'),
+    SWITCHLOG = require('./player/player-switch'),
+    Page = require("./page"),	// van
+    DataCenter = require('./data/center'),
+    Tpl_trackInfo = require("./xtpl/trackInfo-xtpl"),
+    UTool = require("widget/tool/index"),
+    Tip = require("utils/tip/index"),
+    User = require("./user"),
+    Goldlog = require('utils/goldlog/index');
+  // @formatter:on
+  var $ = Node.all;
+  var DATACENTERATTR = null;
+  var LISTENPOSITION = 0;
 
     function player() {
         // @formatter:off
@@ -7689,60 +8488,51 @@ KISSY.add('page/mods/player',['./page', /*van edit*/'node', 'base', 'json', 'eve
         dataUrl: null;
         // @formatter:on
     };
-    player.prototype = {
-        init: function(url, config) {
-            var self = this;
-            self.config = config;
-            self.dataUrl = url;
+  function isIE() {
+    return (navigator.appName == 'Microsoft Internet Explorer') || ((navigator.appName == 'Netscape') && (new RegExp("Trident/.*rv:([0-9]{1,}[\.0-9]{0,})").exec(navigator.userAgent) != null));
+  }
 
-            self.tpl_trackInfo = new Xtemplate(Tpl_trackInfo);
-            self.Play_btn = $("#J_playBtn");
-            self.Prev_btn = $("#J_prevBtn");
-            self.Next_btn = $("#J_nextBtn");
-            self.High_btn = $("#J_playerHQ");
-            self.Mode_btn = $("#J_playerMode");
+  player.prototype = {
+    init: function(url, config) {
+      var self = this;
+      self.config = config;
+      self.dataUrl = url;
+      self.tpl_trackInfo = new Xtemplate(Tpl_trackInfo);
+      self.Play_btn = $("#J_playBtn");
+      self.Prev_btn = $("#J_prevBtn");
+      self.Next_btn = $("#J_nextBtn");
+      self.High_btn = $("#J_playerHQ"); //xiaodi del 4/21 add 6/14
 
-            self.Fav_btn = $("#J_trackFav");
-            self.More_btn = $("#J_trackMore");
-            self.Share_btn = $("#J_trackShare");
-
-            self.Track_info = $("#J_trackInfo");
+      self.Mode_btn = $("#J_playerMode");
+      self.Fav_btn = $("#J_trackFav");
+      self.More_btn = $("#J_trackMore");
+      self.Share_btn = $("#J_trackShare");
+      self.Track_info = $("#J_trackInfo");
 
             self.Sale = $('#lyrics_control');	// dumbbirdedit
-            self.LrcWrap = $('#J_lyricScrollWrap');
+      self.LrcWrap = $('#J_lyricScrollWrap');
+      self.PlayerWrap = $("#J_playerWrap");
+      self.TrackControls = self.PlayerWrap.one(".track-controls");
+      self.BODY = $("#middle");
 
-            self.PlayerWrap = $("#J_playerWrap");
-            self.TrackControls = self.PlayerWrap.one(".track-controls");
-            self.BODY = $("#middle");
+      self.High_Timer = null;
+      self.High_Runing = false;
+      self.QUALITY_CURRENT = 0;
+      self.isVIP = false;
+      self.autoplay = true;
 
-            self.High_Timer = null;
-            self.High_Runing = false;
-            self.isVIP = false;
-            self.autoplay = true;
-            self.__FLASHREADY__ = false;
+      self._opLock = null;
 
-            self._opLock = null;
+      var audio = new PlayerAudio();
+      var audioSupport = audio.support();
+      self.Audio = (!isIE() && audioSupport) ? audio : new PlayerSwf(self.config);
 
-            self.Audio = new PlayerSwf(self.config);
+      self.__FLASHREADY__ = audioSupport ? true : false;
 
-            new IO({
-                url: 'http://42.120.74.204.3580.dns-detect.alicdn.com/api/cdnDetect',
-                data: {
-                    'method': 'commitDetect',
-                    'detectId': 3580
-                },
-                dataType: 'jsonp',
-                jsonp: 'cb',
-                success: function(res) {
-                    if (res.retCode === 0 && res.description === 'Ok') {
-                        self.syncDns(res.content.ldns, res.content.localIp);
-                    }
-                }
-            })
-            self.PlayerSale = new PlayerSale();
-            self.USER = new User();
-			self.Page = new Page();			// van
-            self.PlayerCover = new PlayerCover();
+      self.PlayerSale = new PlayerSale();
+      self.USER = new User();
+      self.Page = new Page();			// van
+      self.PlayerCover = new PlayerCover();
 
             self._playerListen();
             self._playerMenu();
@@ -7758,15 +8548,15 @@ KISSY.add('page/mods/player',['./page', /*van edit*/'node', 'base', 'json', 'eve
             self._dataCenter();
             self._addEvent();
 
-            if (self.USER.get('identity')<2) {
-                var tip = new Tip({
-                    target: '#J_playerHQ',
-                    content: '<p class="tip_60d"><a href="http://www.xiami.com/apps/mobile?vip" target="_blank"><strong>即刻享受高品质</strong><em>安装虾米音乐APP 免费领2个月VIP</em>对耳朵好一点 更纯粹 更细节</a></p>',
-                    maxWidth: '300px',
-                    duration: 10000
-                });
-                tip.show();
-            }
+      if (self.USER.get('identity') < 2) {
+        var tip = new Tip({
+          target: '#J_playerHQ',
+          content: '<p class="tip_60d"><a href="/apps/mobile?vip" target="_blank"><strong>即刻享受高品质</strong>对耳朵好一点 更纯粹 更细节</a></p>',
+          maxWidth: '300px',
+          duration: 10000
+        });
+        tip.show();
+      }
 
         },
         syncDns: function(dns, ip) {
@@ -7801,7 +8591,7 @@ KISSY.add('page/mods/player',['./page', /*van edit*/'node', 'base', 'json', 'eve
                         return '<a href="' + this.artistUrl + '" target="_blank" title="' + artist + '">' + artist + '</a>';
                     }
                     for (var i = 0, max = arr.length; i < max; i++) {
-                        result.push('<a href="http://www.xiami.com/search/find/artist/' + arr[i] + '" target="_blank" title="' + arr[i] + '">' + arr[i] + '</a>');
+                        result.push('<a href="/search/find/artist/' + arr[i] + '" target="_blank" title="' + arr[i] + '">' + arr[i] + '</a>');
                     }
                     return result.join(" / ");	// dumbbirdedit
                 }
@@ -7809,17 +8599,23 @@ KISSY.add('page/mods/player',['./page', /*van edit*/'node', 'base', 'json', 'eve
 			
 			// dumbbirdedit
 			var tc = document.getElementById('trackchange');
+			
 			if (!tc) {
 				tc = document.createElement("div");
 				tc.id = "trackchange";
 				document.head.appendChild(tc); 			
 			}
-		
-			tc.setAttribute("songid", track.songId);
-			tc.setAttribute("songtitle", track.song);
-			tc.setAttribute("artist", track.artist);
-			tc.click();
 			
+			if (tc.getAttribute("songid") == track.songId)
+				tc.setAttribute("repeat", 1);
+			else
+				tc.setAttribute("repeat", 0);
+			tc.setAttribute("songid", track.songId);
+			tc.setAttribute("songtitle", S.unEscapeHTML(track.song));
+			tc.setAttribute("artist", S.unEscapeHTML(track.artist));
+			
+			tc.click();
+			//console.log(repeat);
 			//alert("click done");
 			
             var html = self.tpl_trackInfo.render(data);			
@@ -7862,10 +8658,7 @@ KISSY.add('page/mods/player',['./page', /*van edit*/'node', 'base', 'json', 'eve
                     //self.LrcWrap.css('top', '257px');
                     self.PlayerLrc.sync();
                 }, function() {
-                    //self.Sale.html('<a id="lrc_fullscreen" title="歌词全屏显示开关">f</a><a id="lrc_report" title="歌词报错" href="http://www.xiami.com/group/thread-detail/tid/193387" target="_blank">r</a><a id="lrc_trans" title="文本歌词" status="txt" style="color:lightgray">s</a>');
-                    //self.Sale.show();
-                    //self.LrcWrap.css('top', '215px');
-                    self.PlayerLrc.sync();
+					self.PlayerLrc.sync();
                 });
                 self.TrackControls.show();
                 self.Fav_btn.attr("data-sid", track.songId);
@@ -7876,11 +8669,11 @@ KISSY.add('page/mods/player',['./page', /*van edit*/'node', 'base', 'json', 'eve
 			// Lyrics & Wormhole Control - van & dumbbirdedit
 			
 			html = '<div id="lyrics_control">';
-			html += '<a id="lrc_fullscreen" title="歌词全屏显示开关">l</a>';
+			html += '<a id="lrc_fullscreen" title="歌词全屏显示开关">Ô</a>';
 			html += '<a id="lrc_report" title="歌词报错" href="http://www.xiami.com/group/thread-detail/tid/193387" target="_blank">r</a>';
-			html += '<a id="lrc_trans" title="文本歌词" status="txt" style="color:lightgray">Z</a>';
-			html += '<a id="lrc_wikia" title="载入维基歌词" status="wiki" style="color:lightgray">k</a>';
-			html += '<a id="comments" title="载入评论" status="disabled" style="color:lightgray">s</a>';
+			html += '<a id="lrc_trans" title="文本歌词" status="txt">Z</a>';
+			html += '<a id="lrc_wikia" title="载入维基歌词" status="off">k</a>';
+			html += '<a id="comments" title="载入评论" status="disabled"></a>';
 			html += '</div>';
 			if ($('#lyrics_control').length == 0)
 				$('#J_lrcWrap').append(html);
@@ -7906,14 +8699,9 @@ KISSY.add('page/mods/player',['./page', /*van edit*/'node', 'base', 'json', 'eve
 				self.Fav_btn.attr("title", "穿越中");
 				self.Fav_btn.text("F");
 			}
-			// dislikeSong Button in bottom - van
-		
-			// var dislikebtn = '<a id="J_trackdislikeB" class="icon-dislike-bottom" data-sid="'+track.songId+'" data-type="track" data-event="dislike" title="不喜欢"></a>';
-			// if ($('#J_trackdislikeB').length == 0)
-				// $('#J_trackFav').before(dislikebtn);
-			// else $('#J_trackdislikeB').attr("data-sid", track.songId);
 			
-            var status = self.PlayerData.get('status');
+            var status = self.PlayerData.get('status'); // play
+			
             if ("room" != self.PlayerData.get("status")) {
                 //var index = self.PlayerData.checkIndex();
                 self.PlayerTracks.highCurrentTrack(track.songId, status);
@@ -7954,203 +8742,281 @@ KISSY.add('page/mods/player',['./page', /*van edit*/'node', 'base', 'json', 'eve
             var f;
             S.log(["changeTrackFlag", sid, flag, type]);
 
-            switch (type) {
-                case "roam":
-                    {
-                        f = $("#J_roamItem" + sid).one(".fav-btn");
-                        break;
-                    }
-                case "myfav":
-                    {
-                        f = $("#J_favList" + sid).one(".fav-btn");
-                        break;
-                    }
-                case "history":
-                    {
-                        f = $("#J_historyList" + sid).one(".fav-btn");
-                        break;
-                    }
-                case "collect":
-                    {
-                        f = $("#J_collectList" + sid).one(".fav-btn");
-                        break;
-                    }
-                default:
-                    {
-                        f = $("#J_trackList" + sid).one(".fav-btn");
-                    }
-            }
-            if (type == "roam") {
-                if (!flag) {
-                    f && f.removeClass("icon-roam-faved").addClass("icon-roam-fav");
-                    f && f.attr("title", "收藏");
-                } else {
-                    f && f.removeClass("icon-roam-fav").addClass("icon-roam-faved");
-                    f && f.attr("title", "取消收藏");
-                };
-            } else {
-                if (!flag) {
-                    f && f.removeClass("icon-track-faved").addClass("icon-track-fav");
-                    f && f.attr("title", "收藏");
-                } else {
-                    f && f.removeClass("icon-track-fav").addClass("icon-track-faved");
-                    f && f.attr("title", "取消收藏");
-                }
-            }
-        },
-        playOrPause: function() {
-            var self = this;
-            var track = self.PlayerData.get("track");
-            if (track === "")
-                return false;
-            if ("room" == self.PlayerData.get("status")) {
-                return false;
-            }
-            var status = self.Audio.status();
-            S.log(["playOrPause: ", status]);
-            if (status == "stop") {
-                self.Audio.load(track);
-                self.setMusicInfo(track);
-                self.Play_btn.removeClass("play-btn").addClass("pause-btn");
-                self.BODY.removeClass("playing");
-                //UTool.changeFavicon("http://res.xiami.net/pause.ico");
-                //document.title = document.title.substr(1);
-            }
+      switch (type) {
+        case "roam":
+          {
+            f = $("#J_roamItem" + sid).one(".fav-btn");
+            break;
+          }
+        case "myfav":
+          {
+            f = $("#J_favList" + sid).one(".fav-btn");
+            break;
+          }
+        case "history":
+          {
+            f = $("#J_historyList" + sid).one(".fav-btn");
+            break;
+          }
+        case "collect":
+          {
+            f = $("#J_collectList" + sid).one(".fav-btn");
+            break;
+          }
+        default:
+          {
+            f = $("#J_trackList" + sid).one(".fav-btn");
+          }
+      }
+      if (type == "roam") {
+        if (!flag) {
+          f && f.removeClass("icon-roam-faved").addClass("icon-roam-fav");
+          f && f.attr("title", "收藏");
+        } else {
+          f && f.removeClass("icon-roam-fav").addClass("icon-roam-faved");
+          f && f.attr("title", "取消收藏");
+        };
+      } else {
+        if (!flag) {
+          f && f.removeClass("icon-track-faved").addClass("icon-track-fav");
+          f && f.attr("title", "收藏");
+        } else {
+          f && f.removeClass("icon-track-fav").addClass("icon-track-faved");
+          f && f.attr("title", "取消收藏");
+        }
+      }
+    },
+    playOrPause: function() {
+      var self = this;
+      var track = self.PlayerData.get("track");
+      if (track === "")
+        return false;
+      if ("room" == self.PlayerData.get("status")) {
+        return false;
+      }
+      var status = self.Audio.status();
+      S.log(["playOrPause: ", status]);
+      if (status == "stop") {
+        self.Audio.load(track);
+        self.setMusicInfo(track);
+        self.Play_btn.removeClass("play-btn").addClass("pause-btn");
+        self.BODY.removeClass("playing");
+        //UTool.changeFavicon("http://res.xiami.net/pause.ico");
+        //document.title = document.title.substr(1);
+      }
 
-            if (status == "play") {
-                self.pause();
-                //UTool.changeFavicon("http://res.xiami.net/pause.ico");
-                //document.title = document.title.substr(1);
-            }
-            if (status == "pause") {
-                self.play();
-                //UTool.changeFavicon("http://res.xiami.net/play.ico");
-                //document.title = "▶" + document.title;
-            }
-        },
-        next: function() {
-            var self = this;
-            if (self.autoplay) {
-                self.autoplay && self.PlayerData.next(true);
-            }
-        },
-        prev: function() {
-            var self = this;
-            self.PlayerData.prev();
-        },
-        play: function() {
-            var self = this;
-            self.Audio.play();
-            self.Play_btn.removeClass("play-btn").addClass("pause-btn");
-            self.BODY.addClass("playing");
-        },
-        pause: function() {
-            var self = this;
-            self.Audio.pause();
-            self.Play_btn.removeClass("pause-btn").addClass("play-btn");
-            self.BODY.removeClass("playing");
-        },
-        replay: function() {
-            var self = this;
-            self.Audio.position(0);
-            self.play();
-        },
-        stop: function() {
-            var self = this;
-            self.BODY.removeClass("playing");
-            self.Play_btn.removeClass("pause-btn");
-            self.Play_btn.addClass("play-btn");
-            //self.PlayerLrc.reset();
-            self.Audio.stop();
-        },
-        _addEvent: function() {
-            var self = this;
-            // 播放
-            self.Play_btn.on("click", function() {
-                self.playOrPause();
-            });
-            // 切换高低品质
-            self.High_btn.on("click", function() {
-                S.log(self.isVIP, "", "is vip");
-                if (!self.isVIP) {
-                    var tip = new Tip({
-                        target: '#J_playerHQ',
-                        //content: '享受高品质音乐，立即<a href="http://www.xiami.com/vip/update" target="_blank">开通VIP</a>',
-                        //maxWidth: '200px'
-                        content: '<p class="tip_60d"><a href="http://www.xiami.com/vip/update" target="_blank"><em>享受高品质音乐 立即开通VIP</em><strong>开通VIP</strong>安装虾米音乐APP 免费领2个月VIP</a></p>',
-                        maxWidth: '300px'
-                    });
-                    tip.show();
-                    return false;
-                }
-                if (self.High_Runing)
-                    return false;
-                if (self.High_btn.attr("data-hq") == "off") {
-                    self.Audio.changeHq(true);
-                    self.High_Runing = true;
-                    self.High_btn.attr("class", "mode-hq-on1");
-                    var i = 1;
-                    self.High_Timer = setInterval(function() {
-                        i++;
-                        if (i > 25) {
-                            clearInterval(self.High_Timer);
-                            self.High_btn.attr("data-hq", "on");
-                            self.High_Runing = false;
-                        };
-                        self.High_btn.attr("class", "mode-hq-on" + i);
-                    }, 5);
-                } else {
-                    self.Audio.changeHq(false);
-                    self.High_Runing = true;
-                    self.High_btn.attr("class", "mode-hq-off1");
-                    var i = 1;
-                    self.High_Timer = setInterval(function() {
-                        i++;
-                        if (i > 25) {
-                            clearInterval(self.High_Timer);
-                            self.High_btn.attr("data-hq", "off");
-                            self.High_Runing = false;
-                        };
-                        self.High_btn.attr("class", "mode-hq-off" + i);
-                    }, 5);
-                };
-            });
-            self.Prev_btn.on("click", function() {
-                self._opLock && self._opLock.cancel();
-                self._opLock = S.later(function() {
-                    self.prev();
-                }, 200, false, null, null);
-            });
-            self.Next_btn.on("click", function() {
-                self._opLock && self._opLock.cancel();
-                self._opLock = S.later(function() {
-                    self.next();
-                }, 200, false, null, null);
-            });
-            self.Mode_btn.on("click", function() {
-                if ("room" == self.PlayerData.get("status")) {
-                    // room 模式下禁止操作
-                    return false;
-                }
-                self._opLock && self._opLock.cancel();
-                self._opLock = S.later(function() {
-                    var mode = self.PlayerData.changeMode();
-                    self.setModeView(mode);
-                    setTimeout(function() {
-                        self.Audio.mode(mode);
-                    }, 0);
-                }, 200, false, null, null);
-            });
-            self.Fav_btn.on("click", function() {
-                var that = $(this);
-                var sid = that.attr("data-sid");
-                self.PlayerControl.fav(this, sid);
-            });
-            self.More_btn.on("click", function(event) {
-                event.halt();
-                var that = $(this);
-                var sid = that.attr("data-sid");
-                self.PlayerMenu.showPanelMenu(that, sid);
+      if (status == "play") {
+        self.pause();
+        //UTool.changeFavicon("http://res.xiami.net/pause.ico");
+        //document.title = document.title.substr(1);
+      }
+      if (status == "pause") {
+        self.play();
+        //UTool.changeFavicon("http://res.xiami.net/play.ico");
+        //document.title = "▶" + document.title;
+      }
+    },
+    next: function() {
+      var self = this;
+      if (self.autoplay) {
+        self.autoplay && self.PlayerData.next(true);
+      }
+    },
+    prev: function() {
+      var self = this;
+      self.PlayerData.prev();
+    },
+    play: function() {
+      var self = this;
+      self.Audio.play();
+      self.Play_btn.removeClass("play-btn").addClass("pause-btn");
+      self.BODY.addClass("playing");
+    },
+    pause: function() {
+      var self = this;
+      self.Audio.pause();
+      self.Play_btn.removeClass("pause-btn").addClass("play-btn");
+      self.BODY.removeClass("playing");
+    },
+    replay: function() {
+      var self = this;
+      self.Audio.position(0);
+      self.play();
+    },
+    stop: function() {
+      var self = this;
+      self.BODY.removeClass("playing");
+      self.Play_btn.removeClass("pause-btn");
+      self.Play_btn.addClass("play-btn");
+      //self.PlayerLrc.reset();
+      self.Audio.stop();
+    },
+    _switchHigh: function () {
+      var self = this;
+      if (self.High_Runing)
+        return false;
+      if (self.High_Timer) {
+      clearInterval(self.High_Timer);
+      }
+      if (self.High_btn.attr("data-hq") == "off") {
+        DATACENTERATTR.hqset = 1;
+        self.Audio.changeHq(true);
+        self.High_Runing = true;
+        self.QUALITY_CURRENT = 1;
+        self.High_btn.attr("class", "mode-hq-on1");
+        var i = 1;
+        self.High_Timer = setInterval(function() {
+          i++;
+          if (i > 25) {
+            clearInterval(self.High_Timer);
+            self.High_btn.attr("data-hq", "on");
+            self.High_Runing = false;
+          };
+          self.High_btn.attr("class", "mode-hq-on" + i);
+        }, 5);
+      } else {
+        DATACENTERATTR.hqset = 0;
+        self.Audio.changeHq(false);
+        self.High_Runing = true;
+        self.QUALITY_CURRENT = 0;
+        self.High_btn.attr("class", "mode-hq-off1");
+        var i = 1;
+        self.High_Timer = setInterval(function() {
+          i++;
+          if (i > 25) {
+            clearInterval(self.High_Timer);
+            self.High_btn.attr("data-hq", "off");
+            self.High_Runing = false;
+          };
+          self.High_btn.attr("class", "mode-hq-off" + i);
+        }, 5);
+      };
+    },
+    _playHQ: function () {
+      var self = this;
+      if (self.High_Timer) {
+      clearInterval(self.High_Timer);
+      }
+      if (self.High_btn.attr("data-hq") == "off") {
+        DATACENTERATTR.hqset = 1;
+        self.Audio.changeHq(true);
+        self.High_Runing = true;
+        self.High_btn.attr("class", "mode-hq-on1");
+        var i = 1;
+        self.High_Timer = setInterval(function() {
+          i++;
+          if (i > 25) {
+            clearInterval(self.High_Timer);
+            self.High_btn.attr("data-hq", "on");
+            self.High_Runing = false;
+          };
+          self.High_btn.attr("class", "mode-hq-on" + i);
+        }, 5);
+      }
+    },
+    _playNormal: function () {
+      var self = this;
+      if (self.High_Timer) {
+      clearInterval(self.High_Timer);
+      }
+      if (self.High_btn.attr("data-hq") == "on") {
+      DATACENTERATTR.hqset = 0;
+      self.Audio.changeHq(false);
+      self.High_Runing = true;
+      self.High_btn.attr("class", "mode-hq-off1");
+      var i = 1;
+      self.High_Timer = setInterval(function() {
+        i++;
+        if (i > 25) {
+          clearInterval(self.High_Timer);
+          self.High_btn.attr("data-hq", "off");
+          self.High_Runing = false;
+        };
+        self.High_btn.attr("class", "mode-hq-off" + i);
+      }, 5);
+      }
+    },
+    _addEvent: function() {
+      var self = this;
+      // 播放
+      self.Play_btn.on("click", function() {
+        self.playOrPause();
+      });
+      // 切换高低品质
+      self.High_btn.on("click", function() {
+        var track = self.PlayerData.get("track");
+        var trackJson = {};
+		
+        if (track == '') {
+          self._switchHigh();
+          return;
+        }
+        trackJson = JSON.parse(track);
+        S.log(self.isVIP, "", "is vip");
+        // console.log('-------------++++++');
+        // console.log(trackJson);
+        // console.log('-------------++++++');
+        // alert(self.QUALITY_CURRENT);
+        // console.log(trackJson);
+        if (trackJson.listenLevel && trackJson.listenLevel.HIGH == 'FREE' && trackJson.listenLevel.LOW == 'FREE') {
+          self._switchHigh();
+        } else {
+		  
+          if (!UTool.isLogin()) {
+          return;
+          }
+          if (trackJson.listenLevel) {
+          if (trackJson.listenLevel.LOW == 'NO_PERMISSION') {
+            GOODTip('应版权方要求，歌曲暂不支持低品质试听');
+            return;
+          }
+          if (trackJson.listenLevel.HIGH == 'NO_PERMISSION') {
+            GOODTip('应版权方要求，歌曲暂不支持高品质试听');
+            return;
+          }
+          }
+		  else
+			GOODTip('播放虫洞歌曲的时候暂时不能切换音质哦！-- A message from Xiamini');
+          //buyMusic('song', trackJson.objectId, '播放');
+        }
+      });
+      self.Prev_btn.on("click", function() {
+        self._opLock && self._opLock.cancel();
+        self._opLock = S.later(function() {
+          self.prev();
+        }, 200, false, null, null);
+      });
+      self.Next_btn.on("click", function() {
+        self._opLock && self._opLock.cancel();
+        self._opLock = S.later(function() {
+          self.next();
+        }, 200, false, null, null);
+      });
+      self.Mode_btn.on("click", function() {
+        if ("room" == self.PlayerData.get("status")) {
+          // room 模式下禁止操作
+          return false;
+        }
+        self._opLock && self._opLock.cancel();
+        self._opLock = S.later(function() {
+          var mode = self.PlayerData.changeMode();
+          self.setModeView(mode);
+          setTimeout(function() {
+            self.Audio.mode(mode);
+          }, 0);
+        }, 200, false, null, null);
+      });
+      self.Fav_btn.on("click", function() {
+        var that = $(this);
+        var sid = that.attr("data-sid");
+        self.PlayerControl.fav(this, sid);
+      });
+      self.More_btn.on("click", function(event) {
+        event.halt();
+        var that = $(this);
+        var sid = that.attr("data-sid");
+        var downloadjson = that.attr("data-downloadjson");
+        self.PlayerMenu.showPanelMenu(that, sid, downloadjson);
             });
             self.Share_btn.on("click", function(event) {
                 event.halt();
@@ -8191,333 +9057,403 @@ KISSY.add('page/mods/player',['./page', /*van edit*/'node', 'base', 'json', 'eve
                     case 'J_trackMobile': // 发送
                         op = 111;
                         break;
+					case 'J_winopenPlay': // 切换新旧播放器 - dumbbird & 哀
+						//self.Page._switchOldVersion();
+						break;
 					case 'J_trackdislikeB':		// 不喜欢这首歌　- van
-						var sid = $(event.target).attr('data-sid');
-						self.Page._dislikeTrack(sid);
+						// var sid = $(event.target).attr('data-sid');
+						// self.Page._dislikeTrack(sid);
 						break;
                 }
                 if (op !== 0) {
 
-                    var track = self.PlayerData.get("track"),
-                        trackVo = Json.parse(track);
-                    if (trackVo.rec_note != '') {
-                        var uid = __USER__ && __USER__.get('uid') || 0;
-                        var len = self.XIAMIPLAYER.get('position');
-                        PlayerLog.send(trackVo.rec_note, op, Math.floor(len), trackVo.objectName, trackVo.objectId, uid);
-                    }
-                }
-            });
-        },
-        _playerRoam: function() {
-            var self = this;
-            self.PlayerRoam = new PlayerRoam();
-            //  渲染漫游列表完成, 开始播放漫游歌曲
-            self.PlayerRoam.on("renderComplete", function(event) {
-                self.PlayerTracks.syncScrollView();
-                // self.PlayerData.playthisRoam();
-                // 开始播放 漫游歌曲
-            });
-        },
-        _playerMenu: function() {
-            var self = this;
-            self.PlayerMenu = new PlayerMenu();
-        },
-        _playerBlur: function() {
-            var self = this;
-            self.PlayerBlur = new PlayerBlur({
-                wrap: "#J_blurBackground"
-            });
-        },
-        _playerVolume: function() {
-            var self = this;
-            self.PlayerVolume = new PlayerVolume({
-                //volume : 0,
-                wrap: "#J_volumeRange",
-                mute: "#J_volumeSpeaker"
-            });
-            self.PlayerVolume.on("afterVolumeChange", function(event) {
-                self.Audio.volume(event.newVal);
-            });
-        },
-        _playerLrc: function() {
-            var self = this;
-
-            self.PlayerLrc = new PlayerLrc({
-                wrap: "#J_playerLrc"
-            });
-
-        },
-        _playerControl: function() {
-            var self = this;
-            self.PlayerControl = new PlayerControl();
-            self.PlayerControl.on("trackFavCallback", function(event) {
-                self.PlayerData.changeTrackFav(event.data.songId, event.data.flag, event.targetType);
-                self.changeTrackFlag(event.data.songId, event.data.flag, event.targetType);
-                // 更改列表
-            });
-        },
-
-        _playerListen: function() {
-            var self = this;
-            self.XIAMIPLAYER = window.__XIAMIPLAYER__ = new PlayerLister({
-                grogress: "#J_playerProgress",
-                panel: "#J_playerPanel",
-                positionTime: "#J_positionTime",
-                durationTime: "#J_durationTime"
-            });
-
-            self.XIAMIPLAYER.on("ready", function(event) {
-                var j = Json.parse(event.data);
-                // if(!j.conect && !window.__TEST__){
-                //     alert("你已经打开虾米音乐播放器啦！不能贪心哦！")
-                //     //window.close();
-                //     window.location.href = "http://www.xiami.com";
-                //     return false;
-                // }
-                self.PlayerVolume.set("volume", j.volume, {
-                    "silent": true
-                });
-                self.PlayerVolume.volumeUI(j.volume);
-                self.PlayerData.setMode(j.mode);
-                self.setModeView(j.mode);
-                self.__FLASHREADY__ = window.__FLASHREADY__ = true;
-                setTimeout(function() {
-                    $("#J_loading").fadeOut(0.3, function() {
-                        $("#J_loading").remove();
-                    });
-                }, 100);
-            });
-
-            self.XIAMIPLAYER.on("addSongs", function(event) {
-                self.DataCenter.load(event.data.url, event.data.atPlay);
-            });
-            self.XIAMIPLAYER.on("soundComplete", function(event) {
-                S.log("soundComplete");
-                self.PlayerData.next(false);
-                window.XiamiPlayer.player_song_end && window.XiamiPlayer.player_song_end();
-            });
-            self.XIAMIPLAYER.on("soundOpen", function(event) {
-
-                var a = self.PlayerData.get("track");
-                var b = self.PlayerData.getDataArrLimit();
-                window.XiamiPlayer.player_song_start && window.XiamiPlayer.player_song_start(a, b);
-            });
-            self.XIAMIPLAYER.on("playerRuning", function(event) {
-
-                S.log("playerRuning");
-                var a = self.PlayerData.get("track");
-                var b = self.PlayerData.getDataArrLimit();
-                window.XiamiPlayer.player_runing && window.XiamiPlayer.player_runing(a, b);
-            });
-            self.XIAMIPLAYER.on("soundPlaying", function(event) {
-                var obj = Json.parse(event.data);
-                self.PlayerLrc.syncTime(obj.position);
-            });
-            self.XIAMIPLAYER.on("lyricComplete", function(event) {
-
-                var a = self.PlayerData.get("track");
-                var track = Json.parse(a);
-
-                self.PlayerLrc.render(track.songId, event.status, event.data);
-
-            });
-            self.XIAMIPLAYER.on("soundError", function(event) {
-                S.log(["sounderror", event.data]);
-                if (event.data > 10) {
-                    self.stop();
-                    alert("请检查网络连接是否正常.");
-                    return false;
-                }
-                self.next();
-            });
-        },
-        _playerPanel: function() {
-            var self = this;
-            self.PlayerPanel = new PlayerPanel({
-                grogress: "#J_playerProgress",
-                positionTime: "#J_positionTime",
-                panel: "#J_playerPanel"
-            });
-            self.PlayerPanel.on("afterTickDragChange", function(event) {
-                S.log('change ' + event.attrName + ': ' + event.prevVal + ' --> ' + event.newVal);
-                self.XIAMIPLAYER.set("canRender", !event.newVal);
-            });
-            self.PlayerPanel.on("afterPositionChange", function(event) {
-                S.log('change ' + event.attrName + ': ' + event.prevVal + ' --> ' + event.newVal);
-                if (event.newVal >= 1) {
-                    self.next();
-                    return false;
-                };
-                self.XIAMIPLAYER.changePositionTime(event.newVal);
-                self.Audio.position(event.newVal);
-            });
-            self.PlayerPanel.on('afterDragpositionChange', function(event) {
-                S.log('change ' + event.attrName + ': ' + event.prevVal + ' --> ' + event.newVal);
-                self.XIAMIPLAYER.changePositionTime(event.newVal, true);
-            })
-        },
-        _playerData: function() {
-            var self = this;
-            self.PlayerData = new PlayerData();
-            self.PlayerData.on("afterSoundArrChange", function(event) {
-                S.log(event.newVal.length, "", "afterSoundArrChange");
-                var data = event.newVal;
-                if (data.length == 0) {
-                    self.PlayerTracks.reset();
-                    self.stop();
-                    return false;
-                };
-                var index = self.PlayerData.getCurrentIndex();
-                // 避免前面所在歌曲被删除, 需重新定位
-                var roamSongId = self.PlayerData.get("roamSongId");
-                S.log(['渲染歌曲列表', data, index]);
-                self.PlayerTracks.addTracks(data, index);
-                // 渲染歌曲列表
-            });
-            // 漫游切歌
-            self.PlayerData.on("afterRoamIndexChange", function(event) {
-                S.log(["afterRoamIndexChange", event.prevVal, event.newVal]);
-                self.PlayerRoam.showRoamIcon();
-                var arr = self.PlayerData.getRoamArrLimit();
-                if (event.prevVal == -1 && event.newVal == 0) {
-                    return false;
-                };
-                var step = event.prevVal == -1 ? event.newVal : event.newVal - event.prevVal;
-                if (step < 0) {
-                    step = step + 20;
-                };
-                arr = arr.slice(5 - step);
-                self.PlayerRoam.add(arr, step);
-            });
-            // self.PlayerData.on("EVENT_PlayerDataInit", function(event) {
-            //     S.log("EVENT_PlayerDataInit");
-            //     //self.setMusicInfo(event.data);
-            //     $("#J_loading").fadeOut(0.3, function(){
-            //         $("#J_loading").remove();
-            //     });
-            // });
-            self.PlayerData.on("afterTrackChange", function(event) {
-                S.log("afterTrackChange");
-
-                var track = Json.parse(event.newVal);
-                var passtime = self.PlayerData.get('passtime');
-                if (passtime > track.length) passtime = 0;
-                self.Audio.load(event.newVal, passtime);
-                self.setMusicInfo(event.newVal, passtime);
-                self.PlayerData.set('passtime', 0);
-                if (self.Play_btn.hasClass("play-btn")) {
-                    self.Play_btn.removeClass("play-btn");
-                    self.Play_btn.addClass("pause-btn");
-                }
-            });
-            self.PlayerData.on("afterStatusChange", function(event) {
-                self.PlayerWrap[0].className = "player-" + event.newVal;
-                self.PlayerPanel.set("status", event.newVal);
-            });
-            // 触发歌曲漫游
-            self.PlayerData.on("roamCallback", function(event) {
-                var sid = event.data.songId;
-                if (sid != self.PlayerData.get("songId"))
-                    return false;
-                if (event.status && event.data.songs.length > 0) {
-                    self.PlayerRoam.render(event.data.songId, event.data.songs);
-                } else {
-                    self.PlayerRoam.after(event.data.songId, event.data.songs);
-                }
-            });
-            self.PlayerData.on("thenComplete", function(event) {
-                //S.log( event.mergeArr, event.removeID, event.startSid);
-                self.PlayerTracks.add(event.mergeArr, event.removeID, event.startSid);
-            });
-            self.PlayerData.on("endComplete", function(event) {
-                //S.log( event.mergeArr, event.removeID, event.startSid);
-                self.PlayerTracks.append(event.mergeArr, event.removeID, event.startSid);
-            });
-            self.PlayerData.on("empty", function(event) {
-                self.pause();
-                //self.PlayerLrc.empty();
-            });
-        },
-
-        _playerTracks: function() {
-            var self = this;
-            self.PlayerTracks = new PlayerTracks();
-        },
-        _playerDrag: function() {
-            var self = this;
-            self.PlayerDrag = new PlayerDrag({
-                'scrollView': self.PlayerTracks.scrollView
-            });
-            self.PlayerDrag.on('sort', function(event) {
-                self.PlayerData.swopData(event.data);
-            })
-        },
-        _dataCenter: function() {
-            var self = this;
-            self.DataCenter = new DataCenter({
-                'host': self.config.params.flashVars.host
-            });
-            self.DataCenter.load(self.dataUrl);
-            self.DataCenter.on('complete', function(event) {
-                if (event.status) {
-                    var data = event.target.getAttrVals();
-                    self._dataCenterCompleteHandler(data);
-                }
-            })
-        },
-        _dataCenterCompleteHandler: function(DATA) {
-            var self = this;
-            if (!self.__FLASHREADY__) {
-                return setTimeout(function() {
-                    self._dataCenterCompleteHandler(DATA);
-                }, 100);
-            }
-            if (S.isUndefined(DATA.trackList) || S.isNull(DATA.trackList)) return false;
-            self.Audio.config({
-                'uid': DATA.uid,
-                'isVIP': DATA.vip == 1 ? true : false,
-                'vipRole': DATA.vipRole,
-                'modeHQ': DATA.hqset == 1 ? true : false
-            })
-            self.PlayerData.set("lastPlayId", DATA.lastSongId);
-            self.PlayerData.set("lastPlayToggle", DATA.lastSongToggle);
-            self.PlayerData.setData(DATA.trackList, DATA.atPlay);
-            //设置歌曲对象
-            self.isVIP = DATA.vip == 1;
-            if (self.isVIP && DATA.hqset == 1 && self.High_btn.attr("data-hq") == "off") {
-                self.High_Runing = true;
-                self.High_btn.attr("class", "mode-hq-on1");
-                var i = 1;
-                self.High_Timer = setInterval(function() {
-                    i++;
-                    if (i > 25) {
-                        clearInterval(self.High_Timer);
-                        self.High_btn.attr("data-hq", "on");
-                        self.High_Runing = false;
-                    };
-                    self.High_btn.attr("class", "mode-hq-on" + i);
-                }, 5);
-            }
-            if (self.isVIP && DATA.hqset == 0 && self.High_btn.attr("data-hq") == "on") {
-                self.High_Runing = true;
-                self.High_btn.attr("class", "mode-hq-off1");
-                var i = 1;
-                self.High_Timer = setInterval(function() {
-                    i++;
-                    if (i > 25) {
-                        clearInterval(self.High_Timer);
-                        self.High_btn.attr("data-hq", "off");
-                        self.High_Runing = false;
-                    };
-                    self.High_btn.attr("class", "mode-hq-off" + i);
-                }, 5);
-            }
+          var track = self.PlayerData.get("track"),
+            trackVo = Json.parse(track);
+          if (trackVo.rec_note != '') {
+            var uid = __USER__ && __USER__.get('uid') || 0;
+            var len = self.XIAMIPLAYER.get('position');
+            PlayerLog.send(trackVo.rec_note, op, Math.floor(len), trackVo.objectName, trackVo.objectId, uid);
+          }
         }
-    };
+      });
+    },
+    _playerRoam: function() {
+      var self = this;
+      self.PlayerRoam = new PlayerRoam();
+      //  渲染漫游列表完成, 开始播放漫游歌曲
+      self.PlayerRoam.on("renderComplete", function(event) {
+        self.PlayerTracks.syncScrollView();
+        // self.PlayerData.playthisRoam();
+        // 开始播放 漫游歌曲
+      });
+    },
+    _playerMenu: function() {
+      var self = this;
+      self.PlayerMenu = new PlayerMenu();
+    },
+    _playerBlur: function() {
+      var self = this;
+      self.PlayerBlur = new PlayerBlur({
+        wrap: "#J_blurBackground"
+      });
+    },
+    _playerVolume: function() {
+      var self = this;
+      self.PlayerVolume = new PlayerVolume({
+        //volume : 0,
+        wrap: "#J_volumeRange",
+        mute: "#J_volumeSpeaker"
+      });
+      self.PlayerVolume.on("afterVolumeChange", function(event) {
+        self.Audio.volume(event.newVal);
+      });
+    },
+    _playerLrc: function() {
+      var self = this;
 
-    module.exports = player;
+      self.PlayerLrc = new PlayerLrc({
+        wrap: "#J_playerLrc"
+      });
+
+    },
+    _playerControl: function() {
+      var self = this;
+      self.PlayerControl = new PlayerControl();
+      self.PlayerControl.on("trackFavCallback", function(event) {
+        self.PlayerData.changeTrackFav(event.data.songId, event.data.flag, event.targetType);
+        self.changeTrackFlag(event.data.songId, event.data.flag, event.targetType);
+        // 更改列表
+      });
+    },
+
+    _playerListen: function() {
+	  //alert("open");
+      var self = this;
+      self.XIAMIPLAYER = window.__XIAMIPLAYER__ = new PlayerLister({
+        grogress: "#J_playerProgress",
+        panel: "#J_playerPanel",
+        positionTime: "#J_positionTime",
+        durationTime: "#J_durationTime"
+      });
+
+      self.XIAMIPLAYER.on("ready", function(event) {
+        var j = Json.parse(event.data);
+        // if(!j.conect && !window.__TEST__){
+        //     alert("你已经打开虾米音乐播放器啦！不能贪心哦！")
+        //     //window.close();
+        //     window.location.href = "";
+        //     return false;
+        // }
+        self.PlayerVolume.set("volume", j.volume, {
+          "silent": true
+        });
+        self.PlayerVolume.volumeUI(j.volume);
+        self.PlayerData.setMode(j.mode);
+        self.setModeView(j.mode);
+        self.__FLASHREADY__ = window.__FLASHREADY__ = true;
+        setTimeout(function() {
+          $("#J_loading").fadeOut(0.3, function() {
+            $("#J_loading").remove();
+          });
+        }, 100);
+      });
+
+      self.XIAMIPLAYER.on("addSongs", function(event) {
+
+        self.DataCenter.load(event.data.url, event.data.atPlay);
+      });
+      self.XIAMIPLAYER.on("soundComplete", function(event) {
+        S.log("soundComplete");
+        self.PlayerData.next(false);
+        // window.XiamiPlayer.player_song_end && window.XiamiPlayer.player_song_end();
+      });
+      self.XIAMIPLAYER.on("soundOpen", function(event) {
+        S.log('soundOpen');
+        var a = self.PlayerData.get("track");
+        var b = self.PlayerData.getDataArrLimit();
+        var trackJson = JSON.parse(a);
+		
+		console.log (self.QUALITY_CURRENT + trackJson.listenLevel.HIGH);
+				
+        // height		
+        if (self.QUALITY_CURRENT && trackJson.listenLevel && trackJson.listenLevel.HIGH != 'FREE') {
+          self._playNormal();
+        } else {
+          if (self.QUALITY_CURRENT) {
+          self._playHQ();
+          }
+        }
+
+
+        // normal
+        if (!self.QUALITY_CURRENT && trackJson.listenLevel && trackJson.listenLevel.HIGH == 'FREE' && trackJson.listenLevel.LOW == 'NEED_PAY') {
+          self._playHQ();
+        } else {
+          if (!self.QUALITY_CURRENT) {
+          self._playNormal();
+          }
+        }
+
+        // window.XiamiPlayer.player_song_start && window.XiamiPlayer.player_song_start(a, b);
+      });
+      self.XIAMIPLAYER.on("playerRuning", function(event) {
+        S.log("playerRuning");
+        var a = self.PlayerData.get("track");
+        var b = self.PlayerData.getDataArrLimit();
+        // window.XiamiPlayer.player_runing && window.XiamiPlayer.player_runing(a, b);
+      });
+      self.XIAMIPLAYER.on("soundPlaying", function(event) {
+        var obj = Json.parse(event.data);
+        LISTENPOSITION = parseInt(obj.position / 1000);
+        self.PlayerLrc.syncTime(obj.position);
+      });
+      self.XIAMIPLAYER.on("lyricComplete", function(event) {
+        var a = self.PlayerData.get("track");
+        var track = Json.parse(a);
+        S.log(track, '', '当前歌曲对象');
+        if (track.musicType == 1) {
+          //self.PlayerLrc.pureMusic();
+        } else {
+          self.PlayerLrc.render(track.songId, event.status, event.data);
+        }
+
+      });
+      self.XIAMIPLAYER.on("soundError", function(event) {
+        S.log(["sounderror", event.data]);
+        if (event.data > 10) {
+          self.stop();
+          alert("请检查网络连接是否正常.");
+          return false;
+        }
+        self.next();
+      });
+    },
+    _playerPanel: function() {
+      var self = this;
+      self.PlayerPanel = new PlayerPanel({
+        grogress: "#J_playerProgress",
+        positionTime: "#J_positionTime",
+        panel: "#J_playerPanel"
+      });
+      self.PlayerPanel.on("afterTickDragChange", function(event) {
+        S.log('change ' + event.attrName + ': ' + event.prevVal + ' --> ' + event.newVal);
+        self.XIAMIPLAYER.set("canRender", !event.newVal);
+      });
+      self.PlayerPanel.on("afterPositionChange", function(event) {
+        S.log('change ' + event.attrName + ': ' + event.prevVal + ' --> ' + event.newVal);
+        if (event.newVal >= 1) {
+          self.next();
+          return false;
+        };
+        self.XIAMIPLAYER.changePositionTime(event.newVal);
+        self.Audio.position(event.newVal);
+      });
+      self.PlayerPanel.on('afterDragpositionChange', function(event) {
+        S.log('change ' + event.attrName + ': ' + event.prevVal + ' --> ' + event.newVal);
+        self.XIAMIPLAYER.changePositionTime(event.newVal, true);
+      })
+    },
+    _playerData: function() {
+      var self = this;
+      self.PlayerData = new PlayerData();
+      self.PlayerData.on("afterSoundArrChange", function(event) {
+        S.log(event.newVal.length, "", "afterSoundArrChange");
+        var data = event.newVal;
+        if (data.length == 0) {
+          self.PlayerTracks.reset();
+          self.stop();
+          return false;
+        };
+        var index = self.PlayerData.getCurrentIndex();
+        // 避免前面所在歌曲被删除, 需重新定位
+        var roamSongId = self.PlayerData.get("roamSongId");
+        S.log(['渲染歌曲列表', data, index]);
+        self.PlayerTracks.addTracks(data, index);
+        // 渲染歌曲列表
+      });
+      // 漫游切歌
+      self.PlayerData.on("afterRoamIndexChange", function(event) {
+        S.log(["afterRoamIndexChange", event.prevVal, event.newVal]);
+        self.PlayerRoam.showRoamIcon();
+        var arr = self.PlayerData.getRoamArrLimit();
+        if (event.prevVal == -1 && event.newVal == 0) {
+          return false;
+        };
+        var step = event.prevVal == -1 ? event.newVal : event.newVal - event.prevVal;
+        if (step < 0) {
+          step = step + 20;
+        };
+        arr = arr.slice(5 - step);
+        self.PlayerRoam.add(arr, step);
+      });
+      // self.PlayerData.on("EVENT_PlayerDataInit", function(event) {
+      //     S.log("EVENT_PlayerDataInit");
+      //     //self.setMusicInfo(event.data);
+      //     $("#J_loading").fadeOut(0.3, function(){
+      //         $("#J_loading").remove();
+      //     });
+      // });
+      // 切歌埋点 新增
+      // @author 宝码
+      self.PlayerData.on("beforeTrackChange", function(event) {
+        if (event.prevVal !== '') {
+          var track = Json.parse(event.prevVal)
+          SWITCHLOG.gold({
+            platform: 'web',
+            user_id: self.USER.get('uid'),
+            vip_role: DATACENTERATTR.vipRole,
+            songid: track.songId,
+            quality_type: DATACENTERATTR.hqset == 1 ? 'high' : 'low',
+            song_type: 'mp3',
+            spmtype: track.objectName,
+            spmtype_id: track.objectId,
+            playtime: LISTENPOSITION,
+            fulltime: track.length
+          })
+          LISTENPOSITION = 0;
+        };
+      })
+      self.PlayerData.on("afterTrackChange", function(event) {
+        S.log("afterTrackChange");
+        var track = Json.parse(event.newVal);
+        var passtime = self.PlayerData.get('passtime');
+        if (passtime > track.length) passtime = 0;
+        self.Audio.load(event.newVal, passtime);
+        self.setMusicInfo(event.newVal, passtime);
+        self.PlayerData.set('passtime', 0);
+        if (self.Play_btn.hasClass("play-btn")) {
+          self.Play_btn.removeClass("play-btn");
+          self.Play_btn.addClass("pause-btn");
+        }
+		
+      });
+      self.PlayerData.on("afterStatusChange", function(event) {
+        self.PlayerWrap[0].className = "player-" + event.newVal;
+        self.PlayerPanel.set("status", event.newVal);
+      });
+      // 触发歌曲漫游
+      self.PlayerData.on("roamCallback", function(event) {
+        var sid = event.data.songId;
+        if (sid != self.PlayerData.get("songId"))
+          return false;
+        if (event.status && event.data.songs.length > 0) {
+          self.PlayerRoam.render(event.data.songId, event.data.songs);
+        } else {
+          self.PlayerRoam.after(event.data.songId, event.data.songs);
+        }
+      });
+      self.PlayerData.on("thenComplete", function(event) {
+        //S.log( event.mergeArr, event.removeID, event.startSid);
+        self.PlayerTracks.add(event.mergeArr, event.removeID, event.startSid);
+      });
+      self.PlayerData.on("endComplete", function(event) {
+        //S.log( event.mergeArr, event.removeID, event.startSid);
+        self.PlayerTracks.append(event.mergeArr, event.removeID, event.startSid);
+      });
+      self.PlayerData.on("empty", function(event) {
+        self.pause();
+        //self.PlayerLrc.empty();
+      });
+      //@zhongtang
+      // self.PlayerData.on("getPlayerAd",function(event){
+
+      //     self._playerAdMsg(event.data); //当前播放歌曲的艺人ID
+      // });
+      self.PlayerData.on("addPlayerAd", function(event) {
+        event.data.artistAdId = self.PlayerData.get('artistAdId');
+        self._playerAdInit(event.data);
+      });
+    },
+
+    _playerTracks: function() {
+      var self = this;
+      self.PlayerTracks = new PlayerTracks();
+    },
+    _playerDrag: function() {
+      var self = this;
+      self.PlayerDrag = new PlayerDrag({
+        'scrollView': self.PlayerTracks.scrollView
+      });
+      self.PlayerDrag.on('sort', function(event) {
+        self.PlayerData.swopData(event.data);
+      })
+    },
+    _dataCenter: function() {
+      var self = this;
+      self.DataCenter = new DataCenter({
+        'host': self.config.params.flashVars.host
+      });
+      self.DataCenter.load(self.dataUrl);
+      self.DataCenter.on('complete', function(event) {
+        if (event.status) {
+          var data = DATACENTERATTR = event.target.getAttrVals();
+          self._dataCenterCompleteHandler(data);
+        }
+      })
+    },
+    _dataCenterCompleteHandler: function(DATA) {
+      var self = this;
+      if (!self.__FLASHREADY__) {
+        return setTimeout(function() {
+          self._dataCenterCompleteHandler(DATA);
+        }, 100);
+      }
+      if (S.isUndefined(DATA.trackList) || S.isNull(DATA.trackList)) return false;
+      self.Audio.config({
+        'uid': DATA.uid,
+        //'isVIP': DATA.vip == 1 ? true : false,
+        'isVIP': true,
+        'vipRole': DATA.vipRole,
+        'modeHQ': DATA.hqset == 1 ? true : false
+      })
+      self.PlayerData.set("lastPlayId", DATA.lastSongId);
+      self.PlayerData.set("lastPlayToggle", DATA.lastSongToggle);
+      self.PlayerData.setData(DATA.trackList, DATA.atPlay);
+      //设置歌曲对象
+      self.isVIP = DATA.vip == 1;
+      //if (self.isVIP && DATA.hqset == 1 && self.High_btn.attr("data-hq") == "off") {
+      if (self.isVIP) {
+		
+        self.QUALITY_CURRENT = 1;
+        //self._playHQ();
+		//self._playNormal();
+		
+        // self.High_Runing = true;
+        // self.High_btn.attr("class", "mode-hq-on1");
+        // self.QUALITY_CURRENT = 1;
+        // self.Audio.changeHq(true);
+        // var i = 1;
+        // self.High_Timer = setInterval(function() {
+        //     i++;
+        //     if (i > 25) {
+        //         clearInterval(self.High_Timer);
+        //         self.High_btn.attr("data-hq", "on");
+        //         self.High_Runing = false;
+        //     };
+        //     self.High_btn.attr("class", "mode-hq-on" + i);
+        // }, 5);
+      }
+      // if (self.isVIP && DATA.hqset == 0 && self.High_btn.attr("data-hq") == "on") {
+      //     self.High_Runing = true;
+      //     self.High_btn.attr("class", "mode-hq-off1");
+      //     var i = 1;
+      //     self.High_Timer = setInterval(function() {
+      //         i++;
+      //         if (i > 25) {
+      //             clearInterval(self.High_Timer);
+      //             self.High_btn.attr("data-hq", "off");
+      //             self.High_Runing = false;
+      //         };
+      //         self.High_btn.attr("class", "mode-hq-off" + i);
+      //     }, 5);
+      // }
+    }
+  };
+
+  module.exports = player;
 });
 // 2013-12-30 12:52:28
+
 /** Compiled By kissy-xtemplate */
 KISSY.add('page/mods/xtpl/collectItem-xtpl',function (S, require, exports, module) {
         /*jshint quotmark:false, loopfunc:true, indent:false, asi:true, unused:false, boss:true*/
@@ -8575,33 +9511,42 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                     config3.fn = function (scope) {
                         var buffer = "";
                         buffer += '\n<div class="ui-row-item ui-track-item" data-sid="';	//dumbbirdedit
-                        var id6 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 4);
+                        var id6 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 4);
                         buffer += renderOutputUtil(id6, true);
                         buffer += '" data-type="fav" id="J_favList';
-                        var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 4);
+                        var id7 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 4);
                         buffer += renderOutputUtil(id7, true);
                         buffer += '">\n<div class="ui-track-main">\n\t<div class="ui-track-checkbox">\n\t\t<input type="checkbox" class="ui-track-item-id" name="fav" id="J_track';	//dumbbirdedit
-                        var id8 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 7);
+                        var id8 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 7);
                         buffer += renderOutputUtil(id8, true);
                         buffer += '" value="';
-                        var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 7);
+                        var id9 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 7);
                         buffer += renderOutputUtil(id9, true);
                         buffer += '" />\n\t</div>\n\t<div class="ui-track-sort"><em>';	// dumbbirdedit
                         var id10 = getPropertyUtil(engine, scope, "xindex", 0, 9);
                         buffer += renderOutputUtil(id10 + (1), true);
                         buffer += '</em></div>\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1" data-id="';	// dumbbirdedit
-                        var id11 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 11);
+                        var id11 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 4);
                         buffer += renderOutputUtil(id11, true);
                         buffer += '">';
-                        var id12 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_name", 0, 11);
-                        buffer += renderOutputUtil(id12, false);
-                        buffer += '&nbsp;&nbsp;<img src="http://www.xiami.com/images/group_photo/51/80651/27/1449570516_Nro1_4.png" width="39" height="18" /></div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';	// dumbbirdedit
-                        var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 12);
+                        var id12 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 11);
+						
+						// dumbbirdedit
+						var id12_val = renderOutputUtil(id12, false);				
+						var workTitle = /^(.+: .+? - )/g.exec(id12_val);
+						if (workTitle != null)
+							id12_val = id12_val.replace(workTitle[0], "");
+						//console.log(workTitle);	
+                        buffer += id12_val;
+						//buffer += renderOutputUtil(id12, false);
+						
+                        buffer += '&nbsp;&nbsp;<img src="http://gtms03.alicdn.com/tps/i3/T1iS08FvdcXXblKhDf-39-18.png" width="39" height="18" /></div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
+                        var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistId", 0, 12);
                         buffer += renderOutputUtil(id13, true);
                         buffer += '">\n\t\t';
                         var config14 = {};
                         var params15 = [];
-                        var id16 = getPropertyUtil(engine, scope, "singers", 0, 13);
+                        var id16 = getPropertyUtil(engine, scope, "singersSource", 0, 13);
                         params15.push(id16);
                         config14.params = params15;
                         config14.fn = function (scope) {
@@ -8618,14 +9563,14 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                                 return buffer;
                             };
                             buffer += runBlockCommandUtil(engine, scope, config17, "if", 14);
-                            buffer += '<a href="http://www.xiami.com';
-                            var id20 = getPropertyOrRunCommandUtil(engine, scope, {}, "href", 0, 14);
+                            buffer += '<a href="/search/find/artist/';
+                            var id20 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 14);
                             buffer += renderOutputUtil(id20, true);
                             buffer += '" target="_blank" title="';
-                            var id21 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 14);
+                            var id21 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 14);
                             buffer += renderOutputUtil(id21, false);
                             buffer += '">';
-                            var id22 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 14);
+                            var id22 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 14);
                             buffer += renderOutputUtil(id22, false);
                             buffer += '</a>\n\t\t';
                             return buffer;
@@ -8642,7 +9587,12 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                         buffer += renderOutputUtil(id25, false);
                         buffer += '">';
                         var id26 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 17);
-                        buffer += renderOutputUtil(id26, false);
+						// dumbbirdedit
+						if (workTitle != null)
+							buffer += workTitle[0].slice(0,-2);
+						else
+							buffer += renderOutputUtil(id26, false);
+						//buffer += renderOutputUtil(id26, false);
                         buffer += '</a></div>\n\t</div>\n\t<div class="ui-track-control">\n\t\t';
                         var config27 = {};
                         var params28 = [];
@@ -8660,7 +9610,8 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                             return buffer;
                         };
                         buffer += runBlockCommandUtil(engine, scope, config27, "if", 20);
-                        buffer += '\n\t</div>\n</div>\n</div>\n';
+						buffer += '\n\t\t<a class="more-btn icon-track-more" data-type="myfav" data-event="more" title="更多"></a>\n\t</div>\n</div>\n</div>\n';	// dumbbirdedit
+                        //buffer += '\n\t</div>\n</div>\n</div>\n';
                         return buffer;
                     };
                     config3.inverse = function (scope) {
@@ -8681,18 +9632,27 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                         var id34 = getPropertyUtil(engine, scope, "xindex", 0, 34);
                         buffer += renderOutputUtil(id34 + (1), true);
                         buffer += '</em></div>\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1" data-id="';
-                        var id35 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 36);
+                        var id35 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 36);
                         buffer += renderOutputUtil(id35, true);
                         buffer += '">';
-                        var id36 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_name", 0, 36);
-                        buffer += renderOutputUtil(id36, false);
+                        var id36 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 36);
+						
+						// dumbbirdedit
+						var id36_val = renderOutputUtil(id36, false);				
+						var workTitle = /^(.+: .+? - )/g.exec(id36_val);
+						if (workTitle != null)
+							id36_val = id36_val.replace(workTitle[0], "");
+						//console.log(workTitle);	
+                        buffer += id36_val;
+						
+                        //buffer += renderOutputUtil(id36, false);
                         buffer += '</div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
                         var id37 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 37);
                         buffer += renderOutputUtil(id37, true);
                         buffer += '">\n\t\t';
                         var config38 = {};
                         var params39 = [];
-                        var id40 = getPropertyUtil(engine, scope, "singers", 0, 38);
+                        var id40 = getPropertyUtil(engine, scope, "singersSource", 0, 38);
                         params39.push(id40);
                         config38.params = params39;
                         config38.fn = function (scope) {
@@ -8705,18 +9665,18 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                             config41.params = params42;
                             config41.fn = function (scope) {
                                 var buffer = "";
-                                buffer += ' ; ';
+                                buffer += ' / ';
                                 return buffer;
                             };
                             buffer += runBlockCommandUtil(engine, scope, config41, "if", 39);
-                            buffer += '<a href="http://www.xiami.com';
-                            var id44 = getPropertyOrRunCommandUtil(engine, scope, {}, "href", 0, 39);
+                            buffer += '<a href="/search/find/artist/';
+                            var id44 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 39);
                             buffer += renderOutputUtil(id44, true);
                             buffer += '" target="_blank" title="';
-                            var id45 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 39);
+                            var id45 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 39);
                             buffer += renderOutputUtil(id45, false);
                             buffer += '">';
-                            var id46 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 39);
+                            var id46 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 39);
                             buffer += renderOutputUtil(id46, false);
                             buffer += '</a>\n\t\t';
                             return buffer;
@@ -8733,7 +9693,12 @@ KISSY.add('page/mods/xtpl/favTrackItem-xtpl',function (S, require, exports, modu
                         buffer += renderOutputUtil(id49, false);
                         buffer += '">';
                         var id50 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 42);
-                        buffer += renderOutputUtil(id50, false);
+						// dumbbirdedit
+						if (workTitle != null)
+							buffer += workTitle[0].slice(0,-2);
+						else
+							buffer += renderOutputUtil(id50, false);
+						//buffer += renderOutputUtil(id50, false);
                         buffer += '</a></div>\n\t</div>\n\t<div class="ui-track-control">\n\t\t';
                         var config51 = {};
                         var params52 = [];
@@ -8971,7 +9936,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
             buffer += '</span><a href="http://www.xiami.com/song/showcollect/id/';
             var id4 = getPropertyOrRunCommandUtil(engine, scope, {}, "list_id", 0, 5);
             buffer += renderOutputUtil(id4, true);
-            buffer += '" target="_blank">查看详情</a></p>\n\t</div>\n</div>\n<div class="ui-collect-header ui-row-item">\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1">\n\t\t\t歌曲\n\t\t</div>\n\t\t<div class="ui-row-item-column c2">\n\t\t\t演唱者\n\t\t</div>\n\t\t<div class="ui-row-item-column c3">\n\t\t\t专辑\n\t\t</div>\n\t</div>\n</div>\n';
+            buffer += '" target="_blank">查看详情</a></p>\n\t</div>\n</div>\n<div class="ui-collect-header ui-row-item">\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1">\n\t\t\t曲名 (古典乐章节)\n\t\t</div>\n\t\t<div class="ui-row-item-column c2">\n\t\t\t主艺人\n\t\t</div>\n\t\t<div class="ui-row-item-column c3">\n\t\t\t专辑 (古典作品名)\n\t\t</div>\n\t</div>\n</div>\n';
             var config5 = {};
             var params6 = [];
             var id7 = getPropertyUtil(engine, scope, "song", 0, 21);
@@ -9046,11 +10011,20 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     };
                     buffer += runBlockCommandUtil(engine, scope, config19, "if", 34);
                     buffer += '</div>\n\t\t\t\t\t<div class="ui-row-item-body">\n\t\t\t\t\t\t<div class="ui-row-item-column c1" data-id="';
-                    var id24 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 36);
+                    var id24 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 36);
                     buffer += renderOutputUtil(id24, true);
                     buffer += '">';
-                    var id25 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_name", 0, 36);
-                    buffer += renderOutputUtil(id25, false);
+                    var id25 = getPropertyOrRunCommandUtil(engine, scope, {}, "songName", 0, 36);
+					
+					// dumbbirdedit
+					var id25_val = renderOutputUtil(id25, false);				
+					var workTitle = /^(.+: .+? - )/g.exec(id25_val);
+					if (workTitle != null)
+						id25_val = id25_val.replace(workTitle[0], "");
+					//console.log(workTitle);	
+					buffer += id25_val;
+                    //buffer += renderOutputUtil(id25, false);
+					
                     buffer += '';
                     var config26 = {};
                     var params27 = [];
@@ -9059,7 +10033,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     config26.params = params27;
                     config26.fn = function (scope) {
                         var buffer = "";
-                        buffer += '&nbsp;&nbsp;<img src="http://www.xiami.com/images/group_photo/51/80651/27/1449570516_Nro1_4.png" width="39" height="18" />';	// dumbbirdedit
+                        buffer += '&nbsp;&nbsp;<img src="http://gtms03.alicdn.com/tps/i3/T1iS08FvdcXXblKhDf-39-18.png" width="39" height="18" />';
                         return buffer;
                     };
                     buffer += runBlockCommandUtil(engine, scope, config26, "if", 36);
@@ -9069,7 +10043,7 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     buffer += '">\n\t\t\t\t\t\t';
                     var config30 = {};
                     var params31 = [];
-                    var id32 = getPropertyUtil(engine, scope, "singers", 0, 38);
+                    var id32 = getPropertyUtil(engine, scope, "singersSource", 0, 38);
                     params31.push(id32);
                     config30.params = params31;
                     config30.fn = function (scope) {
@@ -9082,18 +10056,18 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                         config33.params = params34;
                         config33.fn = function (scope) {
                             var buffer = "";
-                            buffer += ' ; ';
+                            buffer += ' / ';
                             return buffer;
                         };
                         buffer += runBlockCommandUtil(engine, scope, config33, "if", 39);
-                        buffer += '<a href="http://www.xiami.com';
-                        var id36 = getPropertyOrRunCommandUtil(engine, scope, {}, "href", 0, 39);
+                        buffer += '<a href="/search/find/artist/';
+                        var id36 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 39);
                         buffer += renderOutputUtil(id36, true);
                         buffer += '" target="_blank" title="';
-                        var id37 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 39);
+                        var id37 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 39);
                         buffer += renderOutputUtil(id37, false);
                         buffer += '">';
-                        var id38 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 39);
+                        var id38 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 39);
                         buffer += renderOutputUtil(id38, false);
                         buffer += '</a>\n\t\t\t\t\t\t';
                         return buffer;
@@ -9110,7 +10084,12 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     buffer += renderOutputUtil(id41, false);
                     buffer += '">';
                     var id42 = getPropertyOrRunCommandUtil(engine, scope, {}, "album_name", 0, 42);
-                    buffer += renderOutputUtil(id42, false);
+					// dumbbirdedit
+					if (workTitle != null)
+						buffer += workTitle[0].slice(0,-2);
+					else
+						buffer += renderOutputUtil(id42, false);
+					//buffer += renderOutputUtil(id42, false);
                     buffer += '</a></div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class="ui-track-control">\n\t\t\t\t\t\t';
                     var config43 = {};
                     var params44 = [];
@@ -9134,18 +10113,18 @@ KISSY.add('page/mods/xtpl/collectDetail-xtpl',function (S, require, exports, mod
                     var id48 = getPropertyUtil(engine, scope, "shield", 0, 50);
                     params47.push(id48);
                     config46.params = params47;
-                    config46.fn = function (scope) {
-                        var buffer = "";
+                    //config46.fn = function (scope) 
+                    //    var buffer = "";
                         buffer += '<a class="more-btn icon-track-more" data-type="collect" data-typeid="';
                         var id49 = getPropertyOrRunCommandUtil(engine, scope, {}, "list_id", 0, 50);
                         buffer += renderOutputUtil(id49, true);
                         buffer += '" data-event="more" title="更多"></a>';
-                        return buffer;
-                    };
+                    //    return buffer;
+                    //;
                     var inverse50 = config46.fn;
                     config46.fn = config46.inverse;
                     config46.inverse = inverse50;
-                    buffer += runBlockCommandUtil(engine, scope, config46, "if", 50);
+                    //buffer += runBlockCommandUtil(engine, scope, config46, "if", 50);
                     buffer += '\n\t\t\t\t\t\t<a class="delete-btn icon-track-delete" data-type="collect" data-event="delete" title="删除"></a>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t';
                     return buffer;
                 };
@@ -9620,18 +10599,18 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                         var id11 = getPropertyUtil(engine, scope, "xindex", 0, 9);
                         buffer += renderOutputUtil(id11 + (1), true);
                         buffer += '</em></i></div>\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1" data-id="';
-                        var id12 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 11);
+                        var id12 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 11);
                         buffer += renderOutputUtil(id12, true);
                         buffer += '">';
-                        var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_name", 0, 11);
+                        var id13 = getPropertyOrRunCommandUtil(engine, scope, {}, "songName", 0, 11);
                         buffer += renderOutputUtil(id13, false);
-                        buffer += '&nbsp;&nbsp;<img src="http://www.xiami.com/images/group_photo/51/80651/27/1449570516_Nro1_4.png" width="39" height="18" /></div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';	// dumbbirdedit
+                        buffer += '&nbsp;&nbsp;<img src="http://gtms03.alicdn.com/tps/i3/T1iS08FvdcXXblKhDf-39-18.png" width="39" height="18" /></div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
                         var id14 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 12);
                         buffer += renderOutputUtil(id14, true);
                         buffer += '">\n\t\t';
                         var config15 = {};
                         var params16 = [];
-                        var id17 = getPropertyUtil(engine, scope, "singers", 0, 13);
+                        var id17 = getPropertyUtil(engine, scope, "singersSource", 0, 13);
                         params16.push(id17);
                         config15.params = params16;
                         config15.fn = function (scope) {
@@ -9644,18 +10623,18 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                             config18.params = params19;
                             config18.fn = function (scope) {
                                 var buffer = "";
-                                buffer += ' ; ';
+                                buffer += ' / ';
                                 return buffer;
                             };
                             buffer += runBlockCommandUtil(engine, scope, config18, "if", 14);
-                            buffer += '<a href="http://www.xiami.com';
-                            var id21 = getPropertyOrRunCommandUtil(engine, scope, {}, "href", 0, 14);
+                            buffer += '<a href="/search/find/artist/';
+                            var id21 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 14);
                             buffer += renderOutputUtil(id21, true);
                             buffer += '" target="_blank" title="';
-                            var id22 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 14);
+                            var id22 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 14);
                             buffer += renderOutputUtil(id22, false);
                             buffer += '">';
-                            var id23 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 14);
+                            var id23 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 14);
                             buffer += renderOutputUtil(id23, false);
                             buffer += '</a>\n\t\t';
                             return buffer;
@@ -9709,10 +10688,10 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                         var id33 = getPropertyUtil(engine, scope, "xindex", 0, 35);
                         buffer += renderOutputUtil(id33 + (1), true);
                         buffer += '</em></div>\n\t<div class="ui-row-item-body">\n\t\t<div class="ui-row-item-column c1" data-id="';
-                        var id34 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_id", 0, 37);
+                        var id34 = getPropertyOrRunCommandUtil(engine, scope, {}, "songId", 0, 37);
                         buffer += renderOutputUtil(id34, true);
                         buffer += '">';
-                        var id35 = getPropertyOrRunCommandUtil(engine, scope, {}, "song_name", 0, 37);
+                        var id35 = getPropertyOrRunCommandUtil(engine, scope, {}, "songName", 0, 37);
                         buffer += renderOutputUtil(id35, false);
                         buffer += '</div>\n\t\t<div class="ui-row-item-column c2" data-artist-id="';
                         var id36 = getPropertyOrRunCommandUtil(engine, scope, {}, "artist_id", 0, 38);
@@ -9720,7 +10699,7 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                         buffer += '">\n\t\t';
                         var config37 = {};
                         var params38 = [];
-                        var id39 = getPropertyUtil(engine, scope, "singers", 0, 39);
+                        var id39 = getPropertyUtil(engine, scope, "singersSource", 0, 39);
                         params38.push(id39);
                         config37.params = params38;
                         config37.fn = function (scope) {
@@ -9733,18 +10712,18 @@ KISSY.add('page/mods/xtpl/histroyTrackItem-xtpl',function (S, require, exports, 
                             config40.params = params41;
                             config40.fn = function (scope) {
                                 var buffer = "";
-                                buffer += ' ; ';
+                                buffer += ' / ';
                                 return buffer;
                             };
                             buffer += runBlockCommandUtil(engine, scope, config40, "if", 40);
-                            buffer += '<a href="http://www.xiami.com';
-                            var id43 = getPropertyOrRunCommandUtil(engine, scope, {}, "href", 0, 40);
+                            buffer += '<a href="/search/find/artist/';
+                            var id43 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 40);
                             buffer += renderOutputUtil(id43, true);
                             buffer += '" target="_blank" title="';
-                            var id44 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 40);
+                            var id44 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 40);
                             buffer += renderOutputUtil(id44, false);
                             buffer += '">';
-                            var id45 = getPropertyOrRunCommandUtil(engine, scope, {}, "name", 0, 40);
+                            var id45 = getPropertyOrRunCommandUtil(engine, scope, {}, "artistName", 0, 40);
                             buffer += renderOutputUtil(id45, false);
                             buffer += '</a>\n\t\t';
                             return buffer;
@@ -10200,6 +11179,7 @@ KISSY.add('page/mods/page',['node', 'event', 'io', './player/player-event'], fun
             },
             success : function(respones) {
 				self._deleteTrack(sid, 'track');
+				alert('已成功加入不喜欢列表~');
             },
             error : function() {
 				alert('添加失败！');

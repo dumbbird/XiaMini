@@ -31,75 +31,6 @@ function addGlobalStyle(css) {
 }
 
 
-// 定义CSS样式
-// addGlobalStyle('.player-info .track-info .track-controls #J_winopenPlay {' + // 弹窗图标CSS
-// '  top: 0px; right: -33px; position: absolute; cursor: pointer;' +
-// '}' +
-// '.icon-winopenPlay {' +
-// '  background-image: url("icon_openplay.png"); background-repeat: no-repeat;' +
-// '}' +
-// '.icon-winopenPlay {' +
-// '  background-position: 0px -277px; width: 18px; height: 18px;' +
-// '}' +
-// '.icon-winopenPlay:hover {' +
-// '  background-position: -28px -277px;' +
-// '}' +
-// '.track-play-menu {' + // 设置DIV+CSS
-// '  padding: 10px; border-radius: 4px; left: 300px; width: 140px; height: 60px; bottom: 26px; position: fixed; z-index: 1999; background-color: rgb(51, 51, 51);' +
-// '}' +
-// '.track-play-menu ul li {' +
-// '  height: 30px; line-height: 30px;' +
-// '}' +
-// '.track-play-menu ul li a {' +
-// '  border-radius: 4px; color: rgb(170, 170, 170); line-height: 30px; padding-left: 38px; text-decoration: none; display: block; position: relative;' +
-// '}' +
-// '.track-play-menu ul li a:hover {' +
-// '  background-color: rgb(68, 68, 68);' +
-// '}' +
-// '.track-play-menu ul li i {' +
-// '  left: 8px; top: 6px; width: 18px; height: 18px; position: absolute;' +
-// '}' +
-// '.track-play-menu .arrow {' +
-// '  left: -9px; width: 9px; height: 18px; bottom: 16px; position: absolute; background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAASCAYAAACJgPRIAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACLSURBVChThc4BDoIwDAVQONK6HUhRuQ4xRrksqP+PDsjWwU+arO3L0uYkrfd+0LeZVkSeQD/ti6yghgheCVioADnike8csHQff/hYgJXAaC1TNWeARdTj8c0X+4oHAT7QVGFEDOAdAxMqWYLBDVVAXW8JIXRYzIeIyaGOyzjnrrhzOkRMgtrWIyKXPykjhfjqVAPDAAAAAElFTkSuQmCC");' +
-// '}' +
-// '.ks-ie7 .track-play-menu .arrow {' +
-// '  background-image: url("http://gtms03.alicdn.com/tps/i3/T1ZNuzFrtaXXbeUgbb-9-18.png");' +
-// '}' +
-// '.icon-OldPlay {' + // 旧版播放器弹窗图标CSS
-// '  background-image: url("icon_openplay.png"); background-repeat: no-repeat;' +
-// '}' +
-// '.icon-OldPlay {' +
-// '  background-position: 0px -527px;' +
-// '}' +
-// '.icon-NewPlay {' + //新版播放器弹窗图标CSS
-// '  background-image: url("icon_openplay.png"); background-repeat: no-repeat;' +
-// '}' +
-// '.icon-NewPlay {' +
-// '  background-position: 0px -545px;' +
-// '}' +
-// '.icon-ListeningPlay {' + //直播间弹窗图标CSS
-// '  background-image: url("icon_openplay.png"); background-repeat: no-repeat;' +
-// '}' +
-// '.icon-ListeningPlay {' +
-// '  background-position: 0px -581px;' +
-// '}');
-
-
-// 将按钮元素添加到"更多"后面
-$('#J_trackMore') .after('<a id=J_winopenPlay class=icon-winopenPlay title=弹窗></a>');
-
-
-// 隐藏和显示div
-$('.icon-winopenPlay') .click(function (e) {
-    $('.track-play-menu') .toggle();
-});
-$('*') .click(function (event) {
-    if (event.target.className != 'icon-winopenPlay') {
-        $('.track-play-menu') .hide();
-    }
-});
-
-
 // 设置div属性及内容
 var str = window.location.href;
 var listening = /^http:\/\/www\.xiami\.com\/play\?uid=\d+$/.exec(str);
@@ -128,9 +59,9 @@ if (str == listening || str == golistening) {
     '<i class=icon-OldPlay></i>' +
     '旧版弹窗播放' +
     '</a></li><li>' +
-    '<a id=J_NewPlay onclick=NewPlay(); href=javascript:void(0)>' +
+    '<a id=J_NewPlay href=javascript:void(0)>' +
     '<i class=icon-NewPlay></i>' +
-    '新版弹窗播放' +
+    '取消' +
     '</a></li>' +
     '</ul>' +
     '<span class="arrow"></span>' +
@@ -141,7 +72,7 @@ if (str == listening || str == golistening) {
 
 // 设置div的left参数
 function divleft() {
-    var woPlayright = document.getElementById('J_winopenPlay') .getBoundingClientRect() .right;
+    var woPlayright = document.getElementById('J_trackMore') .getBoundingClientRect() .right;
     var J_trackPlayMenuleft = woPlayright + 12 + 'px';
     document.getElementById('J_trackPlayMenu') .style.left = J_trackPlayMenuleft;
 }
@@ -171,9 +102,10 @@ $(document) .ready(function () {
 });
 $(document) .ready(function () {
     $('#J_NewPlay') .click(function () {
-        window.open(str, '', 'scrollbars=0,toolbar=0,status=0,location=0,resizable=1,menubar=0,width=930,height=500');
-        window.open('', '_self', '');
-        window.close();
+		$('.track-play-menu') .hide();
+        // window.open(str, '', 'scrollbars=0,toolbar=0,status=0,location=0,resizable=1,menubar=0,width=930,height=500');
+        // window.open('', '_self', '');
+        // window.close();
     });
 });
 

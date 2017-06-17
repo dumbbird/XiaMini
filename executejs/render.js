@@ -1,5 +1,5 @@
 ﻿var CurrentUrl = window.location.href;
-
+		
 chrome.storage.sync.get(null, function (data) {
 	if (data.Mode == 'false')
 		removeXiaMini();
@@ -12,8 +12,9 @@ chrome.storage.sync.get(null, function (data) {
 			// }
 			
 		// render CSS's
-		if (/\/album/.test(CurrentUrl))
-			renderCSS_Album();
+		if (/\/album/.test(CurrentUrl)) {
+			renderCSS_Album();			
+		}
 		else {
 			switch (data.Mode) {
 				case "default":

@@ -214,17 +214,15 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-adminjs/albumedit.js
-adminjs/app.js
+
+#Xiamini
+adminjs/
+database-admin/
 background.js
-adminjs/xiami.js
-adminjs/netease.js
-*.crx
+crx/
 database/wormhole.json
 database/classical-schema.xml
 database/wormhole.bak.json
-adminjs/neteasecore.js
-adminjs/qqplayer.js
 manifest.json
 readme_pic/
 undone/

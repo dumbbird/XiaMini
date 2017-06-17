@@ -76,9 +76,12 @@ var clTracklistArr = function() {
 		//alert(workTitles);	alert(sectionTitles);	
 		//alert(workTrackIndex);
 		//var tracklist_html = $('.track_list').html();
-		var tracks = trackLists.eq(k).find('tr');
+		var tracks; // = trackLists.eq(k).find('tr');
 
-		var new_html = '';
+		var new_html = '<tbody>';
+		new_html += trackLists.eq(k).find("tr").eq(0).html();	
+		new_html += '</tbody>';	// +disc title
+		
 		var j;
 		var flag = 0;
 		for (j=0; j<workTrackIndex.length; j++) {
@@ -104,9 +107,10 @@ var clTracklistArr = function() {
 		var html_a,	// 存放chkbox, trackid的html 
 			html_b;	// 存放song_hot, song_hot_bar, song_act的html
 		var songtitle_html, replacee, workTitle;
-		for (i=0; i<tracks.length; i++) {
-			buffer = tracks.eq(i).html();
-			
+		for (i=0; i<trackTitles.length; i++) {
+			tracks = trackTitles.eq(i).parent().parent();
+			buffer = tracks.html();
+			//alert(buffer);
 			index = buffer.indexOf('<td class="song_name">');
 			html_a = buffer.substring(0, index);
 			index = buffer.indexOf('<td class="song_hot">');
@@ -136,7 +140,8 @@ var clTracklistArr = function() {
 				j++;
 			}
 			
-			songtitle_html = tracks.eq(i).find('.song_name').html();
+			songtitle_html = tracks.find('.song_name').html();
+			//alert(songtitle_html);
 			if (!flag && songtitle_html.indexOf(' - ') != -1) {
 				replacee = Re_title4(workTitles[i]+' - ');								
 			} else {

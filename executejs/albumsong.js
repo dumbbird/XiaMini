@@ -1,3 +1,8 @@
+/*
+version: 2.14
+log: fix songID code issue
+*/
+
 var loadTracklist = function () {
 	// 在单曲页面显示专辑里的其它曲目
 
@@ -12,26 +17,29 @@ var loadTracklist = function () {
 		else
 			return feat_artists;
 	}
-	
+
 	if (document.getElementById("album_song"))
 		return;
 
 	var CurrentUrl = window.location.href;
 	var ArtistItems = $('#albums_info tbody').find("tr").eq(1).find("a");
 	var Artist = ArtistItems.eq(0).text();
+
 	for (var i=1; i<ArtistItems.length; i++)
 		if (ArtistItems.eq(i).attr("href") != "http://i.xiami.com")
-			Artist += " / " + ArtistItems.eq(i).text();	
+			Artist += " / " + ArtistItems.eq(i).text();
 	Artist = Artist.replace("[", "(").replace("]", ")");
-	
+
 	if (CurrentUrl.indexOf("/song/") != -1) {
-		var arr = CurrentUrl.split("//");
-		var ReUrl = arr[1].match(/\d+/);
+		//var arr = CurrentUrl.split("//");
+		var ReUrl = $('#qrcode').find(".acts").text(); // get current songID
+
 		var AlbumUrl = $("#albumCover").attr("href");
 		var MaxShow = 6; // 初始最多显示数量+1
 
 		xhr(AlbumUrl, 'get', 1, "", function (AlbumHtml) {
 			var AllSongs = $(AlbumHtml).find(".song_name");
+			var AllSongIDs = $(AlbumHtml).find("#track .chkbox");
 			$(AllSongs).find("a.show_zhcn").remove(); // 去除歌曲注释信息
 			var AllSongsDo = $(AlbumHtml).find(".song_do");
 			$(AllSongsDo).find(".song_menu").remove(); // 去除more按钮
@@ -48,9 +56,9 @@ var loadTracklist = function () {
 			'<table cellspacing="0" cellpadding="0" class="track_list">';
 
 			for (var i = 0; i < SongsNum; i++) {
-				if (AllSongs.eq(i).html().indexOf(ReUrl) == -1) { //列表不包含当前页歌曲
-					SongID = $(AllSongs).eq(i).find("a").attr('href');
-					SongID = SongID.match(/\d+/); // 截取歌曲ID
+				if (AllSongIDs.eq(i).html().indexOf(ReUrl) == -1) { //列表不包含当前页歌曲
+					SongID = $(AllSongIDs).eq(i).find("input").attr('value');
+					//SongID = SongID.match(/\d+/); // 截取歌曲ID
 					AlbumSongs += '<tr>' +
 					'<input type="hidden" name="ids2" check="checked" value="' + SongID + '"/>' +
 					'<td class="song_name"><p class="as_trackname">';
@@ -60,12 +68,12 @@ var loadTracklist = function () {
 					'<div class="song_do clearfix" style="width:140px;">' +
 					AllSongsDo.eq(i).html() +
 					'</div></td></tr>';
-				} else 
+				} else
 					TrackNum = i+1;
 			}
 			if (AllSongs.length > SongsNum) { //超过部分添加
 				for (var i = SongsNum; i < AllSongs.length; i++) {
-					if (AllSongs.eq(i).html().indexOf(ReUrl) == -1) { //列表不包含当前页歌曲
+					if (AllSongIDs.eq(i).html().indexOf(ReUrl) == -1) { //列表不包含当前页歌曲
 						SongID = $(AllSongs).eq(i).find("a").attr('href');
 						SongID = SongID.match(/\d+/); // 截取歌曲ID
 						AlbumSongs += '<tr name="Al_songs_more">' + // 超过初始显示数量部分将不显示
@@ -78,10 +86,10 @@ var loadTracklist = function () {
 							AllSongsDo.eq(i).html() +
 							'</div></td></tr>'
 					} else
-						TrackNum = i+1;						
+						TrackNum = i+1;
 				}
 			}
-			
+
 			AlbumSongs += '</table></div></div>';
 			if (AllSongs.length > 1) { //只有一首的单曲不显示空列表
 				var textOverflow = '<style>'
@@ -89,20 +97,20 @@ var loadTracklist = function () {
 					 + 'p.as_trackname:hover {text-overflow:inherit; overflow:visible;}'
 					 + '</style>';
 				$('head').append(textOverflow);
-				$("#relate_song").before(AlbumSongs);					
+				$("#relate_song").before(AlbumSongs);
 			}
 			$('#lrc').attr("tracknum", TrackNum);
 			var lastTrack = $(AllSongs).eq(TrackNum-2).find("a").eq(0).text();
 			var nextTrack = $(AllSongs).eq(TrackNum).find("a").eq(0).text();
 			var lastArtist, nextArtist = Artist;
 			lastArtist = getFeatArtists(AllSongs, TrackNum-2);
-			nextArtist = getFeatArtists(AllSongs, TrackNum);			
-				
+			nextArtist = getFeatArtists(AllSongs, TrackNum);
+
 			$('#lrc').attr("last", lastTrack);
 			$('#lrc').attr("next", nextTrack);
 			$('#lrc').attr("lastA", lastArtist);
 			$('#lrc').attr("nextA", nextArtist);
-			
+
 			$("marquee[id^=Tmarquee_]").mouseover(function () {
 				var tmid = this.id.split("_")[1];
 				$("marquee#Tmarquee_" + tmid).attr('scrollamount', '2');
@@ -119,9 +127,9 @@ var loadTracklist = function () {
 				//if( x < x1 || x > x2 || y < y1 || y > y2) 	// 碰到元素内子元素也会触发mouseout事件，追加验证是否还在元素内
 				$("marquee#Tmarquee_" + tmid).attr('scrollamount', '0');
 				$("marquee#Tmarquee_" + tmid).attr('scrollLeft', $("marquee#Tmarquee_" + tmid).attr('width'));
-				
+
 			});
-			
+
 			function Isoverflow(str) {  //添加一个容器，通过丢入字符串后的元素相对高度判断是否换行即超长
 				if ($("td#hidediv").length <= 0) {
 					var hidediv = '<tr id="hidetr"><td id="hidediv" class="song_name"></td><td class="song_act"></td>';
@@ -131,7 +139,7 @@ var loadTracklist = function () {
 				$("td#hidediv").html(str);
 				return ($("td#hidediv").attr('offsetHeight') > 28);
 			};
-			
+
 			$("tr#hidetr").remove();
 			$("tr[name='Al_songs_more']").hide(); //隐藏超过部分
 			$("#al_show").css({

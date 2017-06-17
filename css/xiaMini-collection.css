@@ -1,31 +1,33 @@
 /* fonts */
 
-@font-face {   
-font-family: 'iconRegular';   
-src: url("icon.eot") ;    
-src: url("icon.eot#iefix")  format('embedded-opentype'),         
-url("icon.svg")  format('svg'),         
-url("icon.woff")  format('woff'),         
-url("icon.ttf")  format('truetype');	
-src: url("icon.eot") \9;    
-font-weight: normal;    
+@font-face {
+font-family: 'iconRegular';
+src: url("icon.eot") ;
+src: url("icon.eot#iefix")  format('embedded-opentype'),
+url("icon.svg")  format('svg'),
+url("icon.woff")  format('woff'),
+url("icon.ttf")  format('truetype');
+src: url("icon.eot") \9;
+font-weight: normal;
 font-style: normal;}
 
 /* main page */
 /*#slider,*/
-#recommend, 
-#albums,
+#login_mobile,
+.container #recommend,
+.container #albums,
 #pr_ad,
 #task,
 #pyramid,
 #friend,
 #scene,
+/*#group,*/
 #hsy,
 /*#hot_room,
 #listenMod,*/
 #sidebutton,
-#group,
 .primary #report,
+.secondary #report,
 #charts .extra,
 .athena-main-panel,
 .athena-playlist-panel,
@@ -42,20 +44,32 @@ font-style: normal;}
 #search_60d,
 #tip_60d,
 #qcode,
-#popup_music_taobao
+#popup_music_taobao,
+#down,
+#qrcode,
+.promotion-block
 {display:none  !important;}
 
 #timeline .action .new {border-color:#f60 !important; background-color:#f60 !important;}
 #timeline .action .new:hover{background-color:#f60 !important;}
 /*.primary .account a sup {background-color:#3399FF !important; border-color:white !important;}*/
+/*
+.listen-mod .item-cover .img {height: 120px !important}
+.listen-mod img {float:right; margin-right: 20px}
+.listen-mod .item-cover {padding-bottom: 20px}
+#group, #listenMod {margin-top:10px !important}
+#album {margin-top:30px !important}
+*/
+
+#user  {margin-top: 0px !important}
+#dialog_clt.dialog_popup {top: 203px !important}
 
 /* album and single page */
 
 .adm_block.mgt20,
 #song_fans_block,
 #hot_events_show,
-#artist_fangroup_block,
-#artist_recommend
+#artist_fangroup_block
 {display:none  !important;}
 li.do_share a span {display:block !important}
 li.do_share span {display:none}
@@ -64,30 +78,43 @@ li.do_share span {display:none}
 #wrapper div#title {padding: 20px 0 10px 30px !important;}
 .lrc_main {font-family: "Consolas", monospace;} /*Courier New*/
 
-
 .icon.mv {
 	background:url(http://www.xiami.com/images/group_photo/51/80651/27/1449205355_qINF.png) no-repeat !important;
-	width: 30px;
-	height: 14px;
+	width: 28px !important;
+	height: 14px !important;
 	text-indent:-9999px;
 	font: inherit !important;
 	border-radius: inherit !important;
-	margin-left: 3px;
+	margin-left: 5px;
 }
 
+b.identities {
+	background-image: url(http://www.xiami.com/images/group_photo/51/80651/27/1462767021_ibG7.png) !important;
+	width: 40px !important;
+	height: 14px !important;
+	margin-left: 5px !important;
+}
+
+#relate_song .icon.mv, #relate_song b.identities {display: none;}
+
+.comments_wall .post_item .brief img
+{height: 20px}
+.usr_cover a img
+{height: 50px !important}
+
 /* Single Page Case 1 */
-#song_block .album_relation 
+#song_block .album_relation
 {float: left !important;
 position: relative;
 width: 100% !important;
-padding-top: 9px !important; 
+padding-top: 9px !important;
 }
 
 /* table#albums_info {float: right !important; position: relative !important; margin: -180px 250px 0 5px !important}*/
 /* table#albums_info {font-size:12.5px !important} */
 table#albums_info div {width:600px !important}
 table#albums_info .item {width:70px !important}
- 
+
 #song_contents
 {float: right !important;
 position: relative !important;
@@ -117,23 +144,23 @@ right: 10px !important}
 .ui-album-cover {position:fixed; left: -5px}
 .ui-album-sale {position:fixed !important; bottom: 130px !important; left: 10px !important}
 /*.collect-list, #J_collectScrollView .ks-scrollbar {visibility: hidden} */
-.collect-list {top:390px !important}
+.collect-list {top:390px !important; height: 100px !important}
 .main-outher {width: 340px ; padding-right: 5px !important}
 .menu-outer {border-top: 1px solid #ccc; margin-top:220px}
 .seiya-chatroom {min-width:30px !important; right:350px !important}
 .seiya-chatroom .col-main {right: 0px !important}
 .ui-player-lrc {top: 45px !important; width: 340px }
-/*
-.ui-lrc-line {
-text-align: center;
-line-height: 22px !important;
-padding: 3px 10px !important;}
+.ui-row-item .c1 {width:40% !important}
+.ui-row-item .c2 {width:20% !important}
+.ui-row-item .c3 {width:38% !important}
+.ui-track-main {height: 100% !important}
+.player-info .track-info .player-track-info {padding-right:130px !important}
+.player-info .track-info .track-controls {width: 120px !important}
+#J_trackMoreMenu {height: 150px !important}
+/*#J_playerWrap {padding-right: 278px !important}*/
+/*.player-volume {width: 180px !important}*/
 
-.ui-trans-line{
-display:none;
-text-align: center;
-line-height: 0px !important;
-padding: 0px 10px !important;}*/
+/* ////////////////////////// player - t-LRC /////////////////// */
 
 .ui-trans-current{color:#f60 !important;
 webkit-transition-property: color !important;
@@ -152,8 +179,10 @@ transition-duration: .1s !important;
 -ms-transition-timing-function: ease-in !important;
 transition-timing-function: ease-in !important;}
 
+/* ////////////////////////// player - wormhole and buttons /////////////////// */
+
 .icon-wormhole {
-	font-family: "iconRegular" !important;
+	font-family: "iconRegular";
 	display: inline-block;
 	-webkit-font-smoothing: antialiased;
 	font-size: 20px;
@@ -163,7 +192,7 @@ transition-timing-function: ease-in !important;}
 }
 
 .icon-wormhole-bottom {
-	font-family: "iconRegular" !important;
+	font-family: "iconRegular";
 	display: inline-block;
 	-webkit-font-smoothing: antialiased;
 	font-size: 20px;
@@ -177,7 +206,7 @@ span.icon-dislike{
 	height: 20px;
 	position: absolute;
 	left: 8px;
-	font-family: "iconRegular" !important;
+	font-family: "iconRegular";
 	display: inline-block;
 	-webkit-font-smoothing: antialiased;
 	font-size: 20px;
@@ -190,17 +219,81 @@ background-repeat: no-repeat;
 background-position: -68px -201px;
 }
 
-#J_trackMoreMenu {height: 120px !important}
+span.icon-lrc{
+	font-size: 22px;
+	width: 20px;
+	height: 20px;
+	font-family: "iconRegular";
+	display: inline-block;
+	-webkit-font-smoothing: antialiased;
+	cursor: pointer; text-decoration: none;
+	position:relative; top:2px;
+}
+span.icon-lrc:hover{color: lightgray}
 
+.player-info .track-info .track-controls #J_winopenPlay {
+	top: 0px; right: -33px; position: absolute; cursor: pointer;}
+.icon-winopenPlay {
+	background-image: url("icon_openplay.png");
+	background-position: -28px -277px;
+	background-repeat: no-repeat;}
+.icon-winopenPlay:hover {
+background-position: 0px -277px;}
+
+.track-play-menu {
+ padding: 10px; border-radius: 4px;
+ left: 300px; width: 140px; height: 60px;
+ bottom: 26px; position: fixed; z-index: 1999;
+ background-color: rgb(51, 51, 51);
+}
+
+.track-play-menu ul li {
+  height: 30px; line-height: 30px;
+}
+.track-play-menu ul li a {
+  border-radius: 4px; color: rgb(170, 170, 170); line-height: 30px; padding-left: 38px;
+  text-decoration: none; display: block; position: relative;
+}
+.track-play-menu ul li a:hover {
+  background-color: rgb(68, 68, 68);
+}
+
+.track-play-menu ul li i {
+  left: 8px; top: 6px; width: 18px; height: 18px; position: absolute;
+}
+.track-play-menu .arrow {
+  left: -9px; width: 9px; height: 18px; bottom: 16px; position: absolute;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAASCAYAAACJgPRIAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACLSURBVChThc4BDoIwDAVQONK6HUhRuQ4xRrksqP+PDsjWwU+arO3L0uYkrfd+0LeZVkSeQD/ti6yghgheCVioADnike8csHQff/hYgJXAaC1TNWeARdTj8c0X+4oHAT7QVGFEDOAdAxMqWYLBDVVAXW8JIXRYzIeIyaGOyzjnrrhzOkRMgtrWIyKXPykjhfjqVAPDAAAAAElFTkSuQmCC");
+}
+.ks-ie7 .track-play-menu .arrow {
+  background-image: url("http://gtms03.alicdn.com/tps/i3/T1ZNuzFrtaXXbeUgbb-9-18.png");
+}
+.icon-OldPlay {
+  background-image: url("icon_openplay.png"); background-repeat: no-repeat;
+}
+.icon-OldPlay {
+  background-position: 0px -527px;
+}
+.icon-NewPlay {
+  background-image: url("icon_openplay.png"); background-repeat: no-repeat;
+}
+.icon-NewPlay {
+  background-position: 0px -545px;
+}
+.icon-ListeningPlay {
+  background-image: url("icon_openplay.png"); background-repeat: no-repeat;
+}
+.icon-ListeningPlay {
+  background-position: 0px -581px;
+}
+
+/* ////////////////////////// player - lyrics control/////////////////// */
 #lyrics_control {
 margin: 5px 0px;
 text-align:center;
 width: 100%;
 position: relative;
 }
-
-#lrc_trans {color:#f60;}
-
 #lyrics_control a {
 font-family: "iconRegular" !important;
 display: inline-block;
@@ -208,11 +301,25 @@ display: inline-block;
 font-size: 15px;
 color:lightgray; cursor: pointer; margin: 10px; text-decoration: none}
 
+#lrc_fullscreen:hover, #lrc_wikia:hover, #lrc_fullscreen:hover, #lrc_report:hover, #comments:hover {
+font-family: "iconRegular" !important;
+display: inline-block;
+-webkit-font-smoothing: antialiased;
+color:#f60; cursor: pointer; margin: 10px; text-decoration: none}
+
+#lrc_trans.tlrc {color:#f60;}
+#lrc_trans.lrc {color:#819FF7;}
+
+#lrc_wikia.wiki {color:#f60;}
+/*#lrc_wikia.wiki:hover{color:lightgray;}*/
+#comments.loading {color:#f60;}
+#comments.loading:hover{color:lightgray;}
+
 #J_walllist {
 	width: 100%;
 }
-#J_walllistView {	
-	height: 100%;	
+#J_walllistView {
+	height: 100%;
 }
 #J_walllist .cmt_item {
     padding-bottom: 20px;
@@ -244,78 +351,6 @@ color:lightgray; cursor: pointer; margin: 10px; text-decoration: none}
     word-break: break-all;
     word-wrap: break-word;
     overflow: hidden;
-}
-
-/*
-#lrc_trans:hover  {
-font-family: "iconRegular" !important;
-display: inline-block;
--webkit-font-smoothing: antialiased;
-color:green; cursor: pointer; margin: 10px; text-decoration: none}
-*/
-#lrc_wikia:hover, #lrc_fullscreen:hover, #lrc_report:hover {
-font-family: "iconRegular" !important;
-display: inline-block;
--webkit-font-smoothing: antialiased;
-color:#f60; cursor: pointer; margin: 10px; text-decoration: none}
-
-.player-info .track-info .track-controls #J_winopenPlay {
-	top: 0px; right: -33px; position: absolute; cursor: pointer;}
-.icon-winopenPlay { 
-	background-image: url("icon_openplay.png"); 
-	background-repeat: no-repeat;}
-	
-.icon-winopenPlay {
-background-position: 0px -277px; width: 18px; height: 18px;}
-
-.icon-winopenPlay:hover {
-background-position: -28px -277px;}
-
-.track-play-menu {
- padding: 10px; border-radius: 4px; 
- left: 300px; width: 140px; height: 60px; 
- bottom: 26px; position: fixed; z-index: 1999; 
- background-color: rgb(51, 51, 51);
-}
-
-.track-play-menu ul li {
-  height: 30px; line-height: 30px;
-}
-.track-play-menu ul li a {
-  border-radius: 4px; color: rgb(170, 170, 170); line-height: 30px; padding-left: 38px; 
-  text-decoration: none; display: block; position: relative;
-}
-.track-play-menu ul li a:hover {
-  background-color: rgb(68, 68, 68);
-}
-
-'.track-play-menu ul li i {
-  left: 8px; top: 6px; width: 18px; height: 18px; position: absolute;
-}
-.track-play-menu .arrow {
-  left: -9px; width: 9px; height: 18px; bottom: 16px; position: absolute; 
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAASCAYAAACJgPRIAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACLSURBVChThc4BDoIwDAVQONK6HUhRuQ4xRrksqP+PDsjWwU+arO3L0uYkrfd+0LeZVkSeQD/ti6yghgheCVioADnike8csHQff/hYgJXAaC1TNWeARdTj8c0X+4oHAT7QVGFEDOAdAxMqWYLBDVVAXW8JIXRYzIeIyaGOyzjnrrhzOkRMgtrWIyKXPykjhfjqVAPDAAAAAElFTkSuQmCC");
-}
-.ks-ie7 .track-play-menu .arrow {
-  background-image: url("http://gtms03.alicdn.com/tps/i3/T1ZNuzFrtaXXbeUgbb-9-18.png");
-}
-.icon-OldPlay { 
-  background-image: url("icon_openplay.png"); background-repeat: no-repeat;
-}
-.icon-OldPlay {
-  background-position: 0px -527px;
-}
-.icon-NewPlay { 
-  background-image: url("icon_openplay.png"); background-repeat: no-repeat;
-}
-.icon-NewPlay {
-  background-position: 0px -545px;
-}
-.icon-ListeningPlay { 
-  background-image: url("icon_openplay.png"); background-repeat: no-repeat;
-}
-.icon-ListeningPlay {
-  background-position: 0px -581px;
 }
 
 /* Lyrics Edit Page */
@@ -359,9 +394,9 @@ border-bottom: 1px #f0f0f0 solid;
 }
 
 .mv_item_side .name {
-overflow:hidden; 
-white-space:nowrap; 
-text-overflow: ellipsis; 
+overflow:hidden;
+white-space:nowrap;
+text-overflow: ellipsis;
 }
 
 td.song_name {width: 300px !important; word-break: break-word !important}
@@ -371,6 +406,9 @@ td.song_name {width: 300px !important; word-break: break-word !important}
 .Qsong_item .s_info p {min-width:50px}
 .Qsong_item .s_info {height: inherit !important}
 
+/* Comment page */
+#album_comment .brief img {width: 100% !important}
+
 /* Responsive */
 @media screen and (min-device-width: 1400px) {
 	#header .wrapper, #main .wrapper, #wrapper {max-width: 1200px !important}
@@ -378,7 +416,7 @@ td.song_name {width: 300px !important; word-break: break-word !important}
 	#main .wrapper .section {margin-right:-372px !important}
 	#main .wrapper .section .container {margin-right:372px !important}
 	#main .wrapper .sidebar {width: 332px !important}
-	#albums .view {/*max-width: 840px !important;*/ margin: 15px auto;}	
+	#albums .view {/*max-width: 840px !important;*/ margin: 15px auto;}
 	#slider {margin: 15px auto !important}
 	#relate_collect ul li {margin-right: 20px !important; margin-left: 20px !important}
 	/*.albumBlock_list {padding: 5px 20px 0 40px !important}*/

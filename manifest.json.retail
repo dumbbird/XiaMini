@@ -4,7 +4,7 @@
   "manifest_version": 2,
   "name": "Xiamini 2016 虾米你 2016",
   "description": "4-6维虫洞穿越 / 虾米网首页动态优化 / 播放器优化 / 歌词维基优化 / 320K专门店音质检测结果显示 / 古典音乐资料优化显示",
-  "version": "2.10",
+  "version": "2.13.1",
   "icons": { "16": "xiami.png",
            "48": "xiami.png",
           "128": "xiami.png" },
