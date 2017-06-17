@@ -1,0 +1,4 @@
+#J_mainWrap {padding-right: 10px !important}
+#J_lrcWrap {width:0px !important}
+#J_albumSale, #J_lyricScrollWrap, #lyrics_control, #J_walllist {display:none !important; z-index:-1 !important}
+.icon-lrc {color:#BDC3C7;}

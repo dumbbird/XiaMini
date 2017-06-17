@@ -1,0 +1,73 @@
+@font-face {
+	font-family: test;
+	src: local("STZhongsong"), local("ST Zhongsong"), local("Songti SC"), local("STSong"), local("ST Song");
+	unicode-range: U+2E80-2FDF, U+3400-4DBF, U+4E00-9FFF, U+3040-312F, U+31A0-31BF, U+FF00-FFEF;
+}
+@font-face {
+	font-family: test;
+	src: local("Batang"), local("STFangsong"), local("ST Fangsong"), local("FangSong"), local(Arial);
+	unicode-range: U+1100-11FF, U+3130-318F, U+AC00-D7AF;
+}
+@font-face {
+	font-family: test;
+	src: local(Book Antiqua), local(Palatino), local(Didot), local(Georgia);
+	unicode-range: U+00-024F;
+}
+
+@font-face {
+	font-family: trans;
+	src: local("STFangsong"), local("ST Fangsong"), local("FangSong"), local(Arial);
+	unicode-range: U+2E80-2FDF, U+3400-4DBF, U+4E00-9FFF, U+3040-312F, U+31A0-31BF, U+FF00-FFEF;
+}
+@font-face {
+	font-family: trans;
+	src: local(Big Caslon), local(Book Antiqua), local(Palatino), local(Didot), local(Georgia);
+	unicode-range: U+00-024F;
+}
+
+.ui-player-lrc ul {padding: 1000px 10px !important}
+
+.ui-lrc-line {
+	line-height: 70px !important;
+	/*color: #f60 !important;*/
+	text-shadow: 0 0 10px lightgray;
+	font-family: "Big Caslon", test !important;
+	}
+.ui-trans-line {
+	line-height: 60px !important;
+	color: #f60 !important;
+	text-shadow: 0 0 10px #f60;
+	font-family: trans !important;
+	font-size: 90% !important
+	}
+
+.ui-player-lrc ul .ui-lrc-current,
+.ui-player-lrc ul .ui-trans-current {
+	opacity: 1; transition: all 0.4s ease !important;
+	/*text-shadow: 0.5px 0 0 lightgray;*/
+	/*background-color: rgba(255,255,255,0.7);*/
+				}
+
+li.ui-lrc-line:not(.ui-lrc-current),
+li.ui-trans-line:not(.ui-trans-current) {
+/*visibility: hidden; */
+opacity: 0; transition: all 0.4s ease !important;}
+
+#J_albumCover,
+.no-lrc,
+.seiya-enter
+{display: none !important}
+
+#bottom {z-index: 6 !important}
+#J_playerCover {width: 1% !important}
+#J_lyricScrollWrap {width: 100%; left: 0%}
+#J_lrcWrap {margin-top: -40px; padding-right: 0; z-index: 6 !important; width: 100% !important}
+#lyrics_control {text-shadow: 0px 1px 0px gray !important; font-weight: bold}
+#J_playerLrc {font-size: 401% !important}
+#J_walllistView {margin-top: 20px}
+#J_walllist .cmt_item .info, #J_walllist .cmt_item .brief {font-size: 15px !important;}
+#J_walllist .cmt_item .info {height: 40px !important; line-height:40px !important;}
+#lrc_fullscreen, #J_hideLrc{color:#f60 !important}
+#lrc_fullscreen:hover{color:lightgray !important}
+#J_hideLrc:hover{color:#fff !important}
+span.icon-lrc{font-family: inherit !important; top: 0px !important; font-weight:bold}
