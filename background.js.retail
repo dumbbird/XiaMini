@@ -1,7 +1,9 @@
 
 var updateTab = function(tab) {
 	//alert ("update!");
-	if (!/http(.+)xiami\.com/.test(tab.url)) return;		
+	if (!/http(.+)xiami\.com/.test(tab.url)) return;	
+	if(/admin\.xiami\.com/.test(tab.url))	return;
+	
 	chrome.tabs.executeScript(tab.id, {
 		file : "executejs/render.js",
 		runAt: "document_start"
@@ -17,14 +19,14 @@ var updateAfterComplete = function(tab) {
 			if (/play?/.test(tab.url)) {
 				chrome.tabs.executeScript(tab.id, {
 					file : "executejs/lyricscontrol.js",
-					runAt: "document_idle"
+					runAt: "document_start"
 				}, function() {});	
 			}
 			// render JS in group page
 			if (/thread\-/.test(tab.url)) 
 				chrome.tabs.executeScript(tab.id, {
 					file : "executejs/hidereply.js",
-					runAt: "document_end"
+					runAt: "document_start"
 				}, function() {});
 			
 			// render 320k notes, wormholes in album page
@@ -93,7 +95,8 @@ chrome.webRequest.onBeforeRequest.addListener(
     },
     {
         urls: [
-            "http://g.tbcdn.cn/de/music-player/*min.js",
+            "http://g.alicdn.com/de/music-player/*min.js", 
+	    "http://g.alicdn.com/music/music-player/*min.js"
         ],
         types: ["script"]
     },
