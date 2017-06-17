@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿xiaMini 虾米你
 =======
 
@@ -25,3 +26,11 @@ Xiamini 特别为您补充了跳页功能，看帖、翻评论、查找资料更
 Xiamini 联合 320K专门店以及一切为了高品质小组，对音质码率进行显示，让您放心下载虾米资源！
 
 ![320K专门店音质检测结果显示](readme_pic/320k.jpg "320K专门店音质检测结果显示")
+=======
+﻿xiaMini 虾米你
+=======
+
+意见反馈：[虾米](http://www.xiami.com/group/thread-detail/tid/898395) , [微博](http://weibo.com/musicunited)
+
+
+>>>>>>> c0e915dab60773afd5ec6941ad02db9b216bdb64
